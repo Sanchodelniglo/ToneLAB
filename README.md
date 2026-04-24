@@ -1,139 +1,83 @@
-# ToneLab Synthesizer
+# ToneLab
 
-Advanced Web Synthesizer built with Tone.js featuring a retro-futuristic cyberpunk design.
+Interactive Sound Explorer -- turn knobs, twist parameters, and explore how synthesizers shape sound.
 
-## 🎹 Features
+## Features
 
-- **10 Synthesizer Types**: Synth, AM Synth, FM Synth, Membrane Synth, Metal Synth, Mono Synth, Noise Synth, Pluck Synth, Poly Synth, Duo Synth
-- **38+ Waveforms**: sine, square, triangle, sawtooth, pulse, pwm, and numbered variants (sine2-8, square2-8, etc.)
-- **Effects Chain**: Reverb, Delay, Distortion, Filter, Chorus
-- **Computer Keyboard Support**: Play with QWERTY, AZERTY, QWERTZ, or Dvorak layouts
-- **Octave Shifting**: 0-8 octave range controlled by arrow keys
-- **PWA Support**: Install as a standalone app, works offline
-- **Responsive Design**: Works on desktop and mobile devices
+- **10 Synthesizer Types** with descriptions: Synth, AM, FM, Membrane, Metal, Mono, Noise, Pluck, Poly, Duo
+- **Presets**: 3-4 per synth type, each with tuned parameters, octave, and effects
+- **SVG Rotary Knobs**: Drag up/down to adjust, double-click to reset to default
+- **Master Volume** control
+- **Effects Chain**: Reverb, Delay, Distortion, Filter, Chorus -- all integrated with presets
+- **2-Octave Keyboard**: QWERTY, AZERTY (with dead key support), QWERTZ, Dvorak
+- **Note Notation**: Switch between American (A B C) and Solfege (Do Re Mi)
+- **CRT Screen Effects**: Scanlines, RGB phosphors, chromatic aberration, vignette, flicker, animated static
+- **PWA**: Install as a standalone app, works offline
 
-## 📁 Project Structure
+## Controls
 
-```
-tonelab/
-├── index.html          # Main HTML file
-├── styles.css          # All CSS styling
-├── script.js           # JavaScript logic
-├── manifest.json       # PWA manifest
-├── service-worker.js   # Service worker for offline support
-└── README.md           # This file
-```
+### Keyboard
+- Play notes with your computer keyboard (2 octaves mapped)
+- Arrow keys to shift octaves
+- Layout auto-detected, switchable in the keyboard panel
 
-## 🚀 Installation & Usage
+### Knobs
+- **Drag up/down** to change value
+- **Double-click** to reset to default
+- Presets set all knobs + octave + effects at once
 
-### Option 1: Local Development
-1. Download all files to a folder
-2. Open `index.html` in a modern web browser
-3. Click anywhere to start the audio context
+### Presets
+Click a preset button to instantly configure the synth, effects, and octave for that sound. Examples: Acid Bass, Electric Piano, Hi-Hat, Dreamy Pad, Sci-Fi Laser...
 
-### Option 2: Web Server (Recommended for PWA features)
-1. Host all files on a web server (HTTPS required for PWA)
-2. Visit the URL in your browser
-3. Click the "📱 Install App" button to install as a PWA
+## Tech Stack
 
-### Option 3: Simple Python Server
+- **Tone.js 14.8.49** -- Web Audio synthesis
+- **Vanilla JS** -- No frameworks
+- **CSS3** -- CRT effects, SVG knobs, responsive grid
+- **PWA** -- Service worker, offline support, installable
+- **Fonts** -- Orbitron (logo), Share Tech Mono (UI), Inter (descriptions)
+
+## Deploy
+
+Static site, no build step:
+
 ```bash
-python -m http.server 8000
-# Then visit http://localhost:8000
+npx wrangler pages deploy . --project-name=tonelab
 ```
 
-## 🎮 Controls
+Or connect the repo to Cloudflare Pages with output directory `/`.
 
-### Keyboard Playing
-- **A W S E D F T G Y H U J K** (QWERTY) - Play notes
-- **←/→ Arrow Keys** - Change octaves
-- Keys are automatically mapped to your selected keyboard layout
+## CRT Effect Stack
 
-### Mouse/Touch
-- Click piano keys to play notes
-- Adjust sliders to modify parameters
-- Select different instruments and waveforms from dropdowns
+| Layer | Technique |
+|-------|-----------|
+| Scanlines + RGB | `body::before` -- alternating gradient lines + RGB phosphor columns |
+| Vignette | `body::after` -- radial gradient darkening edges |
+| Flicker | `.crt-flicker` div -- rapid opacity animation (0.10s cycle) |
+| Static snow | `#crtStatic` canvas -- 512x512 random pixels at 60fps, pauses on hidden tab |
+| Chromatic aberration | 3 keyframe animations (text/box/knob) with staggered delays |
+| Screen frame | `.crt-screen` wrapper -- inset shadows + outer glow |
 
-### Parameters
-Each synthesizer has unique parameters:
-- **Envelope**: Attack, Decay, Sustain, Release
-- **Oscillator**: Waveform type selection
-- **Modulation**: Harmonicity, modulation index (AM/FM synths)
-- **Filter**: Cutoff frequency, Q factor (MonoSynth)
-- And many more instrument-specific controls
+Reference: [Alec Lownes - CRT Display](https://aleclownes.com/2017/02/01/crt-display.html)
 
-### Effects
-Global effects can be adjusted in real-time:
-- **Reverb**: Room ambience
-- **Delay**: Echo effect with time and feedback
-- **Distortion**: Overdrive/saturation
-- **Filter**: Frequency cutoff
-- **Chorus**: Modulation effect
+## Project Structure
 
-## 🎨 Design Theme
-
-Retro-futuristic cyberpunk aesthetic featuring:
-- Neon cyan (#00f0ff) and magenta (#ff00aa) accents
-- Dark translucent panels with glow effects
-- Orbitron font for headers
-- Share Tech Mono for body text
-- Smooth animations and hover effects
-
-## 🛠️ Technical Stack
-
-- **Tone.js 14.8.49**: Web Audio synthesis library
-- **Vanilla JavaScript**: No frameworks required
-- **CSS3**: Modern features (gradients, backdrop-filter, animations)
-- **PWA**: Progressive Web App with service worker
-- **LocalStorage**: Saves keyboard layout preference
-
-## 📱 PWA Features
-
-- **Installable**: Add to home screen on mobile/desktop
-- **Offline**: Works without internet after first load
-- **Standalone**: Opens in its own window
-- **Fast**: Cached resources for instant loading
-
-## 🔧 Customization
-
-### Changing Colors
-Edit CSS variables in `styles.css`:
-```css
-:root {
-    --bg-primary: #0a0e27;
-    --accent-cyan: #00f0ff;
-    --accent-magenta: #ff00aa;
-    /* ... */
-}
+```
+ToneLAB/
+  index.html          Main HTML with CRT overlays
+  script.js           Synth engine, knobs, presets, keyboard, static noise
+  styles.css          CRT effects, knob layout, responsive design
+  manifest.json       PWA manifest
+  service-worker.js   Offline caching
+  icons/              App icons (192px, 512px)
 ```
 
-### Adding Instruments
-1. Add option to instrument selector in `index.html`
-2. Add configuration in `getSynthConfig()` in `script.js`
-3. Add controls in `controlSets` object in `script.js`
+## License
 
-### Modifying Effects
-Edit effect initialization in `initEffects()` function in `script.js`
+MIT
 
-## 🌐 Browser Compatibility
+## Credits
 
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Android)
-
-Requires Web Audio API support.
-
-## 📄 License
-
-Feel free to use and modify for personal or commercial projects.
-
-## 🙏 Credits
-
-- Built with [Tone.js](https://tonejs.github.io/)
-- Fonts from [Google Fonts](https://fonts.google.com/)
-- Design inspired by retro-futuristic synthesizers
-
----
-
-Made with ❤️ and ☕ | Enjoy making music! 🎵
+- [Tone.js](https://tonejs.github.io/)
+- [Google Fonts](https://fonts.google.com/)
+- CRT effect inspired by [Alec Lownes](https://aleclownes.com/2017/02/01/crt-display.html)

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneLab Synthesizer</title>
+    <title>ToneLab — Interactive Sound Explorer</title>
 
     <!-- PWA Meta Tags -->
-    <meta name="description" content="Advanced Web Synthesizer with Tone.js - Create music with multiple instruments, effects, and waveforms">
+    <meta name="description" content="Turn knobs, twist parameters, and explore how synthesizers shape sound. An interactive playground to experiment with waveforms, filters, and effects.">
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Inter:wght@400&display=swap">
 
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -31,6 +31,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" defer></script>
 </head>
 <body>
+    <canvas id="crtStatic" aria-hidden="true"></canvas>
+<div class="crt-screen">
     <a href="#keyboard" class="skip-link">Skip to keyboard</a>
 
     <!-- Audio activation overlay -->
@@ -50,7 +52,7 @@
     <div class="container">
         <header>
             <h1>ToneLab</h1>
-            <p class="subtitle">Advanced Web Synthesizer</p>
+            <p class="subtitle">Interactive Sound Explorer</p>
             <button id="installBtn" style="display: none; margin-top: 1rem;">Install App</button>
         </header>
 
@@ -75,6 +77,10 @@
                     </div>
                 </div>
 
+                <p class="synth-description" id="synthDescription" aria-live="polite"></p>
+
+                <div class="preset-bar" id="presetBar" role="group" aria-label="Presets"></div>
+
                 <div id="controls" class="controls-grid" role="group" aria-labelledby="instrumentHeading"></div>
             </div>
 
@@ -83,13 +89,20 @@
                     <h2 class="panel-title" id="effectsHeading">Effects</h2>
                 </div>
                 <div class="effect-controls" role="group" aria-labelledby="effectsHeading">
+                    <div class="control-group control-group--volume">
+                        <div class="control-label">
+                            <label for="masterVolume">Volume</label>
+                            <span class="control-value" id="masterVolumeValue">75%</span>
+                        </div>
+                        <input type="range" id="masterVolume" min="0" max="100" step="1" value="75" data-default-value="75">
+                    </div>
                     <div class="control-group">
                         <div class="control-label">
                             <label for="reverb">Reverb</label>
                             <span class="control-value" id="reverbValue">0.3</span>
                         </div>
                         <p class="control-hint">Simulates room space &mdash; higher = bigger room, more echo</p>
-                        <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3">
+                        <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
                     </div>
                     <div class="control-group">
                         <div class="control-label">
@@ -97,7 +110,7 @@
                             <span class="control-value" id="delayTimeValue">0.25s</span>
                         </div>
                         <p class="control-hint">Time between each echo repeat</p>
-                        <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25">
+                        <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25" data-default-value="0.25">
                     </div>
                     <div class="control-group">
                         <div class="control-label">
@@ -105,7 +118,7 @@
                             <span class="control-value" id="delayFeedbackValue">0.3</span>
                         </div>
                         <p class="control-hint">How many times the echo repeats &mdash; higher = more echoes</p>
-                        <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3">
+                        <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3" data-default-value="0.3">
                     </div>
                     <div class="control-group">
                         <div class="control-label">
@@ -113,7 +126,7 @@
                             <span class="control-value" id="distortionValue">0</span>
                         </div>
                         <p class="control-hint">Adds grit and crunch to the sound &mdash; from subtle warmth to heavy fuzz</p>
-                        <input type="range" id="distortion" min="0" max="1" step="0.01" value="0">
+                        <input type="range" id="distortion" min="0" max="1" step="0.01" value="0" data-default-value="0">
                     </div>
                     <div class="control-group">
                         <div class="control-label">
@@ -121,7 +134,7 @@
                             <span class="control-value" id="filterFreqValue">5000 Hz</span>
                         </div>
                         <p class="control-hint">Cuts frequencies above this point &mdash; low = dark and muffled, high = bright and open</p>
-                        <input type="range" id="filterFreq" min="100" max="10000" step="10" value="5000">
+                        <input type="range" id="filterFreq" min="100" max="10000" step="10" value="5000" data-default-value="5000">
                     </div>
                     <div class="control-group">
                         <div class="control-label">
@@ -129,7 +142,7 @@
                             <span class="control-value" id="chorusRateValue">1.5 Hz</span>
                         </div>
                         <p class="control-hint">Speed of the chorus shimmer effect &mdash; makes the sound wider and richer</p>
-                        <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5">
+                        <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5" data-default-value="1.5">
                     </div>
                 </div>
             </div>
@@ -146,6 +159,13 @@
                                     <option value="azerty">AZERTY</option>
                                     <option value="qwertz">QWERTZ</option>
                                     <option value="dvorak">Dvorak</option>
+                                </select>
+                            </div>
+                            <div class="instrument-select">
+                                <label for="noteNotation">Notes:</label>
+                                <select id="noteNotation">
+                                    <option value="english">American</option>
+                                    <option value="solfege">Solfege</option>
                                 </select>
                             </div>
                             <div class="octave-controls">
@@ -173,6 +193,8 @@
             </div>
         </main>
     </div>
+
+    </div><!-- .crt-screen -->
 
     <!-- External JavaScript -->
     <script src="script.js" defer></script>

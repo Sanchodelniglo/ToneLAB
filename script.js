@@ -1,21 +1,76 @@
+// CRT static snow — pauses when tab is hidden
+(function() {
+    const canvas = document.getElementById('crtStatic');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = 512;
+    const H = 512;
+    canvas.width = W;
+    canvas.height = H;
+    const imageData = ctx.createImageData(W, H);
+    const data = imageData.data;
+    let rafId = null;
+
+    function renderStatic() {
+        for (let i = 0; i < data.length; i += 4) {
+            const v = Math.random() * 255 | 0;
+            data[i] = v;
+            data[i + 1] = v;
+            data[i + 2] = v;
+            data[i + 3] = 255;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        rafId = requestAnimationFrame(renderStatic);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        } else if (!rafId) {
+            renderStatic();
+        }
+    });
+
+    renderStatic();
+})();
+
 // Initialize audio context
 let synth = null;
 let reverb, delay, distortion, filter, chorus;
 let currentInstrumentType = 'Synth';
 let currentOctave = 4;
 let minOctave = 0;
-let maxOctave = 8;
+let maxOctave = 7;
 let activeKeys = new Set();
 let userLayout = 'qwerty';
+let noteNotation = localStorage.getItem('noteNotation') || 'english';
 let audioInitialized = false;
 
-// Keyboard layouts
+// Keyboard layouts — 2 octaves (25 notes: C to C)
+// Bottom row = octave 1, top row = octave 2
 const keyboardLayouts = {
-    qwerty: ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j', 'k'],
-    azerty: ['q', 'z', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j', 'k'],
-    qwertz: ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'z', 'h', 'u', 'j', 'k'],
-    dvorak: ['a', ',', 'o', 'e', '.', 'u', 'k', 'i', 'x', 'd', 'b', 'h', 'n']
+    qwerty: ['a','w','s','e','d','f','t','g','y','h','u','j','k','o','l','p',';','\'','[',']'],
+    azerty: ['q','z','s','e','d','f','t','g','y','h','u','j','k','o','l','p','m','ù','^','$'],
+    qwertz: ['a','w','s','e','d','f','t','g','z','h','u','j','k','o','l','p','ö','ä','ü','+'],
+    dvorak: ['a',',','o','e','.','u','k','i','x','d','b','h','n','l','s',';','q','j','w','v']
 };
+
+// Map physical key codes to layout characters for dead keys
+const deadKeyCodeMap = {
+    'BracketLeft': '^',
+    'BracketRight': '$'
+};
+
+// Note display labels by notation system
+const noteLabels = {
+    english: { 'C': 'C', 'C#': 'C#', 'D': 'D', 'D#': 'D#', 'E': 'E', 'F': 'F', 'F#': 'F#', 'G': 'G', 'G#': 'G#', 'A': 'A', 'A#': 'A#', 'B': 'B' },
+    solfege: { 'C': 'Do', 'C#': 'Do#', 'D': 'Ré', 'D#': 'Ré#', 'E': 'Mi', 'F': 'Fa', 'F#': 'Fa#', 'G': 'Sol', 'G#': 'Sol#', 'A': 'La', 'A#': 'La#', 'B': 'Si' }
+};
+
+function getDisplayLabel(noteLabel) {
+    return noteLabels[noteNotation]?.[noteLabel] || noteLabel;
+}
 
 // Detect user's keyboard layout
 function detectKeyboardLayout() {
@@ -119,7 +174,8 @@ function getSynthConfig(type) {
             harmonicity: 5.1,
             modulationIndex: 32,
             resonance: 4000,
-            octaves: 1.5
+            octaves: 1.5,
+            volume: 15
         },
         'MonoSynth': {
             oscillator: { type: 'square' },
@@ -160,9 +216,183 @@ function getSynthConfig(type) {
     return configs[type] || configs['Synth'];
 }
 
+const synthDescriptions = {
+    'Synth': 'Basic single-oscillator synthesizer. A great starting point \u2014 clean, simple tones that respond well to waveform and envelope changes. Good for leads, pads, and learning synthesis fundamentals.',
+    'AMSynth': 'Amplitude Modulation synthesis. One oscillator controls the volume of another, creating tremolo-like effects and rich harmonic textures. Great for bells, organs, and evolving timbres.',
+    'FMSynth': 'Frequency Modulation synthesis. One oscillator modulates the frequency of another, producing complex, harmonically rich sounds. The go-to for electric pianos, metallic tones, and basses.',
+    'MembraneSynth': 'Models a vibrating membrane like a drum head. Features a pitch sweep on each hit, making it ideal for kick drums, toms, and percussive booms.',
+    'MetalSynth': 'Generates inharmonic, metallic tones using FM synthesis with high modulation. Perfect for cymbals, hi-hats, gongs, and any clangorous sound.',
+    'MonoSynth': 'Single-voice synth with a built-in filter and filter envelope. Classic monophonic lead and bass machine \u2014 think acid lines, squelchy basses, and screaming solos.',
+    'NoiseSynth': 'Pure noise generator shaped by an amplitude envelope. No pitch \u2014 just texture. Use it for snares, wind effects, risers, and percussive hits.',
+    'PluckSynth': 'Physical modeling of a plucked string using Karplus-Strong synthesis. Produces guitar-like, harp, and pizzicato string sounds with natural decay.',
+    'PolySynth': 'Polyphonic version of the basic synth \u2014 play multiple notes at once. Ideal for chords, pads, and any time you need more than one voice.',
+    'DuoSynth': 'Two voices layered together with independent oscillators and a shared vibrato. Creates thick, detuned sounds perfect for lush pads and rich leads.'
+};
+
+const synthPresets = {
+    'Synth': [
+        { name: 'Warm Pad', octave: 3, effects: { reverb: 0.7, delayTime: 0.4, delayFeedback: 0.4, distortion: 0, filterFreq: 3000, chorusRate: 1.2 }, params: { oscType: 'sine', attack: 0.8, decay: 0.3, sustain: 0.7, release: 3, volume: -10 } },
+        { name: 'Sharp Lead', octave: 4, effects: { reverb: 0.15, delayTime: 0.12, delayFeedback: 0.2, distortion: 0.15, filterFreq: 8000, chorusRate: 0.1 }, params: { oscType: 'sawtooth', attack: 0.01, decay: 0.1, sustain: 0.6, release: 0.3, volume: -10 } },
+        { name: 'Soft Flute', octave: 4, effects: { reverb: 0.5, delayTime: 0.3, delayFeedback: 0.25, distortion: 0, filterFreq: 4000, chorusRate: 2 }, params: { oscType: 'triangle', attack: 0.15, decay: 0.2, sustain: 0.5, release: 1.5, volume: -10 } },
+        { name: 'Retro Square', octave: 3, effects: { reverb: 0.1, delayTime: 0.15, delayFeedback: 0.5, distortion: 0.08, filterFreq: 6000, chorusRate: 0.5 }, params: { oscType: 'square', attack: 0.01, decay: 0.05, sustain: 0.8, release: 0.5, volume: -15 } },
+    ],
+    'AMSynth': [
+        { name: 'Bell Tone', octave: 4, effects: { reverb: 0.6, delayTime: 0.35, delayFeedback: 0.3, distortion: 0, filterFreq: 7000, chorusRate: 0.3 }, params: { harmonicity: 5, oscType: 'sine', modType: 'square', attack: 0.01, decay: 0.8, sustain: 0.1, release: 2, modAttack: 0.01, modRelease: 0.5 } },
+        { name: 'Tremolo Organ', octave: 3, effects: { reverb: 0.25, delayTime: 0.1, delayFeedback: 0.15, distortion: 0.1, filterFreq: 5000, chorusRate: 4 }, params: { harmonicity: 2, oscType: 'square', modType: 'sine', attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.8, modAttack: 0.1, modRelease: 1 } },
+        { name: 'Wobble', octave: 2, effects: { reverb: 0.4, delayTime: 0.25, delayFeedback: 0.5, distortion: 0.2, filterFreq: 2500, chorusRate: 0.8 }, params: { harmonicity: 1.5, oscType: 'sawtooth', modType: 'sine', attack: 0.1, decay: 0.3, sustain: 0.6, release: 1.5, modAttack: 0.5, modRelease: 2 } },
+    ],
+    'FMSynth': [
+        { name: 'Electric Piano', octave: 3, effects: { reverb: 0.35, delayTime: 0.2, delayFeedback: 0.2, distortion: 0, filterFreq: 6000, chorusRate: 1.5 }, params: { harmonicity: 3, modulationIndex: 14, oscType: 'sine', modType: 'sine', attack: 0.01, decay: 1, sustain: 0.2, release: 1.5, modAttack: 0.01, modRelease: 0.5 } },
+        { name: 'Metallic Stab', octave: 4, effects: { reverb: 0.5, delayTime: 0.18, delayFeedback: 0.4, distortion: 0.3, filterFreq: 9000, chorusRate: 0.1 }, params: { harmonicity: 5.5, modulationIndex: 50, oscType: 'sine', modType: 'square', attack: 0.001, decay: 0.3, sustain: 0, release: 0.5, modAttack: 0.01, modRelease: 0.1 } },
+        { name: 'Deep Bass', octave: 1, effects: { reverb: 0.1, delayTime: 0, delayFeedback: 0, distortion: 0.12, filterFreq: 1500, chorusRate: 0.3 }, params: { harmonicity: 1, modulationIndex: 5, oscType: 'sine', modType: 'triangle', attack: 0.01, decay: 0.4, sustain: 0.5, release: 0.8, modAttack: 0.05, modRelease: 0.3 } },
+        { name: 'Sci-Fi Laser', octave: 4, effects: { reverb: 0.6, delayTime: 0.3, delayFeedback: 0.6, distortion: 0.05, filterFreq: 10000, chorusRate: 6 }, params: { harmonicity: 7, modulationIndex: 80, oscType: 'sine', modType: 'sawtooth', attack: 0.001, decay: 0.5, sustain: 0.1, release: 2, modAttack: 0.01, modRelease: 1.5 } },
+    ],
+    'MembraneSynth': [
+        { name: 'Kick Drum', octave: 1, effects: { reverb: 0.1, delayTime: 0, delayFeedback: 0, distortion: 0.05, filterFreq: 2000, chorusRate: 0.1 }, params: { pitchDecay: 0.05, octaves: 10, oscType: 'sine', attack: 0.001, decay: 0.4, sustain: 0.01, release: 0.5 } },
+        { name: 'Floor Tom', octave: 1, effects: { reverb: 0.3, delayTime: 0, delayFeedback: 0, distortion: 0, filterFreq: 3000, chorusRate: 0.1 }, params: { pitchDecay: 0.08, octaves: 6, oscType: 'sine', attack: 0.001, decay: 0.8, sustain: 0.05, release: 1 } },
+        { name: 'Boing', octave: 2, effects: { reverb: 0.5, delayTime: 0.2, delayFeedback: 0.5, distortion: 0, filterFreq: 5000, chorusRate: 0.1 }, params: { pitchDecay: 0.3, octaves: 14, oscType: 'sine', attack: 0.001, decay: 1.2, sustain: 0.01, release: 2 } },
+        { name: '808 Sub', octave: 1, effects: { reverb: 0.05, delayTime: 0, delayFeedback: 0, distortion: 0.25, filterFreq: 800, chorusRate: 0.1 }, params: { pitchDecay: 0.03, octaves: 4, oscType: 'sine', attack: 0.001, decay: 1.5, sustain: 0.2, release: 3 } },
+    ],
+    'MetalSynth': [
+        { name: 'Hi-Hat', octave: 4, effects: { reverb: 0.1, delayTime: 0, delayFeedback: 0, distortion: 0, filterFreq: 8000, chorusRate: 0.1 }, params: { frequency: 400, harmonicity: 5.1, modulationIndex: 32, resonance: 6000, octaves: 1.5, attack: 0.001, decay: 0.15, release: 0.05 } },
+        { name: 'Crash Cymbal', octave: 4, effects: { reverb: 0.6, delayTime: 0.1, delayFeedback: 0.15, distortion: 0, filterFreq: 9000, chorusRate: 0.5 }, params: { frequency: 300, harmonicity: 8, modulationIndex: 40, resonance: 7000, octaves: 2, attack: 0.001, decay: 3, release: 1 } },
+        { name: 'Gong', octave: 3, effects: { reverb: 0.8, delayTime: 0.3, delayFeedback: 0.3, distortion: 0, filterFreq: 3000, chorusRate: 0.3 }, params: { frequency: 100, harmonicity: 3, modulationIndex: 20, resonance: 2000, octaves: 0.5, attack: 0.01, decay: 5, release: 3 } },
+        { name: 'Clang', octave: 4, effects: { reverb: 0.4, delayTime: 0.15, delayFeedback: 0.5, distortion: 0.15, filterFreq: 7000, chorusRate: 2 }, params: { frequency: 600, harmonicity: 12, modulationIndex: 60, resonance: 5000, octaves: 3, attack: 0.001, decay: 0.5, release: 0.2 } },
+    ],
+    'MonoSynth': [
+        { name: 'Acid Bass', octave: 2, effects: { reverb: 0.1, delayTime: 0.1, delayFeedback: 0.3, distortion: 0.3, filterFreq: 2000, chorusRate: 0.1 }, params: { oscType: 'sawtooth', filterQ: 15, filterCutoff: 800, attack: 0.01, decay: 0.15, sustain: 0.4, release: 0.3, filterAttack: 0.01, filterDecay: 0.3, filterSustain: 0.2, filterRelease: 0.5 } },
+        { name: 'Thick Lead', octave: 3, effects: { reverb: 0.2, delayTime: 0.25, delayFeedback: 0.35, distortion: 0.1, filterFreq: 6000, chorusRate: 1.5 }, params: { oscType: 'square', filterQ: 3, filterCutoff: 3000, attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.5, filterAttack: 0.05, filterDecay: 0.2, filterSustain: 0.8, filterRelease: 1 } },
+        { name: 'Wah Bass', octave: 2, effects: { reverb: 0.15, delayTime: 0.08, delayFeedback: 0.2, distortion: 0.2, filterFreq: 1500, chorusRate: 0.1 }, params: { oscType: 'sawtooth', filterQ: 10, filterCutoff: 400, attack: 0.01, decay: 0.3, sustain: 0.6, release: 0.5, filterAttack: 0.06, filterDecay: 0.5, filterSustain: 0.1, filterRelease: 1.5 } },
+        { name: 'Muted Pluck', octave: 3, effects: { reverb: 0.4, delayTime: 0.2, delayFeedback: 0.4, distortion: 0, filterFreq: 4000, chorusRate: 0.8 }, params: { oscType: 'square', filterQ: 8, filterCutoff: 2000, attack: 0.001, decay: 0.2, sustain: 0, release: 0.3, filterAttack: 0.001, filterDecay: 0.15, filterSustain: 0, filterRelease: 0.3 } },
+    ],
+    'NoiseSynth': [
+        { name: 'Snare Hit', octave: 4, effects: { reverb: 0.2, delayTime: 0, delayFeedback: 0, distortion: 0.1, filterFreq: 7000, chorusRate: 0.1 }, params: { noiseType: 'white', attack: 0.001, decay: 0.15, sustain: 0, release: 0.1 } },
+        { name: 'Wind Gust', octave: 4, effects: { reverb: 0.7, delayTime: 0.4, delayFeedback: 0.3, distortion: 0, filterFreq: 2500, chorusRate: 0.5 }, params: { noiseType: 'brown', attack: 0.5, decay: 0.3, sustain: 0.6, release: 2 } },
+        { name: 'Hiss Riser', octave: 4, effects: { reverb: 0.5, delayTime: 0.3, delayFeedback: 0.6, distortion: 0, filterFreq: 6000, chorusRate: 3 }, params: { noiseType: 'pink', attack: 1.5, decay: 0.1, sustain: 1, release: 3 } },
+        { name: 'Static Burst', octave: 4, effects: { reverb: 0.1, delayTime: 0.05, delayFeedback: 0.7, distortion: 0.5, filterFreq: 9000, chorusRate: 0.1 }, params: { noiseType: 'white', attack: 0.001, decay: 0.05, sustain: 0.3, release: 0.05 } },
+    ],
+    'PluckSynth': [
+        { name: 'Guitar Pick', octave: 3, effects: { reverb: 0.2, delayTime: 0.15, delayFeedback: 0.2, distortion: 0.08, filterFreq: 5000, chorusRate: 0.5 }, params: { attackNoise: 3, dampening: 3500, resonance: 0.9 } },
+        { name: 'Harp', octave: 4, effects: { reverb: 0.65, delayTime: 0.3, delayFeedback: 0.25, distortion: 0, filterFreq: 8000, chorusRate: 1.2 }, params: { attackNoise: 0.5, dampening: 6000, resonance: 0.98 } },
+        { name: 'Banjo', octave: 3, effects: { reverb: 0.1, delayTime: 0.08, delayFeedback: 0.15, distortion: 0.12, filterFreq: 6000, chorusRate: 0.1 }, params: { attackNoise: 8, dampening: 2500, resonance: 0.7 } },
+        { name: 'Dark Pluck', octave: 2, effects: { reverb: 0.5, delayTime: 0.35, delayFeedback: 0.5, distortion: 0, filterFreq: 1500, chorusRate: 0.8 }, params: { attackNoise: 1, dampening: 1000, resonance: 0.85 } },
+    ],
+    'PolySynth': [
+        { name: 'Dreamy Pad', octave: 3, effects: { reverb: 0.8, delayTime: 0.4, delayFeedback: 0.4, distortion: 0, filterFreq: 3500, chorusRate: 1.5 }, params: { oscType: 'sine', attack: 1, decay: 0.3, sustain: 0.8, release: 4 } },
+        { name: 'Bright Chords', octave: 3, effects: { reverb: 0.3, delayTime: 0.15, delayFeedback: 0.2, distortion: 0.05, filterFreq: 8000, chorusRate: 2 }, params: { oscType: 'sawtooth', attack: 0.02, decay: 0.2, sustain: 0.5, release: 1 } },
+        { name: 'Organ', octave: 3, effects: { reverb: 0.25, delayTime: 0, delayFeedback: 0, distortion: 0.08, filterFreq: 5000, chorusRate: 4.5 }, params: { oscType: 'square', attack: 0.01, decay: 0.05, sustain: 1, release: 0.3 } },
+        { name: 'Glass Keys', octave: 5, effects: { reverb: 0.6, delayTime: 0.3, delayFeedback: 0.35, distortion: 0, filterFreq: 9000, chorusRate: 0.8 }, params: { oscType: 'triangle', attack: 0.01, decay: 0.5, sustain: 0.2, release: 2 } },
+    ],
+    'DuoSynth': [
+        { name: 'Lush Pad', octave: 3, effects: { reverb: 0.75, delayTime: 0.35, delayFeedback: 0.35, distortion: 0, filterFreq: 3500, chorusRate: 1.2 }, params: { vibratoAmount: 0.3, vibratoRate: 3, harmonicity: 1.5, voice0Type: 'sine', voice1Type: 'triangle', attack: 0.6, decay: 0.3, sustain: 0.8, release: 3 } },
+        { name: 'Detune Lead', octave: 3, effects: { reverb: 0.2, delayTime: 0.2, delayFeedback: 0.3, distortion: 0.15, filterFreq: 7000, chorusRate: 0.5 }, params: { vibratoAmount: 0.1, vibratoRate: 5, harmonicity: 1.01, voice0Type: 'sawtooth', voice1Type: 'sawtooth', attack: 0.02, decay: 0.1, sustain: 0.7, release: 0.5 } },
+        { name: 'Alien Voice', octave: 4, effects: { reverb: 0.5, delayTime: 0.25, delayFeedback: 0.6, distortion: 0.1, filterFreq: 5000, chorusRate: 7 }, params: { vibratoAmount: 0.8, vibratoRate: 12, harmonicity: 3, voice0Type: 'square', voice1Type: 'sine', attack: 0.1, decay: 0.4, sustain: 0.5, release: 2 } },
+        { name: 'Octave Stack', octave: 2, effects: { reverb: 0.3, delayTime: 0.1, delayFeedback: 0.2, distortion: 0.2, filterFreq: 4500, chorusRate: 1 }, params: { vibratoAmount: 0.05, vibratoRate: 2, harmonicity: 2, voice0Type: 'sawtooth', voice1Type: 'square', attack: 0.05, decay: 0.2, sustain: 0.6, release: 1 } },
+    ]
+};
+
+function applyPreset(type, presetIndex) {
+    const preset = synthPresets[type]?.[presetIndex];
+    if (!preset) return;
+
+    // Apply each param to the synth engine and update UI controls
+    const controlsDiv = document.getElementById('controls');
+    for (const [param, value] of Object.entries(preset.params)) {
+        updateSynthParameter(param, value);
+
+        const el = controlsDiv.querySelector(`[data-control="${param}"]`);
+        if (!el) continue;
+
+        if (el.tagName === 'SELECT') {
+            el.value = value;
+        } else {
+            el.value = value;
+            const valueDisplay = document.getElementById(`${el.id}Value`);
+            if (valueDisplay) {
+                // Extract suffix from current display text (e.g. "s", " Hz", " dB")
+                const suffix = valueDisplay.textContent.replace(/^[\d.\-]+/, '');
+                valueDisplay.textContent = value + suffix;
+            }
+            el.setAttribute('aria-valuenow', value);
+            updateSliderFill(el);
+        }
+    }
+
+    // Set octave if preset specifies one
+    if (preset.octave !== undefined && preset.octave !== currentOctave) {
+        currentOctave = preset.octave;
+        document.getElementById('currentOctave').textContent = currentOctave;
+        createKeyboard();
+        updateOctaveButtons();
+    }
+
+    // Apply effects and sync UI
+    if (preset.effects) {
+        const fx = preset.effects;
+        const effectMap = {
+            reverb:        { engine: () => { if (reverb) reverb.wet.value = fx.reverb; }, displayId: 'reverbValue', suffix: '' },
+            delayTime:     { engine: () => { if (delay) delay.delayTime.value = fx.delayTime; }, displayId: 'delayTimeValue', suffix: 's' },
+            delayFeedback: { engine: () => { if (delay) delay.feedback.value = fx.delayFeedback; }, displayId: 'delayFeedbackValue', suffix: '' },
+            distortion:    { engine: () => { if (distortion) { distortion.distortion = fx.distortion; distortion.wet.value = fx.distortion > 0 ? 0.5 : 0; } }, displayId: 'distortionValue', suffix: '' },
+            filterFreq:    { engine: () => { if (filter) filter.frequency.value = fx.filterFreq; }, displayId: 'filterFreqValue', suffix: ' Hz' },
+            chorusRate:    { engine: () => { if (chorus) chorus.frequency.value = fx.chorusRate; }, displayId: 'chorusRateValue', suffix: ' Hz' },
+        };
+
+        for (const [key, config] of Object.entries(effectMap)) {
+            if (fx[key] === undefined) continue;
+            config.engine();
+            const slider = document.getElementById(key);
+            if (slider) {
+                slider.value = fx[key];
+                updateSliderFill(slider);
+            }
+            const display = document.getElementById(config.displayId);
+            if (display) display.textContent = fx[key] + config.suffix;
+        }
+    }
+
+    // Update active preset button
+    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`.preset-btn[data-preset="${presetIndex}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+}
+
+function updatePresetBar(type) {
+    const bar = document.getElementById('presetBar');
+    bar.innerHTML = '';
+
+    const presets = synthPresets[type];
+    if (!presets) return;
+
+    const label = document.createElement('span');
+    label.className = 'preset-label';
+    label.textContent = 'Presets:';
+    bar.appendChild(label);
+
+    presets.forEach((preset, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'preset-btn';
+        btn.textContent = preset.name;
+        btn.dataset.preset = i;
+        btn.addEventListener('click', () => applyPreset(type, i));
+        bar.appendChild(btn);
+    });
+}
+
 function updateControls(type) {
     const controlsDiv = document.getElementById('controls');
+
+    // Clean up knob drag listeners before destroying DOM
+    controlsDiv.querySelectorAll('.knob-container').forEach(knob => {
+        if (knob._dragController) knob._dragController.abort();
+    });
+
     controlsDiv.innerHTML = '';
+
+    const descEl = document.getElementById('synthDescription');
+    if (descEl) descEl.textContent = synthDescriptions[type] || '';
+
+    updatePresetBar(type);
 
     const allWaveforms = ['sine', 'square', 'triangle', 'sawtooth', 'pulse', 'pwm'];
     const extendedWaveforms = [...allWaveforms, 'sine2', 'sine3', 'sine4', 'sine5', 'sine6', 'sine7', 'sine8',
@@ -331,6 +561,7 @@ function updateControls(type) {
                 <input type="range"
                        id="${uniqueId}"
                        data-control="${control.id}"
+                       data-default-value="${control.default}"
                        min="${control.min}"
                        max="${control.max}"
                        step="${control.step}"
@@ -367,6 +598,13 @@ function updateControls(type) {
             updateSliderFill(slider);
         }
     });
+
+    // Attach knobs to new controls
+    controlsDiv.querySelectorAll('input[type="range"]').forEach(slider => {
+        if (!slider.parentElement.querySelector('.knob-container')) {
+            attachKnobToSlider(slider);
+        }
+    });
 }
 
 // Update slider track fill to reflect current value
@@ -376,6 +614,187 @@ function updateSliderFill(slider) {
     const val = parseFloat(slider.value);
     const percent = ((val - min) / (max - min)) * 100;
     slider.style.setProperty('--fill-percent', `${percent}%`);
+    // Sync knob if it exists
+    const knob = slider.parentElement?.querySelector('.knob-container');
+    if (knob) updateKnobVisual(knob, percent / 100);
+}
+
+// --- Knob system ---
+const KNOB_ARC_START = 225; // degrees from top, clockwise — bottom-left
+const KNOB_ARC_END = 495;   // 225 + 270 — bottom-right
+const KNOB_ARC_RANGE = 270;
+const KNOB_RADIUS = 28;
+const KNOB_CENTER = 36;
+
+function createKnobSVG(percent) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const container = document.createElement('div');
+    container.className = 'knob-container';
+    container.title = 'Drag up/down to adjust \u2022 Double-click to reset';
+
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'knob-svg');
+    svg.setAttribute('viewBox', '0 0 72 72');
+
+    // Arc helper: angle in degrees (0 = top) to SVG coords
+    function polarToCart(angleDeg, r) {
+        const rad = (angleDeg - 90) * Math.PI / 180;
+        return { x: KNOB_CENTER + r * Math.cos(rad), y: KNOB_CENTER + r * Math.sin(rad) };
+    }
+
+    // Track arc (background)
+    const trackStart = polarToCart(KNOB_ARC_START, KNOB_RADIUS);
+    const trackEnd = polarToCart(KNOB_ARC_END, KNOB_RADIUS);
+    const track = document.createElementNS(ns, 'path');
+    track.setAttribute('class', 'knob-track');
+    track.setAttribute('d', `M${trackStart.x},${trackStart.y} A${KNOB_RADIUS},${KNOB_RADIUS} 0 1,1 ${trackEnd.x},${trackEnd.y}`);
+    svg.appendChild(track);
+
+    // Notches at 0%, 25%, 50%, 75%, 100%
+    for (let i = 0; i <= 4; i++) {
+        const angle = KNOB_ARC_START + (KNOB_ARC_RANGE * i / 4);
+        const inner = polarToCart(angle, KNOB_RADIUS + 2);
+        const outer = polarToCart(angle, KNOB_RADIUS + 6);
+        const notch = document.createElementNS(ns, 'line');
+        notch.setAttribute('class', 'knob-notch');
+        notch.setAttribute('x1', inner.x);
+        notch.setAttribute('y1', inner.y);
+        notch.setAttribute('x2', outer.x);
+        notch.setAttribute('y2', outer.y);
+        svg.appendChild(notch);
+    }
+
+    // Fill arc (value)
+    const fill = document.createElementNS(ns, 'path');
+    fill.setAttribute('class', 'knob-fill');
+    fill.setAttribute('data-knob-fill', '');
+    svg.appendChild(fill);
+
+    // Knob body
+    const body = document.createElementNS(ns, 'circle');
+    body.setAttribute('class', 'knob-body');
+    body.setAttribute('cx', KNOB_CENTER);
+    body.setAttribute('cy', KNOB_CENTER);
+    body.setAttribute('r', KNOB_RADIUS - 6);
+    svg.appendChild(body);
+
+    // Indicator line
+    const indicator = document.createElementNS(ns, 'line');
+    indicator.setAttribute('class', 'knob-indicator');
+    indicator.setAttribute('data-knob-indicator', '');
+    svg.appendChild(indicator);
+
+    container.appendChild(svg);
+    updateKnobVisual(container, percent);
+    return container;
+}
+
+function updateKnobVisual(container, percent) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const clamped = Math.max(0, Math.min(1, percent));
+
+    function polarToCart(angleDeg, r) {
+        const rad = (angleDeg - 90) * Math.PI / 180;
+        return { x: KNOB_CENTER + r * Math.cos(rad), y: KNOB_CENTER + r * Math.sin(rad) };
+    }
+
+    // Update fill arc
+    const fill = container.querySelector('[data-knob-fill]');
+    if (fill) {
+        if (clamped <= 0.001) {
+            fill.setAttribute('d', '');
+        } else {
+            const startAngle = KNOB_ARC_START;
+            const endAngle = KNOB_ARC_START + KNOB_ARC_RANGE * clamped;
+            const start = polarToCart(startAngle, KNOB_RADIUS);
+            const end = polarToCart(endAngle, KNOB_RADIUS);
+            const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+            fill.setAttribute('d', `M${start.x},${start.y} A${KNOB_RADIUS},${KNOB_RADIUS} 0 ${largeArc},1 ${end.x},${end.y}`);
+        }
+    }
+
+    // Update indicator line
+    const indicator = container.querySelector('[data-knob-indicator]');
+    if (indicator) {
+        const angle = KNOB_ARC_START + KNOB_ARC_RANGE * clamped;
+        const inner = polarToCart(angle, 8);
+        const outer = polarToCart(angle, KNOB_RADIUS - 8);
+        indicator.setAttribute('x1', inner.x);
+        indicator.setAttribute('y1', inner.y);
+        indicator.setAttribute('x2', outer.x);
+        indicator.setAttribute('y2', outer.y);
+    }
+}
+
+function attachKnobToSlider(slider) {
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const step = parseFloat(slider.step) || 1;
+    const val = parseFloat(slider.value);
+    const percent = (val - min) / (max - min);
+
+    const knob = createKnobSVG(percent);
+    slider.parentElement.insertBefore(knob, slider.nextSibling);
+
+    // AbortController to clean up document-level listeners on rebuild
+    const controller = new AbortController();
+    knob._dragController = controller;
+
+    let dragging = false;
+    let startY = 0;
+    let startValue = 0;
+
+    function onStart(e) {
+        dragging = true;
+        startY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+        startValue = parseFloat(slider.value);
+        document.body.style.cursor = 'grabbing';
+        e.preventDefault();
+    }
+
+    function onMove(e) {
+        if (!dragging) return;
+        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+        const deltaY = startY - clientY; // up = positive
+        const range = max - min;
+        const sensitivity = range / 150; // full range in ~150px drag
+        let newVal = startValue + deltaY * sensitivity;
+        newVal = Math.round(newVal / step) * step;
+        newVal = Math.max(min, Math.min(max, newVal));
+
+        slider.value = newVal;
+        slider.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function onEnd() {
+        if (!dragging) return;
+        dragging = false;
+        document.body.style.cursor = '';
+    }
+
+    knob.addEventListener('mousedown', onStart);
+    knob.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove, { signal: controller.signal });
+    document.addEventListener('touchmove', onMove, { passive: false, signal: controller.signal });
+    document.addEventListener('mouseup', onEnd, { signal: controller.signal });
+    document.addEventListener('touchend', onEnd, { signal: controller.signal });
+
+    // Double-click to reset to default
+    knob.addEventListener('dblclick', () => {
+        const defaultVal = slider.dataset.defaultValue;
+        if (defaultVal !== undefined) {
+            slider.value = defaultVal;
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    });
+}
+
+function attachKnobsToAll() {
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+        if (!slider.parentElement.querySelector('.knob-container')) {
+            attachKnobToSlider(slider);
+        }
+    });
 }
 
 function updateSynthParameter(param, value) {
@@ -511,21 +930,32 @@ function createKeyboard() {
     keyboard.innerHTML = '';
 
     const keys = keyboardLayouts[userLayout];
-    const notes = [
-        { note: `C${currentOctave}`, white: true, label: 'C', key: keys[0] },
-        { note: `C#${currentOctave}`, white: false, label: 'C#', key: keys[1] },
-        { note: `D${currentOctave}`, white: true, label: 'D', key: keys[2] },
-        { note: `D#${currentOctave}`, white: false, label: 'D#', key: keys[3] },
-        { note: `E${currentOctave}`, white: true, label: 'E', key: keys[4] },
-        { note: `F${currentOctave}`, white: true, label: 'F', key: keys[5] },
-        { note: `F#${currentOctave}`, white: false, label: 'F#', key: keys[6] },
-        { note: `G${currentOctave}`, white: true, label: 'G', key: keys[7] },
-        { note: `G#${currentOctave}`, white: false, label: 'G#', key: keys[8] },
-        { note: `A${currentOctave}`, white: true, label: 'A', key: keys[9] },
-        { note: `A#${currentOctave}`, white: false, label: 'A#', key: keys[10] },
-        { note: `B${currentOctave}`, white: true, label: 'B', key: keys[11] },
-        { note: `C${currentOctave + 1}`, white: true, label: 'C', key: keys[12] }
+    const notePattern = [
+        { label: 'C', white: true },
+        { label: 'C#', white: false },
+        { label: 'D', white: true },
+        { label: 'D#', white: false },
+        { label: 'E', white: true },
+        { label: 'F', white: true },
+        { label: 'F#', white: false },
+        { label: 'G', white: true },
+        { label: 'G#', white: false },
+        { label: 'A', white: true },
+        { label: 'A#', white: false },
+        { label: 'B', white: true },
     ];
+
+    const notes = [];
+    let keyIndex = 0;
+    // First octave (12 notes)
+    for (let i = 0; i < 12 && keyIndex < keys.length; i++, keyIndex++) {
+        notes.push({ note: `${notePattern[i].label}${currentOctave}`, white: notePattern[i].white, label: notePattern[i].label, key: keys[keyIndex] });
+    }
+    // Second octave (up to available keys)
+    const oct2 = currentOctave + 1;
+    for (let i = 0; i < 12 && keyIndex < keys.length; i++, keyIndex++) {
+        notes.push({ note: `${notePattern[i].label}${oct2}`, white: notePattern[i].white, label: notePattern[i].label, key: keys[keyIndex] });
+    }
 
     notes.forEach((n, i) => {
         const keyEl = document.createElement('div');
@@ -534,12 +964,12 @@ function createKeyboard() {
         keyEl.dataset.keyboardKey = n.key;
         keyEl.innerHTML = `
             <span class="keyboard-key-label">${n.key.toUpperCase()}</span>
-            <span class="note-label">${n.label}</span>
+            <span class="note-label">${getDisplayLabel(n.label)}</span>
         `;
 
         // Accessibility
         keyEl.setAttribute('role', 'button');
-        const noteOctave = i === notes.length - 1 ? currentOctave + 1 : currentOctave;
+        const noteOctave = n.note.match(/\d+/)[0];
         keyEl.setAttribute('aria-label', `${n.label.replace('#', ' sharp')} octave ${noteOctave}`);
         keyEl.setAttribute('tabindex', '0');
 
@@ -583,13 +1013,18 @@ function createKeyboard() {
 function playNote(note) {
     if (!synth) return;
 
-    document.getElementById('currentNote').textContent = note;
+    // Display note in chosen notation (e.g. "C#4" → "Do#4")
+    const noteName = note.replace(/\d+/, '');
+    const octaveNum = note.match(/\d+/)?.[0] || '';
+    document.getElementById('currentNote').textContent = getDisplayLabel(noteName) + octaveNum;
 
     try {
         if (currentInstrumentType === 'NoiseSynth') {
             synth.triggerAttack();
         } else if (currentInstrumentType === 'MetalSynth') {
-            synth.triggerAttack();
+            const envDecay = synth.envelope?.decay ?? 1.4;
+            const envRelease = synth.envelope?.release ?? 0.2;
+            synth.triggerAttackRelease(envDecay + envRelease);
         } else {
             synth.triggerAttack(note);
         }
@@ -602,11 +1037,16 @@ function stopNote(note) {
     if (!synth) return;
 
     try {
-        if (currentInstrumentType === 'PolySynth' && note) {
-            // Release specific note for polyphonic synth
+        if (currentInstrumentType === 'MetalSynth') {
+            // MetalSynth uses triggerAttackRelease, no manual release needed
+        } else if (currentInstrumentType === 'PolySynth' && note) {
             synth.triggerRelease(note);
+        } else if (currentInstrumentType === 'NoiseSynth') {
+            // NoiseSynth has no note concept — release when all inputs are up
+            if (activeKeys.size === 0 && activeTouches.size === 0) {
+                synth.triggerRelease();
+            }
         } else if (activeKeys.size === 0 && activeTouches.size === 0) {
-            // Only release mono synths when all keys/touches are up
             synth.triggerRelease();
         }
     } catch (error) {
@@ -616,6 +1056,23 @@ function stopNote(note) {
     if (activeKeys.size === 0 && activeTouches.size === 0) {
         document.getElementById('currentNote').textContent = '\u2014';
     }
+}
+
+// Master volume control
+document.getElementById('masterVolume').addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    document.getElementById('masterVolumeValue').textContent = value + '%';
+    // Map 0-100 to -Infinity..0 dB (logarithmic)
+    Tone.Destination.volume.value = value === 0 ? -Infinity : -60 + (value / 100) * 60;
+    updateSliderFill(e.target);
+});
+
+// Set initial master volume
+function initMasterVolume() {
+    const slider = document.getElementById('masterVolume');
+    const value = parseInt(slider.value);
+    Tone.Destination.volume.value = value === 0 ? -Infinity : -60 + (value / 100) * 60;
+    updateSliderFill(slider);
 }
 
 // Effect controls — guarded against pre-init access
@@ -673,6 +1130,9 @@ document.getElementById('instrumentType').addEventListener('change', (e) => {
     e.target.blur();
 });
 
+// Attach knobs to effects sliders
+attachKnobsToAll();
+
 // Octave controls
 document.getElementById('octaveUp').addEventListener('click', () => {
     if (currentOctave < maxOctave) {
@@ -702,7 +1162,12 @@ document.getElementById('octaveDown').addEventListener('click', () => {
 document.addEventListener('keydown', (e) => {
     if (e.repeat) return;
 
-    const key = e.key.toLowerCase();
+    let key = e.key.toLowerCase();
+    // Resolve dead keys (e.g. ^ and $ on AZERTY) via physical key code
+    if (key === 'dead' && deadKeyCodeMap[e.code]) {
+        key = deadKeyCodeMap[e.code];
+        e.preventDefault();
+    }
     const tag = document.activeElement?.tagName;
     const isFormControl = tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
 
@@ -740,7 +1205,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('keyup', (e) => {
-    const key = e.key.toLowerCase();
+    let key = e.key.toLowerCase();
+    if (key === 'dead' && deadKeyCodeMap[e.code]) {
+        key = deadKeyCodeMap[e.code];
+    }
 
     if (key === 'arrowleft' || key === 'arrowright') return;
 
@@ -761,11 +1229,21 @@ document.getElementById('keyboardLayout').addEventListener('change', (e) => {
     e.target.blur();
 });
 
+// Note notation selector
+document.getElementById('noteNotation').value = noteNotation;
+document.getElementById('noteNotation').addEventListener('change', (e) => {
+    noteNotation = e.target.value;
+    localStorage.setItem('noteNotation', noteNotation);
+    createKeyboard();
+    e.target.blur();
+});
+
 // Initialize
 async function init() {
     try {
         await Tone.start();
         initEffects();
+        initMasterVolume();
         initSynth('Synth');
 
         userLayout = detectKeyboardLayout();
@@ -773,6 +1251,7 @@ async function init() {
 
         createKeyboard();
         audioInitialized = true;
+
 
         // Hide overlay
         const overlay = document.getElementById('audioOverlay');
@@ -1062,7 +1541,8 @@ function enhanceMobileTouchHandling() {
     }
 
     const keyboardSection = document.querySelector('.keyboard-section');
-    if (keyboardSection) {
+    if (keyboardSection && !keyboardSection.dataset.touchHandled) {
+        keyboardSection.dataset.touchHandled = 'true';
         let savedScrollY = 0;
         keyboardSection.addEventListener('touchstart', () => {
             savedScrollY = window.scrollY;

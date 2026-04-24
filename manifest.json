@@ -1,7 +1,7 @@
 {
-  "name": "ToneLab Synthesizer",
+  "name": "ToneLab — Interactive Sound Explorer",
   "short_name": "ToneLab",
-  "description": "Advanced Web Synthesizer with Tone.js",
+  "description": "Turn knobs, twist parameters, and explore how synthesizers shape sound",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -37,9 +37,9 @@
   "categories": ["music", "entertainment", "utilities"],
   "shortcuts": [
     {
-      "name": "Open Synthesizer",
-      "short_name": "Synth",
-      "description": "Launch ToneLab Synthesizer",
+      "name": "Open ToneLab",
+      "short_name": "ToneLab",
+      "description": "Launch ToneLab Sound Explorer",
       "url": "/",
       "icons": [
         {

@@ -945,16 +945,15 @@ function createKeyboard() {
         { label: 'B', white: true },
     ];
 
+    const isMobile = window.innerWidth <= 768;
+    const octaveCount = isMobile ? 1 : 2;
     const notes = [];
     let keyIndex = 0;
-    // First octave (12 notes)
-    for (let i = 0; i < 12 && keyIndex < keys.length; i++, keyIndex++) {
-        notes.push({ note: `${notePattern[i].label}${currentOctave}`, white: notePattern[i].white, label: notePattern[i].label, key: keys[keyIndex] });
-    }
-    // Second octave (up to available keys)
-    const oct2 = currentOctave + 1;
-    for (let i = 0; i < 12 && keyIndex < keys.length; i++, keyIndex++) {
-        notes.push({ note: `${notePattern[i].label}${oct2}`, white: notePattern[i].white, label: notePattern[i].label, key: keys[keyIndex] });
+    for (let oct = 0; oct < octaveCount; oct++) {
+        const octNum = currentOctave + oct;
+        for (let i = 0; i < 12 && keyIndex < keys.length; i++, keyIndex++) {
+            notes.push({ note: `${notePattern[i].label}${octNum}`, white: notePattern[i].white, label: notePattern[i].label, key: keys[keyIndex] });
+        }
     }
 
     notes.forEach((n, i) => {
@@ -1540,22 +1539,8 @@ function enhanceMobileTouchHandling() {
         centerKeyboard();
     }
 
-    const keyboardSection = document.querySelector('.keyboard-section');
-    if (keyboardSection && !keyboardSection.dataset.touchHandled) {
-        keyboardSection.dataset.touchHandled = 'true';
-        let savedScrollY = 0;
-        keyboardSection.addEventListener('touchstart', () => {
-            savedScrollY = window.scrollY;
-            document.body.style.top = `-${savedScrollY}px`;
-            document.body.classList.add('keyboard-active');
-        }, { passive: true });
-
-        keyboardSection.addEventListener('touchend', () => {
-            document.body.classList.remove('keyboard-active');
-            document.body.style.top = '';
-            window.scrollTo(0, savedScrollY);
-        }, { passive: true });
-    }
+    // Body scroll lock removed — single-octave mobile keyboard with
+    // touch-action: none on keys prevents unwanted page scroll.
 
     updateOctaveButtons();
 }

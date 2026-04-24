@@ -1003,13 +1003,6 @@ button:focus-visible {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Prevent body scroll when touching keyboard */
-    body.keyboard-active {
-        overflow: hidden;
-        position: fixed;
-        width: 100%;
-    }
-
     .keyboard-section {
         position: sticky;
         bottom: 0;
@@ -1087,30 +1080,13 @@ button:focus-visible {
     }
 
     .keyboard {
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: var(--space-sm) 0 var(--space-sm) 0;
+        overflow: hidden;
+        padding: var(--space-sm) 0;
         margin: 0;
         position: relative;
         gap: 2px;
         width: 100%;
-        justify-content: flex-start;
-        scroll-behavior: smooth;
-        scroll-snap-type: x proximity;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .keyboard::-webkit-scrollbar {
-        display: none;
-    }
-
-    .keyboard > .key:first-child {
-        margin-left: var(--space-md);
-    }
-
-    .keyboard > .key:last-child {
-        margin-right: var(--space-md);
+        justify-content: center;
     }
 
     .key {
@@ -1119,7 +1095,6 @@ button:focus-visible {
         min-width: 52px;
         height: 140px;
         border-radius: 0 0 var(--radius-md) var(--radius-md);
-        scroll-snap-align: start;
         touch-action: none;
         -webkit-tap-highlight-color: transparent;
         user-select: none;
@@ -1156,69 +1131,8 @@ button:focus-visible {
         padding: 2px 4px;
     }
 
-    /* Scroll indicators */
-    .keyboard-wrapper {
-        position: relative;
-        width: 100%;
-    }
-
     .keyboard-scroll-indicator {
-        display: flex;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 40px;
-        height: 80px;
-        pointer-events: none;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.9;
-        transition: opacity 0.3s ease-out;
-        z-index: 5;
-        animation: pulse-hint 2s ease-in-out infinite;
-        will-change: opacity;
-    }
-
-    .keyboard-scroll-indicator.left {
-        left: 0;
-        background: linear-gradient(to right, rgba(10, 14, 39, 0.9), transparent);
-    }
-
-    .keyboard-scroll-indicator.right {
-        right: 0;
-        background: linear-gradient(to left, rgba(10, 14, 39, 0.9), transparent);
-    }
-
-    .keyboard-scroll-indicator.hidden {
-        opacity: 0;
-        animation: none;
-    }
-
-    .keyboard-scroll-indicator svg {
-        width: 24px;
-        height: 24px;
-        fill: var(--accent-cyan);
-        filter: drop-shadow(0 0 8px var(--accent-cyan));
-        animation: bounce-hint 1.5s ease-in-out infinite;
-    }
-
-    .keyboard-scroll-indicator.left svg {
-        animation: bounce-left 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse-hint {
-        0%, 100% { opacity: 0.9; }
-        50% { opacity: 0.5; }
-    }
-
-    @keyframes bounce-hint {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(4px); }
-    }
-
-    @keyframes bounce-left {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(-4px); }
+        display: none;
     }
 
     /* Info display adjustments */

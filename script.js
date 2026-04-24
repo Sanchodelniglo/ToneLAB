@@ -5,8 +5,9 @@ let currentInstrumentType = 'Synth';
 let currentOctave = 4;
 let minOctave = 0;
 let maxOctave = 8;
-let activeKeys = new Set(); // Track which keys are currently pressed
-let userLayout = 'qwerty'; // Default layout
+let activeKeys = new Set();
+let userLayout = 'qwerty';
+let audioInitialized = false;
 
 // Keyboard layouts
 const keyboardLayouts = {
@@ -16,15 +17,13 @@ const keyboardLayouts = {
     dvorak: ['a', ',', 'o', 'e', '.', 'u', 'k', 'i', 'x', 'd', 'b', 'h', 'n']
 };
 
-// Detect user's keyboard layout (approximate detection)
+// Detect user's keyboard layout
 function detectKeyboardLayout() {
-    // This is a simplified detection. In reality, browser APIs don't give us direct access to keyboard layout.
-    // We'll provide a selector for users to choose their layout.
     const savedLayout = localStorage.getItem('keyboardLayout');
     if (savedLayout && keyboardLayouts[savedLayout]) {
         return savedLayout;
     }
-    return 'qwerty'; // Default
+    return 'qwerty';
 }
 
 // Initialize effects
@@ -32,7 +31,7 @@ function initEffects() {
     reverb = new Tone.Reverb({ decay: 1.5, wet: 0.3 }).toDestination();
     delay = new Tone.FeedbackDelay({ delayTime: 0.25, feedback: 0.3, wet: 0.3 }).connect(reverb);
     distortion = new Tone.Distortion({ distortion: 0, wet: 0 }).connect(delay);
-    filter = new Tone.Filter({ frequency: 1000, type: 'lowpass' }).connect(distortion);
+    filter = new Tone.Filter({ frequency: 5000, type: 'lowpass' }).connect(distortion);
     chorus = new Tone.Chorus({ frequency: 1.5, delayTime: 3.5, depth: 0.7, wet: 0.3 }).connect(filter);
     chorus.start();
 }
@@ -40,11 +39,16 @@ function initEffects() {
 // Initialize synth
 function initSynth(type) {
     if (synth) {
+        // Clear active state before disposing
+        activeKeys.clear();
+        activeTouches.clear();
+        document.querySelectorAll('.key.pressed').forEach(k => k.classList.remove('pressed'));
+        document.getElementById('currentNote').textContent = '\u2014';
         synth.dispose();
     }
 
     const synthConfig = getSynthConfig(type);
-    
+
     switch(type) {
         case 'Synth':
             synth = new Tone.Synth(synthConfig).connect(chorus);
@@ -160,12 +164,43 @@ function updateControls(type) {
     const controlsDiv = document.getElementById('controls');
     controlsDiv.innerHTML = '';
 
-    // All available waveforms in Tone.js
     const allWaveforms = ['sine', 'square', 'triangle', 'sawtooth', 'pulse', 'pwm'];
-    const extendedWaveforms = [...allWaveforms, 'sine2', 'sine3', 'sine4', 'sine5', 'sine6', 'sine7', 'sine8', 
+    const extendedWaveforms = [...allWaveforms, 'sine2', 'sine3', 'sine4', 'sine5', 'sine6', 'sine7', 'sine8',
                                 'square2', 'square3', 'square4', 'square5', 'square6', 'square7', 'square8',
                                 'triangle2', 'triangle3', 'triangle4', 'triangle5', 'triangle6', 'triangle7', 'triangle8',
                                 'sawtooth2', 'sawtooth3', 'sawtooth4', 'sawtooth5', 'sawtooth6', 'sawtooth7', 'sawtooth8'];
+
+    // Human-readable descriptions for each parameter
+    const descs = {
+        oscType: 'The basic shape of the sound wave \u2014 sine is smooth, square is buzzy, sawtooth is bright',
+        attack: 'How fast the sound fades in when you press a key',
+        decay: 'How fast the sound drops from peak to sustain level',
+        sustain: 'The volume level held while a key stays pressed',
+        release: 'How long the sound fades out after releasing a key',
+        volume: 'Overall loudness of the instrument',
+        harmonicity: 'Ratio between the two oscillators \u2014 higher = more metallic, bell-like tones',
+        modType: 'Shape of the wave that modulates (wobbles) the main sound',
+        modulationIndex: 'How much the modulator affects the sound \u2014 higher = wilder, more complex tones',
+        modAttack: 'How fast the modulation effect fades in',
+        modRelease: 'How long the modulation effect fades out after release',
+        pitchDecay: 'How fast the pitch drops after hitting the drum \u2014 short = tight kick, long = tom',
+        octaves: 'Range of the pitch sweep \u2014 higher = more dramatic pitch drop',
+        frequency: 'Base pitch of the metallic tone',
+        resonance: 'How ringy and resonant the metallic sound is',
+        filterQ: 'Sharpness of the filter peak \u2014 higher = more resonant, nasal tone',
+        filterCutoff: 'Which frequencies get through \u2014 low = dark/muffled, high = bright/open',
+        filterAttack: 'How fast the filter opens when you press a key',
+        filterDecay: 'How fast the filter closes back down after opening',
+        filterSustain: 'How open the filter stays while a key is held',
+        filterRelease: 'How long the filter takes to close after releasing a key',
+        noiseType: 'Color of the noise \u2014 white is hissy, pink is balanced, brown is rumbly',
+        attackNoise: 'Amount of initial pluck brightness \u2014 higher = more pick attack',
+        dampening: 'How quickly the high frequencies die out \u2014 low = muffled, high = bright',
+        vibratoAmount: 'How much the pitch wobbles \u2014 higher = more wobble',
+        vibratoRate: 'Speed of the pitch wobble \u2014 slow = gentle sway, fast = tremolo',
+        voice0Type: 'Wave shape for the first voice layer',
+        voice1Type: 'Wave shape for the second voice layer'
+    };
 
     const controlSets = {
         'Synth': [
@@ -244,7 +279,6 @@ function updateControls(type) {
             { name: 'Resonance', id: 'resonance', min: 0, max: 1, step: 0.01, default: 0.7 }
         ],
         'PolySynth': [
-            { name: 'Polyphony', id: 'polyphony', min: 1, max: 32, step: 1, default: 4 },
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.01, default: 0.05, suffix: 's' },
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
@@ -265,18 +299,24 @@ function updateControls(type) {
     };
 
     const controls = controlSets[type] || controlSets['Synth'];
+    let controlIndex = 0;
 
     controls.forEach(control => {
         const controlGroup = document.createElement('div');
         controlGroup.className = 'control-group';
+        const uniqueId = `ctrl_${control.id}_${controlIndex++}`;
+
+        const desc = descs[control.id] || '';
 
         if (control.type === 'wave') {
+            const labelId = `${uniqueId}_label`;
             controlGroup.innerHTML = `
                 <div class="control-label">
-                    <span>${control.name}</span>
+                    <label id="${labelId}" for="${uniqueId}">${control.name}</label>
                 </div>
-                <select class="wave-select" data-control="${control.id}">
-                    ${control.values.map(val => 
+                ${desc ? `<p class="control-hint">${desc}</p>` : ''}
+                <select class="wave-select" id="${uniqueId}" data-control="${control.id}" aria-labelledby="${labelId}">
+                    ${control.values.map(val =>
                         `<option value="${val}" ${val === control.default ? 'selected' : ''}>${val}</option>`
                     ).join('')}
                 </select>
@@ -284,15 +324,20 @@ function updateControls(type) {
         } else {
             controlGroup.innerHTML = `
                 <div class="control-label">
-                    <span>${control.name}</span>
-                    <span class="control-value" id="${control.id}Value">${control.default}${control.suffix || ''}</span>
+                    <label for="${uniqueId}">${control.name}</label>
+                    <span class="control-value" id="${uniqueId}Value">${control.default}${control.suffix || ''}</span>
                 </div>
-                <input type="range" 
-                       id="${control.id}" 
-                       min="${control.min}" 
-                       max="${control.max}" 
-                       step="${control.step}" 
-                       value="${control.default}">
+                ${desc ? `<p class="control-hint">${desc}</p>` : ''}
+                <input type="range"
+                       id="${uniqueId}"
+                       data-control="${control.id}"
+                       min="${control.min}"
+                       max="${control.max}"
+                       step="${control.step}"
+                       value="${control.default}"
+                       aria-valuenow="${control.default}"
+                       aria-valuemin="${control.min}"
+                       aria-valuemax="${control.max}">
             `;
         }
 
@@ -300,23 +345,37 @@ function updateControls(type) {
     });
 
     // Add event listeners
-    controls.forEach(control => {
+    controls.forEach((control, i) => {
+        const uniqueId = `ctrl_${control.id}_${i}`;
         if (control.type === 'wave') {
-            const select = document.querySelector(`[data-control="${control.id}"]`);
+            const select = document.getElementById(uniqueId);
             select.addEventListener('change', (e) => {
                 updateSynthParameter(control.id, e.target.value);
+                e.target.blur();
             });
         } else {
-            const slider = document.getElementById(control.id);
-            const valueDisplay = document.getElementById(`${control.id}Value`);
-            
+            const slider = document.getElementById(uniqueId);
+            const valueDisplay = document.getElementById(`${uniqueId}Value`);
+
             slider.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
                 valueDisplay.textContent = value + (control.suffix || '');
+                slider.setAttribute('aria-valuenow', value);
                 updateSynthParameter(control.id, value);
+                updateSliderFill(slider);
             });
+            updateSliderFill(slider);
         }
     });
+}
+
+// Update slider track fill to reflect current value
+function updateSliderFill(slider) {
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const val = parseFloat(slider.value);
+    const percent = ((val - min) / (max - min)) * 100;
+    slider.style.setProperty('--fill-percent', `${percent}%`);
 }
 
 function updateSynthParameter(param, value) {
@@ -325,7 +384,11 @@ function updateSynthParameter(param, value) {
     try {
         switch(param) {
             case 'oscType':
-                synth.oscillator.type = value;
+                if (currentInstrumentType === 'PolySynth') {
+                    synth.set({ oscillator: { type: value } });
+                } else {
+                    synth.oscillator.type = value;
+                }
                 break;
             case 'modType':
                 if (synth.modulation) synth.modulation.type = value;
@@ -340,31 +403,43 @@ function updateSynthParameter(param, value) {
                 if (synth.voice1) synth.voice1.oscillator.type = value;
                 break;
             case 'attack':
-                synth.envelope.attack = value;
-                if (synth.voice0) {
+                if (currentInstrumentType === 'PolySynth') {
+                    synth.set({ envelope: { attack: value } });
+                } else if (synth.voice0) {
                     synth.voice0.envelope.attack = value;
                     synth.voice1.envelope.attack = value;
+                } else {
+                    synth.envelope.attack = value;
                 }
                 break;
             case 'decay':
-                synth.envelope.decay = value;
-                if (synth.voice0) {
+                if (currentInstrumentType === 'PolySynth') {
+                    synth.set({ envelope: { decay: value } });
+                } else if (synth.voice0) {
                     synth.voice0.envelope.decay = value;
                     synth.voice1.envelope.decay = value;
+                } else {
+                    synth.envelope.decay = value;
                 }
                 break;
             case 'sustain':
-                synth.envelope.sustain = value;
-                if (synth.voice0) {
+                if (currentInstrumentType === 'PolySynth') {
+                    synth.set({ envelope: { sustain: value } });
+                } else if (synth.voice0) {
                     synth.voice0.envelope.sustain = value;
                     synth.voice1.envelope.sustain = value;
+                } else {
+                    synth.envelope.sustain = value;
                 }
                 break;
             case 'release':
-                synth.envelope.release = value;
-                if (synth.voice0) {
+                if (currentInstrumentType === 'PolySynth') {
+                    synth.set({ envelope: { release: value } });
+                } else if (synth.voice0) {
                     synth.voice0.envelope.release = value;
                     synth.voice1.envelope.release = value;
+                } else {
+                    synth.envelope.release = value;
                 }
                 break;
             case 'modAttack':
@@ -424,9 +499,6 @@ function updateSynthParameter(param, value) {
             case 'volume':
                 synth.volume.value = value;
                 break;
-            case 'polyphony':
-                // Polyphony can't be changed dynamically, requires reinit
-                break;
         }
     } catch (error) {
         console.log('Parameter update error:', error);
@@ -436,8 +508,8 @@ function updateSynthParameter(param, value) {
 // Create keyboard
 function createKeyboard() {
     const keyboard = document.getElementById('keyboard');
-    keyboard.innerHTML = ''; // Clear existing keys
-    
+    keyboard.innerHTML = '';
+
     const keys = keyboardLayouts[userLayout];
     const notes = [
         { note: `C${currentOctave}`, white: true, label: 'C', key: keys[0] },
@@ -455,7 +527,7 @@ function createKeyboard() {
         { note: `C${currentOctave + 1}`, white: true, label: 'C', key: keys[12] }
     ];
 
-    notes.forEach(n => {
+    notes.forEach((n, i) => {
         const keyEl = document.createElement('div');
         keyEl.className = n.white ? 'key' : 'key black';
         keyEl.dataset.note = n.note;
@@ -465,36 +537,54 @@ function createKeyboard() {
             <span class="note-label">${n.label}</span>
         `;
 
-        // Accessibility attributes
+        // Accessibility
         keyEl.setAttribute('role', 'button');
-        keyEl.setAttribute('aria-label', `${n.label.replace('#', ' sharp')} octave ${currentOctave}`);
+        const noteOctave = i === notes.length - 1 ? currentOctave + 1 : currentOctave;
+        keyEl.setAttribute('aria-label', `${n.label.replace('#', ' sharp')} octave ${noteOctave}`);
         keyEl.setAttribute('tabindex', '0');
 
+        // Mouse handlers
         keyEl.addEventListener('mousedown', () => {
             playNote(n.note);
             keyEl.classList.add('pressed');
         });
         keyEl.addEventListener('mouseup', () => {
-            stopNote();
             keyEl.classList.remove('pressed');
+            stopNote(n.note);
         });
         keyEl.addEventListener('mouseleave', () => {
-            stopNote();
             keyEl.classList.remove('pressed');
+            stopNote(n.note);
+        });
+
+        // Keyboard activation (Enter/Space) for accessibility
+        keyEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                playNote(n.note);
+                keyEl.classList.add('pressed');
+            }
+        });
+        keyEl.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                keyEl.classList.remove('pressed');
+                stopNote(n.note);
+            }
         });
 
         keyboard.appendChild(keyEl);
     });
 
-    // Initialize mobile touch handling
+    // Initialize mobile touch handling (only once)
     enhanceMobileTouchHandling();
 }
 
 function playNote(note) {
     if (!synth) return;
-    
+
     document.getElementById('currentNote').textContent = note;
-    
+
     try {
         if (currentInstrumentType === 'NoiseSynth') {
             synth.triggerAttack();
@@ -508,61 +598,79 @@ function playNote(note) {
     }
 }
 
-function stopNote() {
+function stopNote(note) {
     if (!synth) return;
-    
-    setTimeout(() => {
-        document.getElementById('currentNote').textContent = '—';
-    }, 100);
-    
+
     try {
-        synth.triggerRelease();
+        if (currentInstrumentType === 'PolySynth' && note) {
+            // Release specific note for polyphonic synth
+            synth.triggerRelease(note);
+        } else if (activeKeys.size === 0 && activeTouches.size === 0) {
+            // Only release mono synths when all keys/touches are up
+            synth.triggerRelease();
+        }
     } catch (error) {
         console.log('Release error:', error);
     }
+
+    if (activeKeys.size === 0 && activeTouches.size === 0) {
+        document.getElementById('currentNote').textContent = '\u2014';
+    }
 }
 
-// Effect controls
+// Effect controls — guarded against pre-init access
 document.getElementById('reverb').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('reverbValue').textContent = value;
-    reverb.wet.value = value;
+    if (reverb) reverb.wet.value = value;
+    updateSliderFill(e.target);
 });
 
 document.getElementById('delayTime').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('delayTimeValue').textContent = value + 's';
-    delay.delayTime.value = value;
+    if (delay) delay.delayTime.value = value;
+    updateSliderFill(e.target);
 });
 
 document.getElementById('delayFeedback').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('delayFeedbackValue').textContent = value;
-    delay.feedback.value = value;
+    if (delay) delay.feedback.value = value;
+    updateSliderFill(e.target);
 });
 
 document.getElementById('distortion').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('distortionValue').textContent = value;
-    distortion.distortion = value;
-    distortion.wet.value = value > 0 ? 0.5 : 0;
+    if (distortion) {
+        distortion.distortion = value;
+        distortion.wet.value = value > 0 ? 0.5 : 0;
+    }
+    updateSliderFill(e.target);
 });
 
 document.getElementById('filterFreq').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('filterFreqValue').textContent = value + ' Hz';
-    filter.frequency.value = value;
+    if (filter) filter.frequency.value = value;
+    updateSliderFill(e.target);
 });
 
 document.getElementById('chorusRate').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     document.getElementById('chorusRateValue').textContent = value + ' Hz';
-    chorus.frequency.value = value;
+    if (chorus) chorus.frequency.value = value;
+    updateSliderFill(e.target);
 });
+
+// Initialize slider fills for static effects sliders
+document.querySelectorAll('.effect-controls input[type="range"]').forEach(updateSliderFill);
 
 // Instrument selector
 document.getElementById('instrumentType').addEventListener('change', (e) => {
     initSynth(e.target.value);
+    e.target.blur();
 });
 
 // Octave controls
@@ -590,15 +698,17 @@ document.getElementById('octaveDown').addEventListener('click', () => {
     }
 });
 
-// Keyboard shortcuts for octave changes
+// Keyboard shortcuts for octave changes — only when no form control is focused
 document.addEventListener('keydown', (e) => {
-    // Prevent repeat firing when holding down a key
     if (e.repeat) return;
-    
+
     const key = e.key.toLowerCase();
-    
-    // Octave controls - using only arrow keys to avoid conflicts
-    if (key === 'arrowleft') {
+    const tag = document.activeElement?.tagName;
+    const isFormControl = tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
+
+    // Octave controls — skip if a form control is focused
+    if (key === 'arrowleft' && !isFormControl) {
+        e.preventDefault();
         if (currentOctave > minOctave) {
             currentOctave--;
             document.getElementById('currentOctave').textContent = currentOctave;
@@ -606,7 +716,8 @@ document.addEventListener('keydown', (e) => {
             updateOctaveButtons();
         }
         return;
-    } else if (key === 'arrowright') {
+    } else if (key === 'arrowright' && !isFormControl) {
+        e.preventDefault();
         if (currentOctave < maxOctave) {
             currentOctave++;
             document.getElementById('currentOctave').textContent = currentOctave;
@@ -615,8 +726,10 @@ document.addEventListener('keydown', (e) => {
         }
         return;
     }
-    
-    // Find the key element that corresponds to this keyboard key
+
+    // Note playing — only block if focused on a select or text input (where letter keys have native behavior)
+    if (tag === 'SELECT' || tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type !== 'range')) return;
+
     const keyElement = document.querySelector(`[data-keyboard-key="${key}"]`);
     if (keyElement && !activeKeys.has(key)) {
         activeKeys.add(key);
@@ -628,15 +741,15 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('keyup', (e) => {
     const key = e.key.toLowerCase();
-    
-    // Don't process octave keys
+
     if (key === 'arrowleft' || key === 'arrowright') return;
-    
+
     const keyElement = document.querySelector(`[data-keyboard-key="${key}"]`);
     if (keyElement && activeKeys.has(key)) {
+        const note = keyElement.dataset.note;
         activeKeys.delete(key);
-        stopNote();
         keyElement.classList.remove('pressed');
+        stopNote(note);
     }
 });
 
@@ -645,30 +758,68 @@ document.getElementById('keyboardLayout').addEventListener('change', (e) => {
     userLayout = e.target.value;
     localStorage.setItem('keyboardLayout', userLayout);
     createKeyboard();
+    e.target.blur();
 });
 
 // Initialize
 async function init() {
-    await Tone.start();
-    initEffects();
-    initSynth('Synth');
-    
-    // Set user's keyboard layout
-    userLayout = detectKeyboardLayout();
-    document.getElementById('keyboardLayout').value = userLayout;
-    
-    createKeyboard();
+    try {
+        await Tone.start();
+        initEffects();
+        initSynth('Synth');
+
+        userLayout = detectKeyboardLayout();
+        document.getElementById('keyboardLayout').value = userLayout;
+
+        createKeyboard();
+        audioInitialized = true;
+
+        // Hide overlay
+        const overlay = document.getElementById('audioOverlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+        }
+    } catch (error) {
+        console.error('Audio initialization failed:', error);
+        const overlay = document.getElementById('audioOverlay');
+        if (overlay) {
+            const content = overlay.querySelector('.audio-overlay-content p');
+            if (content) {
+                content.textContent = 'Audio could not start. Try a different browser or check sound settings.';
+                content.style.color = '#ff4444';
+            }
+        }
+    }
 }
 
-// Start on user interaction
-document.body.addEventListener('click', init, { once: true });
+// Start on overlay click
+const audioOverlay = document.getElementById('audioOverlay');
+if (audioOverlay) {
+    audioOverlay.addEventListener('click', () => {
+        if (!audioInitialized) init();
+    });
+}
+
+// Also allow any click if overlay was somehow missed
+document.body.addEventListener('click', () => {
+    if (!audioInitialized) init();
+}, { once: true });
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
             .then(registration => {
-                console.log('Service Worker registered successfully:', registration.scope);
+                // Listen for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            newWorker.postMessage('SKIP_WAITING');
+                        }
+                    });
+                });
             })
             .catch(error => {
                 console.log('Service Worker registration failed:', error);
@@ -681,34 +832,22 @@ let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
-    // Stash the event so it can be triggered later
     deferredPrompt = e;
-    
-    // Show install button
     installBtn.style.display = 'inline-block';
 });
 
 installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-        return;
-    }
-    
-    // Show the install prompt
+    if (!deferredPrompt) return;
+
     deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`User response to install prompt: ${outcome}`);
-    
-    // Clear the deferredPrompt for next time
     deferredPrompt = null;
     installBtn.style.display = 'none';
 });
 
 window.addEventListener('appinstalled', () => {
-    console.log('PWA installed successfully');
     deferredPrompt = null;
     installBtn.style.display = 'none';
 });
@@ -736,6 +875,8 @@ function updateOctaveButtons() {
     if (octaveUpBtn && octaveDownBtn) {
         octaveUpBtn.disabled = currentOctave >= maxOctave;
         octaveDownBtn.disabled = currentOctave <= minOctave;
+        octaveUpBtn.setAttribute('aria-disabled', currentOctave >= maxOctave);
+        octaveDownBtn.setAttribute('aria-disabled', currentOctave <= minOctave);
     }
 }
 
@@ -763,131 +904,140 @@ function updateScrollIndicators() {
     }
 }
 
-// Center keyboard to middle key
+// Center keyboard to middle key — using double RAF instead of setTimeout
 function centerKeyboard() {
     const keyboard = document.getElementById('keyboard');
     if (!keyboard) return;
 
-    setTimeout(() => {
-        const middleKey = keyboard.querySelector(`[data-note="E${currentOctave}"]`);
-        if (middleKey) {
-            middleKey.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-            });
-        }
-    }, 100);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const middleKey = keyboard.querySelector(`[data-note="E${currentOctave}"]`);
+            if (middleKey) {
+                middleKey.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }
+        });
+    });
 }
 
-// Enhanced mobile touch handling
-function enhanceMobileTouchHandling() {
-    const keyboard = document.getElementById('keyboard');
-    if (!keyboard) return;
+// Stable touch handler references (hoisted to avoid listener accumulation)
+function handleTouchStart(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-    function handleTouchStart(e) {
-        e.preventDefault();
-        e.stopPropagation();
+    isPlayingNotes = true;
 
-        isPlayingNotes = true;
+    Array.from(e.changedTouches).forEach(touch => {
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        const key = element?.closest('.key');
 
-        Array.from(e.changedTouches).forEach(touch => {
+        if (key && !activeTouches.has(touch.identifier)) {
+            const note = key.dataset.note;
+
+            activeTouches.set(touch.identifier, {
+                key: key.dataset.note,
+                note: note,
+                element: key,
+                startX: touch.clientX,
+                startY: touch.clientY
+            });
+
+            playNote(note);
+            key.classList.add('pressed');
+
+            if (navigator.vibrate) {
+                navigator.vibrate(touchConfig.hapticDuration);
+            }
+        }
+    });
+}
+
+function handleTouchMove(e) {
+    if (!touchConfig.slideGestureEnabled) return;
+
+    e.preventDefault();
+
+    Array.from(e.changedTouches).forEach(touch => {
+        const touchData = activeTouches.get(touch.identifier);
+        if (!touchData) return;
+
+        const deltaX = Math.abs(touch.clientX - touchData.startX);
+        const deltaY = Math.abs(touch.clientY - touchData.startY);
+
+        if (deltaX > touchConfig.touchMoveThreshold || deltaY > touchConfig.touchMoveThreshold) {
             const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            const key = element?.closest('.key');
+            const newKey = element?.closest('.key');
 
-            if (key && !activeTouches.has(touch.identifier)) {
-                const note = key.dataset.note;
+            if (newKey && newKey !== touchData.element) {
+                const oldNote = touchData.note;
+                const newNote = newKey.dataset.note;
 
-                activeTouches.set(touch.identifier, {
-                    key: key.dataset.note,
-                    note: note,
-                    element: key,
-                    startX: touch.clientX,
-                    startY: touch.clientY
-                });
+                touchData.element.classList.remove('pressed');
 
-                playNote(note);
-                key.classList.add('pressed');
+                // Release old note for PolySynth before playing new one
+                if (currentInstrumentType === 'PolySynth') {
+                    try { synth.triggerRelease(oldNote); } catch(err) { /* ignore */ }
+                }
+
+                touchData.element = newKey;
+                touchData.note = newNote;
+                touchData.key = newKey.dataset.note;
+
+                playNote(newNote);
+                newKey.classList.add('pressed');
 
                 if (navigator.vibrate) {
-                    navigator.vibrate(touchConfig.hapticDuration);
+                    navigator.vibrate(8);
                 }
             }
-        });
-    }
-
-    function handleTouchMove(e) {
-        if (!touchConfig.slideGestureEnabled) return;
-
-        e.preventDefault();
-
-        Array.from(e.changedTouches).forEach(touch => {
-            const touchData = activeTouches.get(touch.identifier);
-            if (!touchData) return;
-
-            const deltaX = Math.abs(touch.clientX - touchData.startX);
-            const deltaY = Math.abs(touch.clientY - touchData.startY);
-
-            if (deltaX > touchConfig.touchMoveThreshold || deltaY > touchConfig.touchMoveThreshold) {
-                const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                const newKey = element?.closest('.key');
-
-                if (newKey && newKey !== touchData.element) {
-                    const newNote = newKey.dataset.note;
-
-                    touchData.element.classList.remove('pressed');
-
-                    // Legato transition - no audio gap
-                    touchData.element = newKey;
-                    touchData.note = newNote;
-                    touchData.key = newKey.dataset.note;
-
-                    playNote(newNote);
-                    newKey.classList.add('pressed');
-
-                    if (navigator.vibrate) {
-                        navigator.vibrate(8);
-                    }
-                }
-            }
-        });
-    }
-
-    function handleTouchEnd(e) {
-        e.preventDefault();
-
-        Array.from(e.changedTouches).forEach(touch => {
-            const touchData = activeTouches.get(touch.identifier);
-
-            if (touchData) {
-                stopNote();
-                touchData.element.classList.remove('pressed');
-                activeTouches.delete(touch.identifier);
-            }
-        });
-
-        if (activeTouches.size === 0) {
-            isPlayingNotes = false;
         }
-    }
+    });
+}
 
-    function handleTouchCancel(e) {
-        e.preventDefault();
+function handleTouchEnd(e) {
+    e.preventDefault();
 
-        Array.from(e.changedTouches).forEach(touch => {
-            const touchData = activeTouches.get(touch.identifier);
+    Array.from(e.changedTouches).forEach(touch => {
+        const touchData = activeTouches.get(touch.identifier);
 
-            if (touchData) {
-                stopNote();
-                touchData.element.classList.remove('pressed');
-                activeTouches.delete(touch.identifier);
-            }
-        });
-
-        if (activeTouches.size === 0) {
-            isPlayingNotes = false;
+        if (touchData) {
+            touchData.element.classList.remove('pressed');
+            activeTouches.delete(touch.identifier);
+            stopNote(touchData.note);
         }
+    });
+
+    if (activeTouches.size === 0) {
+        isPlayingNotes = false;
     }
+}
+
+function handleTouchCancel(e) {
+    e.preventDefault();
+
+    Array.from(e.changedTouches).forEach(touch => {
+        const touchData = activeTouches.get(touch.identifier);
+
+        if (touchData) {
+            touchData.element.classList.remove('pressed');
+            activeTouches.delete(touch.identifier);
+            stopNote(touchData.note);
+        }
+    });
+
+    if (activeTouches.size === 0) {
+        isPlayingNotes = false;
+    }
+}
+
+// Enhanced mobile touch handling — attaches listeners once
+function enhanceMobileTouchHandling() {
+    const keyboard = document.getElementById('keyboard');
+    if (!keyboard || keyboard.dataset.touchHandled) return;
+    keyboard.dataset.touchHandled = 'true';
 
     keyboard.addEventListener('touchstart', handleTouchStart, { passive: false });
     keyboard.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -898,7 +1048,6 @@ function enhanceMobileTouchHandling() {
     if (window.innerWidth <= 768) {
         updateScrollIndicators();
 
-        // Throttled scroll listener for performance
         let scrollTimeout;
         keyboard.addEventListener('scroll', () => {
             if (!scrollTimeout) {
@@ -914,24 +1063,32 @@ function enhanceMobileTouchHandling() {
 
     const keyboardSection = document.querySelector('.keyboard-section');
     if (keyboardSection) {
+        let savedScrollY = 0;
         keyboardSection.addEventListener('touchstart', () => {
+            savedScrollY = window.scrollY;
+            document.body.style.top = `-${savedScrollY}px`;
             document.body.classList.add('keyboard-active');
         }, { passive: true });
 
         keyboardSection.addEventListener('touchend', () => {
             document.body.classList.remove('keyboard-active');
+            document.body.style.top = '';
+            window.scrollTo(0, savedScrollY);
         }, { passive: true });
     }
 
     updateOctaveButtons();
 }
 
-// Prevent zoom on double-tap for iOS
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-    }
-    lastTouchEnd = now;
-}, { passive: false });
+// Prevent zoom on double-tap — scoped to keyboard only
+const keyboardEl = document.getElementById('keyboard');
+if (keyboardEl) {
+    let lastTouchEnd = 0;
+    keyboardEl.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+}

@@ -4,145 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToneLab Synthesizer</title>
-    
+
     <!-- PWA Meta Tags -->
     <meta name="description" content="Advanced Web Synthesizer with Tone.js - Create music with multiple instruments, effects, and waveforms">
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ToneLab">
     <link rel="manifest" href="manifest.json">
-    
+
+    <!-- Preconnect to external origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap">
+
     <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300f0ff;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23ff00aa;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' fill='%230a0e27'/%3E%3Cpath d='M40 80 L40 140 L60 140 L60 80 Z' fill='url(%23grad)' stroke='%2300f0ff' stroke-width='2'/%3E%3Cpath d='M70 70 L70 140 L90 140 L90 70 Z' fill='url(%23grad)' stroke='%2300f0ff' stroke-width='2'/%3E%3Cpath d='M100 90 L100 140 L120 140 L120 90 Z' fill='url(%23grad)' stroke='%2300f0ff' stroke-width='2'/%3E%3Cpath d='M130 60 L130 140 L150 140 L150 60 Z' fill='url(%23grad)' stroke='%2300f0ff' stroke-width='2'/%3E%3Cpath d='M55 70 L55 110 L70 110 L70 70 Z' fill='%23ff00aa' stroke='%23ff00aa' stroke-width='2'/%3E%3Cpath d='M115 80 L115 110 L130 110 L130 80 Z' fill='%23ff00aa' stroke='%23ff00aa' stroke-width='2'/%3E%3Ctext x='96' y='170' font-family='Orbitron, sans-serif' font-size='20' font-weight='bold' fill='%2300f0ff' text-anchor='middle'%3EToneLab%3C/text%3E%3C/svg%3E">
-    
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
     <!-- External Stylesheets -->
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" defer></script>
 </head>
 <body>
+    <a href="#keyboard" class="skip-link">Skip to keyboard</a>
+
+    <!-- Audio activation overlay -->
+    <div id="audioOverlay" class="audio-overlay">
+        <div class="audio-overlay-content">
+            <h2 class="audio-overlay-title">ToneLab</h2>
+            <p>Tap anywhere to activate audio</p>
+            <div class="audio-overlay-icon">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>ToneLab</h1>
             <p class="subtitle">Advanced Web Synthesizer</p>
-            <button id="installBtn" style="display: none; margin-top: 1rem;">📱 Install App</button>
+            <button id="installBtn" style="display: none; margin-top: 1rem;">Install App</button>
         </header>
 
-        <div class="synth-panel">
-            <div class="panel-header">
-                <h2 class="panel-title">Instrument</h2>
-                <div class="instrument-select">
-                    <label for="instrumentType">Type:</label>
-                    <select id="instrumentType">
-                        <option value="Synth">Synth</option>
-                        <option value="AMSynth">AM Synth</option>
-                        <option value="FMSynth">FM Synth</option>
-                        <option value="MembraneSynth">Membrane Synth</option>
-                        <option value="MetalSynth">Metal Synth</option>
-                        <option value="MonoSynth">Mono Synth</option>
-                        <option value="NoiseSynth">Noise Synth</option>
-                        <option value="PluckSynth">Pluck Synth</option>
-                        <option value="PolySynth">Poly Synth</option>
-                        <option value="DuoSynth">Duo Synth</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="controls" class="controls-grid"></div>
-        </div>
-
-        <div class="synth-panel">
-            <div class="panel-header">
-                <h2 class="panel-title">Effects</h2>
-            </div>
-            <div class="effect-controls">
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Reverb</span>
-                        <span class="control-value" id="reverbValue">0.3</span>
-                    </div>
-                    <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3">
-                </div>
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Delay Time</span>
-                        <span class="control-value" id="delayTimeValue">0.25s</span>
-                    </div>
-                    <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25">
-                </div>
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Delay Feedback</span>
-                        <span class="control-value" id="delayFeedbackValue">0.3</span>
-                    </div>
-                    <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3">
-                </div>
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Distortion</span>
-                        <span class="control-value" id="distortionValue">0</span>
-                    </div>
-                    <input type="range" id="distortion" min="0" max="1" step="0.01" value="0">
-                </div>
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Filter Frequency</span>
-                        <span class="control-value" id="filterFreqValue">1000 Hz</span>
-                    </div>
-                    <input type="range" id="filterFreq" min="100" max="10000" step="10" value="1000">
-                </div>
-                <div class="control-group">
-                    <div class="control-label">
-                        <span>Chorus Rate</span>
-                        <span class="control-value" id="chorusRateValue">1.5 Hz</span>
-                    </div>
-                    <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5">
-                </div>
-            </div>
-        </div>
-
-        <div class="keyboard-section">
-            <div class="synth-panel keyboard-panel">
+        <main id="main-content">
+            <div class="synth-panel">
                 <div class="panel-header">
-                    <h2 class="panel-title">Keyboard</h2>
-                    <div class="keyboard-controls">
-                        <div class="instrument-select">
-                            <label for="keyboardLayout">Layout:</label>
-                            <select id="keyboardLayout">
-                                <option value="qwerty">QWERTY</option>
-                                <option value="azerty">AZERTY</option>
-                                <option value="qwertz">QWERTZ</option>
-                                <option value="dvorak">Dvorak</option>
-                            </select>
-                        </div>
-                        <div class="octave-controls">
-                            <button id="octaveDown" class="octave-btn">◄ OCTAVE</button>
-                            <span class="octave-display">Octave: <span id="currentOctave">4</span></span>
-                            <button id="octaveUp" class="octave-btn">OCTAVE ►</button>
-                        </div>
+                    <h2 class="panel-title" id="instrumentHeading">Instrument</h2>
+                    <div class="instrument-select">
+                        <label for="instrumentType">Type:</label>
+                        <select id="instrumentType">
+                            <option value="Synth">Synth</option>
+                            <option value="AMSynth">AM Synth</option>
+                            <option value="FMSynth">FM Synth</option>
+                            <option value="MembraneSynth">Membrane Synth</option>
+                            <option value="MetalSynth">Metal Synth</option>
+                            <option value="MonoSynth">Mono Synth</option>
+                            <option value="NoiseSynth">Noise Synth</option>
+                            <option value="PluckSynth">Pluck Synth</option>
+                            <option value="PolySynth">Poly Synth</option>
+                            <option value="DuoSynth">Duo Synth</option>
+                        </select>
                     </div>
                 </div>
-                <div class="keyboard-wrapper">
-                    <div class="keyboard-scroll-indicator left" id="scrollIndicatorLeft">
-                        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+
+                <div id="controls" class="controls-grid" role="group" aria-labelledby="instrumentHeading"></div>
+            </div>
+
+            <div class="synth-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title" id="effectsHeading">Effects</h2>
+                </div>
+                <div class="effect-controls" role="group" aria-labelledby="effectsHeading">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="reverb">Reverb</label>
+                            <span class="control-value" id="reverbValue">0.3</span>
+                        </div>
+                        <p class="control-hint">Simulates room space &mdash; higher = bigger room, more echo</p>
+                        <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3">
                     </div>
-                    <div class="keyboard" id="keyboard"></div>
-                    <div class="keyboard-scroll-indicator right" id="scrollIndicatorRight">
-                        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="delayTime">Delay Time</label>
+                            <span class="control-value" id="delayTimeValue">0.25s</span>
+                        </div>
+                        <p class="control-hint">Time between each echo repeat</p>
+                        <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="delayFeedback">Delay Feedback</label>
+                            <span class="control-value" id="delayFeedbackValue">0.3</span>
+                        </div>
+                        <p class="control-hint">How many times the echo repeats &mdash; higher = more echoes</p>
+                        <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="distortion">Distortion</label>
+                            <span class="control-value" id="distortionValue">0</span>
+                        </div>
+                        <p class="control-hint">Adds grit and crunch to the sound &mdash; from subtle warmth to heavy fuzz</p>
+                        <input type="range" id="distortion" min="0" max="1" step="0.01" value="0">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="filterFreq">Filter Frequency</label>
+                            <span class="control-value" id="filterFreqValue">5000 Hz</span>
+                        </div>
+                        <p class="control-hint">Cuts frequencies above this point &mdash; low = dark and muffled, high = bright and open</p>
+                        <input type="range" id="filterFreq" min="100" max="10000" step="10" value="5000">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="chorusRate">Chorus Rate</label>
+                            <span class="control-value" id="chorusRateValue">1.5 Hz</span>
+                        </div>
+                        <p class="control-hint">Speed of the chorus shimmer effect &mdash; makes the sound wider and richer</p>
+                        <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5">
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="info-display">
-            <p>Play with your computer keyboard! | Press ←/→ arrow keys to change octaves | Change instruments and tweak parameters in real-time</p>
-            <p>Currently playing: <span id="currentNote" style="color: var(--accent-cyan); font-weight: bold;">—</span></p>
-        </div>
+            <div class="keyboard-section">
+                <div class="synth-panel keyboard-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Keyboard</h2>
+                        <div class="keyboard-controls">
+                            <div class="instrument-select">
+                                <label for="keyboardLayout">Layout:</label>
+                                <select id="keyboardLayout">
+                                    <option value="qwerty">QWERTY</option>
+                                    <option value="azerty">AZERTY</option>
+                                    <option value="qwertz">QWERTZ</option>
+                                    <option value="dvorak">Dvorak</option>
+                                </select>
+                            </div>
+                            <div class="octave-controls">
+                                <button id="octaveDown" class="octave-btn" aria-label="Decrease octave">&#9664; OCT</button>
+                                <span class="octave-display">Octave: <span id="currentOctave" aria-live="polite">4</span></span>
+                                <button id="octaveUp" class="octave-btn" aria-label="Increase octave">OCT &#9654;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="keyboard-wrapper">
+                        <div class="keyboard-scroll-indicator left" id="scrollIndicatorLeft" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                        </div>
+                        <div class="keyboard" id="keyboard" role="group" aria-label="Piano keyboard"></div>
+                        <div class="keyboard-scroll-indicator right" id="scrollIndicatorRight" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-display" role="status">
+                <p>Play with your computer keyboard! | Press &#8592;/&#8594; arrow keys to change octaves</p>
+                <p>Currently playing: <span id="currentNote" aria-live="assertive" style="color: var(--accent-cyan); font-weight: bold;">&#8212;</span></p>
+            </div>
+        </main>
     </div>
 
     <!-- External JavaScript -->
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

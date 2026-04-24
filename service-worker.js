@@ -1,51 +1,65 @@
-const CACHE_NAME = 'tonelab-synth-v1';
-const urlsToCache = [
-  '/synthesizer.html',
-  'https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js',
-  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap'
+const CACHE_NAME = 'tonelab-synth-v2';
+const LOCAL_URLS = [
+  './',
+  './index.html',
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-// Install service worker and cache resources
+const EXTERNAL_URLS = [
+  'https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js',
+  'https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap'
+];
+
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(err => {
-        console.log('Cache failed:', err);
-      })
-  );
-});
-
-// Fetch from cache first, then network
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
+    caches.open(CACHE_NAME).then(async cache => {
+      await cache.addAll(LOCAL_URLS);
+      for (const url of EXTERNAL_URLS) {
+        try {
+          const response = await fetch(url, { mode: 'cors' });
+          if (response.ok) {
+            await cache.put(url, response);
+          }
+        } catch (err) {
+          console.warn('Failed to cache external resource:', url, err);
         }
-        return fetch(event.request);
       }
-    )
+    })
   );
 });
 
-// Clean up old caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
       );
+    }).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) return response;
+      return fetch(event.request).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
+});
+
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

@@ -1,0 +1,3 @@
+Tone.js 14.8.49 — MIT License
+Copyright (c) 2014-2020 Yotam Mann
+https://github.com/Tonejs/Tone.js/blob/14.8.49/LICENSE.md

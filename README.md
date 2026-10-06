@@ -31,11 +31,11 @@ Click a preset button to instantly configure the synth, effects, and octave for 
 
 ## Tech Stack
 
-- **Tone.js 14.8.49** -- Web Audio synthesis
+- **Tone.js 14.8.49** -- Web Audio synthesis (vendored in `vendor/`)
 - **Vanilla JS** -- No frameworks
 - **CSS3** -- CRT effects, SVG knobs, responsive grid
-- **PWA** -- Service worker, offline support, installable
-- **Fonts** -- Orbitron (logo), Share Tech Mono (UI), Inter (descriptions)
+- **PWA** -- Service worker, fully offline (no CDN at runtime), installable
+- **Fonts** -- Orbitron (logo), Share Tech Mono (UI), Inter (descriptions), self-hosted in `fonts/`
 
 ## Deploy
 
@@ -68,7 +68,9 @@ ToneLAB/
   script.js           Synth engine, knobs, presets, keyboard, static noise
   styles.css          CRT effects, knob layout, responsive design
   manifest.json       PWA manifest
-  service-worker.js   Offline caching
+  service-worker.js   Offline caching (precache + stale-while-revalidate)
+  fonts/              Self-hosted woff2 fonts + @font-face CSS
+  vendor/             Tone.js (MIT, see Tone.js.LICENSE.txt)
   icons/              App icons (192px, 512px)
 ```
 
@@ -79,5 +81,5 @@ MIT
 ## Credits
 
 - [Tone.js](https://tonejs.github.io/)
-- [Google Fonts](https://fonts.google.com/)
+- [Google Fonts](https://fonts.google.com/) (Orbitron, Share Tech Mono, Inter -- self-hosted)
 - CRT effect inspired by [Alec Lownes](https://aleclownes.com/2017/02/01/crt-display.html)

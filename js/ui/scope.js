@@ -33,6 +33,7 @@ export const scope = (() => {
     let mode = localStorage.getItem('scopeMode') === 'spectrum' ? 'spectrum' : 'wave';
     let sampleRate = 44100;
     let lastPeak = 0; // peak of the last drawn waveform frame, 0..1
+    let lastMaxDb = -Infinity; // loudest bin of the last drawn spectrum frame
 
     function resize() {
         const rect = canvas.getBoundingClientRect();
@@ -130,15 +131,18 @@ export const scope = (() => {
         const n = values.length;
         const logMax = Math.log(n);
 
+        let maxDb = -Infinity;
         ctx.beginPath();
         ctx.moveTo(0, height);
         for (let i = 1; i < n; i++) {
             const x = (Math.log(i) / logMax) * width;
+            if (values[i] > maxDb) maxDb = values[i];
             const db = Math.min(MAX_DB, Math.max(MIN_DB, values[i]));
             const y = height - ((db - MIN_DB) / (MAX_DB - MIN_DB)) * height;
             ctx.lineTo(x, y);
         }
         ctx.lineTo(width, height);
+        lastMaxDb = maxDb;
 
         const fill = ctx.createLinearGradient(0, 0, 0, height);
         fill.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
@@ -160,22 +164,42 @@ export const scope = (() => {
         ctx.stroke();
     }
 
+    // Perf: when nothing is playing the trace is a flat line, so after a short
+    // run of silent frames the loop drops from 60 fps to ~12 fps and comes back
+    // to full rate on the first frame with signal.
+    const IDLE_AFTER_FRAMES = 30;
+    const IDLE_INTERVAL_MS = 80;
+    let idleFrames = 0;
+    let idleTimer = null;
+
+    function isSilent() {
+        return mode === 'wave' ? lastPeak < 0.002 : lastMaxDb < -90;
+    }
+
     function render() {
         // Fade instead of clear: previous traces linger like a real CRT phosphor
         ctx.fillStyle = PERSISTENCE;
         ctx.fillRect(0, 0, width, height);
         drawGrid();
         if (mode === 'wave') drawWave(); else drawSpectrum();
-        rafId = requestAnimationFrame(render);
+
+        idleFrames = isSilent() ? idleFrames + 1 : 0;
+        if (idleFrames > IDLE_AFTER_FRAMES) {
+            idleTimer = setTimeout(() => { idleTimer = null; rafId = requestAnimationFrame(render); }, IDLE_INTERVAL_MS);
+        } else {
+            rafId = requestAnimationFrame(render);
+        }
     }
 
     function stop() {
         if (rafId) cancelAnimationFrame(rafId);
+        if (idleTimer) clearTimeout(idleTimer);
         rafId = null;
+        idleTimer = null;
     }
 
     function run() {
-        if (!rafId && waveform) render();
+        if (!rafId && !idleTimer && waveform) render();
     }
 
     function setMode(next) {

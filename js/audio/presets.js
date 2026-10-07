@@ -126,8 +126,8 @@ function applyPreset(type, presetIndex) {
     }
 
     // Update active preset button
-    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.querySelector(`.preset-btn[data-preset="${presetIndex}"]`);
+    document.querySelectorAll('#presetBar .preset-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`#presetBar .preset-btn[data-preset="${presetIndex}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 }
 

@@ -1,0 +1,14 @@
+# Cloudflare Pages cache rules. The service worker precaches with cache:'reload'
+# so these only affect first loads and browsers without the SW.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/vendor/*
+  Cache-Control: public, max-age=2592000
+/icons/*
+  Cache-Control: public, max-age=604800
+/service-worker.js
+  Cache-Control: no-cache
+/js/*
+  Cache-Control: public, max-age=3600
+/styles.css
+  Cache-Control: public, max-age=3600

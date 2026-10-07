@@ -57,8 +57,14 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     });
 });
 
-let storedControlStyle = 'knobs';
-try { storedControlStyle = localStorage.getItem(CONTROL_STYLE_KEY) || 'knobs'; } catch (e) { /* private mode */ }
+// First visit on a touch device starts in slider mode: dragging a knob on a
+// phone is fiddly. The toggle still works and the choice is remembered.
+let storedControlStyle = null;
+try { storedControlStyle = localStorage.getItem(CONTROL_STYLE_KEY); } catch (e) { /* private mode */ }
+if (!storedControlStyle) {
+    const coarse = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    storedControlStyle = coarse ? 'sliders' : 'knobs';
+}
 setControlStyle(storedControlStyle);
 
 // Double-click a slider to reset it, same gesture as the knobs
@@ -68,6 +74,55 @@ document.addEventListener('dblclick', (e) => {
     slider.value = slider.dataset.defaultValue;
     slider.dispatchEvent(new Event('input', { bubbles: true }));
 });
+
+// Semantic grouping of the instrument knobs: every control id belongs to a
+// named set, with a few per-synth overrides where the same id means something
+// else (MetalSynth's harmonicity is tone colour, not an operator ratio).
+const GROUP_BY_ID = {
+    oscType: 'Oscillator', volume: 'Oscillator',
+    attack: 'Envelope', decay: 'Envelope', sustain: 'Envelope', release: 'Envelope',
+    harmonicity: 'Operators', modulationIndex: 'Operators', modType: 'Operators',
+    modAttack: 'Mod Envelope', modRelease: 'Mod Envelope',
+    pitchDecay: 'Pitch', octaves: 'Pitch',
+    frequency: 'Tone', resonance: 'Tone',
+    filterQ: 'Filter', filterCutoff: 'Filter',
+    filterAttack: 'Filter Envelope', filterDecay: 'Filter Envelope', filterSustain: 'Filter Envelope', filterRelease: 'Filter Envelope',
+    noiseType: 'Noise',
+    attackNoise: 'String', dampening: 'String',
+    vibratoAmount: 'Vibrato', vibratoRate: 'Vibrato',
+    voice0Type: 'Voices', voice1Type: 'Voices'
+};
+const GROUP_OVERRIDES = {
+    AMSynth: { oscType: 'Operators' },
+    FMSynth: { oscType: 'Operators' },
+    MembraneSynth: { oscType: 'Pitch' },
+    MetalSynth: { harmonicity: 'Tone', modulationIndex: 'Tone', octaves: 'Tone' },
+    PluckSynth: { resonance: 'String' },
+    DuoSynth: { harmonicity: 'Voices' }
+};
+function groupFor(type, id) {
+    return GROUP_OVERRIDES[type]?.[id] || GROUP_BY_ID[id] || 'Controls';
+}
+
+// Returns the grid inside the named set, creating the set on first use.
+function setGrid(container, sets, name) {
+    if (!sets.has(name)) {
+        const set = document.createElement('section');
+        set.className = 'control-set';
+        set.setAttribute('role', 'group');
+        set.setAttribute('aria-label', name);
+        const title = document.createElement('h3');
+        title.className = 'control-set-title';
+        title.textContent = name;
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+        set.appendChild(title);
+        set.appendChild(grid);
+        container.appendChild(set);
+        sets.set(name, grid);
+    }
+    return sets.get(name);
+}
 
 function updateControls(type) {
     const controlsDiv = document.getElementById('controls');
@@ -224,6 +279,7 @@ function updateControls(type) {
     const controls = controlSets[type] || controlSets['Synth'];
     let controlIndex = 0;
 
+    const sets = new Map();
     controls.forEach(control => {
         const controlGroup = document.createElement('div');
         controlGroup.className = 'control-group';
@@ -267,7 +323,7 @@ function updateControls(type) {
             `;
         }
 
-        controlsDiv.appendChild(controlGroup);
+        setGrid(controlsDiv, sets, groupFor(type, control.id)).appendChild(controlGroup);
     });
 
     // Add event listeners

@@ -49,10 +49,6 @@
         <header>
             <h1>ToneLab</h1>
             <p class="subtitle">Interactive Sound Explorer</p>
-            <div class="view-toggle" role="group" aria-label="Control style">
-                <button type="button" class="preset-btn view-btn active" data-controls="knobs" aria-pressed="true">Knobs</button>
-                <button type="button" class="preset-btn view-btn" data-controls="sliders" aria-pressed="false">Sliders</button>
-            </div>
             <button id="installBtn" style="display: none; margin-top: 1rem;">Install App</button>
         </header>
 
@@ -60,6 +56,7 @@
             <div class="synth-panel">
                 <div class="panel-header">
                     <h2 class="panel-title" id="instrumentHeading">Instrument</h2>
+                    <div class="panel-tools">
                     <div class="instrument-select">
                         <label for="instrumentType">Type:</label>
                         <select id="instrumentType">
@@ -75,122 +72,155 @@
                             <option value="DuoSynth">Duo Synth</option>
                         </select>
                     </div>
+                    <div class="view-toggle" role="group" aria-label="Control style">
+                        <button type="button" class="preset-btn view-btn active" data-controls="knobs" aria-pressed="true">Knobs</button>
+                        <button type="button" class="preset-btn view-btn" data-controls="sliders" aria-pressed="false">Sliders</button>
+                    </div>
+                    </div>
                 </div>
 
-                <p class="synth-description" id="synthDescription" aria-live="polite"></p>
+                <!-- Intro (description + presets) on the left, live scope on the right -->
+                <div class="instrument-top">
+                    <div class="instrument-intro">
+                        <p class="synth-description" id="synthDescription" aria-live="polite"></p>
+                        <div class="preset-bar" id="presetBar" role="group" aria-label="Presets"></div>
+                    </div>
+                    <div class="scope-block" role="group" aria-labelledby="scopeHeading">
+                        <div class="scope-head">
+                            <h3 class="control-set-title" id="scopeHeading">Scope</h3>
+                            <div class="scope-modes" role="group" aria-label="Scope display mode">
+                                <button type="button" class="preset-btn scope-btn active" id="scopeModeWave" data-scope-mode="wave" aria-pressed="true">Wave</button>
+                                <button type="button" class="preset-btn scope-btn" id="scopeModeSpectrum" data-scope-mode="spectrum" aria-pressed="false">Spectrum</button>
+                            </div>
+                        </div>
+                        <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform" title="What you hear, after the effects. Hold a note and turn a knob."></canvas>
+                    </div>
+                </div>
 
-                <div class="preset-bar" id="presetBar" role="group" aria-label="Presets"></div>
-
-                <div id="controls" class="controls-grid" role="group" aria-labelledby="instrumentHeading"></div>
+                <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
             </div>
 
             <div class="synth-panel">
                 <div class="panel-header">
                     <h2 class="panel-title" id="effectsHeading">Effects</h2>
                 </div>
-                <div class="effect-controls" role="group" aria-labelledby="effectsHeading">
-                    <div class="control-group control-group--volume">
-                        <div class="control-label">
-                            <label for="masterVolume">Volume</label>
-                            <span class="control-value" id="masterVolumeValue">75%</span>
+                <div class="effect-controls control-sets" role="group" aria-labelledby="effectsHeading">
+                    <section class="control-set" role="group" aria-label="Master">
+                        <h3 class="control-set-title">Master</h3>
+                        <div class="controls-grid">
+                        <div class="control-group control-group--volume">
+                            <div class="control-label">
+                                <label for="masterVolume">Volume</label>
+                                <span class="control-value" id="masterVolumeValue">75%</span>
+                            </div>
+                            <input type="range" id="masterVolume" min="0" max="100" step="1" value="75" data-default-value="75">
                         </div>
-                        <input type="range" id="masterVolume" min="0" max="100" step="1" value="75" data-default-value="75">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="reverb">Reverb Mix</label>
-                            <span class="control-value" id="reverbValue">0.3</span>
-                            <button type="button" class="help-btn" aria-label="What does Reverb Mix do?" aria-expanded="false" aria-controls="reverbHint">?</button>
                         </div>
-                        <p class="control-hint" id="reverbHint" hidden>How much room sound is blended in. 0 = bone dry, 0.2 for leads, 0.6+ for pads and ambience</p>
-                        <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="reverbSize">Reverb Size</label>
-                            <span class="control-value" id="reverbSizeValue">2.5s</span>
-                            <button type="button" class="help-btn" aria-label="What does Reverb Size do?" aria-expanded="false" aria-controls="reverbSizeHint">?</button>
+                    </section>
+                    <section class="control-set" role="group" aria-label="Reverb">
+                        <h3 class="control-set-title">Reverb</h3>
+                        <div class="controls-grid">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="reverb">Reverb Mix</label>
+                                <span class="control-value" id="reverbValue">0.3</span>
+                                <button type="button" class="help-btn" aria-label="What does Reverb Mix do?" aria-expanded="false" aria-controls="reverbHint">?</button>
+                            </div>
+                            <p class="control-hint" id="reverbHint" hidden>How much room sound is blended in. 0 = bone dry, 0.2 for leads, 0.6+ for pads and ambience</p>
+                            <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
                         </div>
-                        <p class="control-hint" id="reverbSizeHint" hidden>How long the room rings. 0.5s = small booth, 2s = hall, 6s+ = cathedral wash</p>
-                        <input type="range" id="reverbSize" min="0.1" max="10" step="0.1" value="2.5" data-default-value="2.5">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="delayTime">Delay Time</label>
-                            <span class="control-value" id="delayTimeValue">0.25s</span>
-                            <button type="button" class="help-btn" aria-label="What does Delay Time do?" aria-expanded="false" aria-controls="delayTimeHint">?</button>
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="reverbSize">Reverb Size</label>
+                                <span class="control-value" id="reverbSizeValue">2.5s</span>
+                                <button type="button" class="help-btn" aria-label="What does Reverb Size do?" aria-expanded="false" aria-controls="reverbSizeHint">?</button>
+                            </div>
+                            <p class="control-hint" id="reverbSizeHint" hidden>How long the room rings. 0.5s = small booth, 2s = hall, 6s+ = cathedral wash</p>
+                            <input type="range" id="reverbSize" min="0.1" max="10" step="0.1" value="2.5" data-default-value="2.5">
                         </div>
-                        <p class="control-hint" id="delayTimeHint" hidden>Gap between echoes. 0.08s = slapback, 0.25s = rhythmic, 0.5s+ = dub spaces</p>
-                        <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25" data-default-value="0.25">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="delayFeedback">Delay Feedback</label>
-                            <span class="control-value" id="delayFeedbackValue">0.3</span>
-                            <button type="button" class="help-btn" aria-label="What does Delay Feedback do?" aria-expanded="false" aria-controls="delayFeedbackHint">?</button>
                         </div>
-                        <p class="control-hint" id="delayFeedbackHint" hidden>How many repeats you hear. 0 = one echo, 0.5 = a trail, 0.8+ = nearly endless</p>
-                        <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3" data-default-value="0.3">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="delayMix">Delay Mix</label>
-                            <span class="control-value" id="delayMixValue">0.3</span>
-                            <button type="button" class="help-btn" aria-label="What does Delay Mix do?" aria-expanded="false" aria-controls="delayMixHint">?</button>
+                    </section>
+                    <section class="control-set" role="group" aria-label="Delay">
+                        <h3 class="control-set-title">Delay</h3>
+                        <div class="controls-grid">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="delayTime">Delay Time</label>
+                                <span class="control-value" id="delayTimeValue">0.25s</span>
+                                <button type="button" class="help-btn" aria-label="What does Delay Time do?" aria-expanded="false" aria-controls="delayTimeHint">?</button>
+                            </div>
+                            <p class="control-hint" id="delayTimeHint" hidden>Gap between echoes. 0.08s = slapback, 0.25s = rhythmic, 0.5s+ = dub spaces</p>
+                            <input type="range" id="delayTime" min="0" max="1" step="0.01" value="0.25" data-default-value="0.25">
                         </div>
-                        <p class="control-hint" id="delayMixHint" hidden>Loudness of the echoes. Turn to 0 to switch the delay off, e.g. for drums and bass</p>
-                        <input type="range" id="delayMix" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="distortion">Distortion</label>
-                            <span class="control-value" id="distortionValue">0</span>
-                            <button type="button" class="help-btn" aria-label="What does Distortion do?" aria-expanded="false" aria-controls="distortionHint">?</button>
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="delayFeedback">Delay Feedback</label>
+                                <span class="control-value" id="delayFeedbackValue">0.3</span>
+                                <button type="button" class="help-btn" aria-label="What does Delay Feedback do?" aria-expanded="false" aria-controls="delayFeedbackHint">?</button>
+                            </div>
+                            <p class="control-hint" id="delayFeedbackHint" hidden>How many repeats you hear. 0 = one echo, 0.5 = a trail, 0.8+ = nearly endless</p>
+                            <input type="range" id="delayFeedback" min="0" max="0.9" step="0.01" value="0.3" data-default-value="0.3">
                         </div>
-                        <p class="control-hint" id="distortionHint" hidden>Drive and crunch. 0.1 = warm saturation, 0.3 = gritty, 0.7+ = fuzz. Great on bass and leads</p>
-                        <input type="range" id="distortion" min="0" max="1" step="0.01" value="0" data-default-value="0">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="filterFreq">Filter Cutoff</label>
-                            <span class="control-value" id="filterFreqValue">5000 Hz</span>
-                            <button type="button" class="help-btn" aria-label="What does Filter Cutoff do?" aria-expanded="false" aria-controls="filterFreqHint">?</button>
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="delayMix">Delay Mix</label>
+                                <span class="control-value" id="delayMixValue">0.3</span>
+                                <button type="button" class="help-btn" aria-label="What does Delay Mix do?" aria-expanded="false" aria-controls="delayMixHint">?</button>
+                            </div>
+                            <p class="control-hint" id="delayMixHint" hidden>Loudness of the echoes. Turn to 0 to switch the delay off, e.g. for drums and bass</p>
+                            <input type="range" id="delayMix" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
                         </div>
-                        <p class="control-hint" id="filterFreqHint" hidden>Low-pass: removes everything above this pitch. Sweep it down to 500 Hz for a muffled, underwater tone</p>
-                        <input type="range" id="filterFreq" min="100" max="10000" step="10" value="5000" data-default-value="5000">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="chorusRate">Chorus Rate</label>
-                            <span class="control-value" id="chorusRateValue">1.5 Hz</span>
-                            <button type="button" class="help-btn" aria-label="What does Chorus Rate do?" aria-expanded="false" aria-controls="chorusRateHint">?</button>
                         </div>
-                        <p class="control-hint" id="chorusRateHint" hidden>Speed of the shimmer. 0.5 Hz = slow swirl, 2 Hz = classic 80s chorus, 6 Hz+ = wobbly leslie</p>
-                        <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5" data-default-value="1.5">
-                    </div>
-                    <div class="control-group">
-                        <div class="control-label">
-                            <label for="chorusMix">Chorus Mix</label>
-                            <span class="control-value" id="chorusMixValue">0.3</span>
-                            <button type="button" class="help-btn" aria-label="What does Chorus Mix do?" aria-expanded="false" aria-controls="chorusMixHint">?</button>
+                    </section>
+                    <section class="control-set" role="group" aria-label="Tone">
+                        <h3 class="control-set-title">Tone</h3>
+                        <div class="controls-grid">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="filterFreq">Filter Cutoff</label>
+                                <span class="control-value" id="filterFreqValue">5000 Hz</span>
+                                <button type="button" class="help-btn" aria-label="What does Filter Cutoff do?" aria-expanded="false" aria-controls="filterFreqHint">?</button>
+                            </div>
+                            <p class="control-hint" id="filterFreqHint" hidden>Low-pass: removes everything above this pitch. Sweep it down to 500 Hz for a muffled, underwater tone</p>
+                            <input type="range" id="filterFreq" min="100" max="10000" step="10" value="5000" data-default-value="5000">
                         </div>
-                        <p class="control-hint" id="chorusMixHint" hidden>How much of the widened copy you hear. 0 = off (keeps drums tight), 0.5 = wide stereo pad</p>
-                        <input type="range" id="chorusMix" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
-                    </div>
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="distortion">Distortion</label>
+                                <span class="control-value" id="distortionValue">0</span>
+                                <button type="button" class="help-btn" aria-label="What does Distortion do?" aria-expanded="false" aria-controls="distortionHint">?</button>
+                            </div>
+                            <p class="control-hint" id="distortionHint" hidden>Drive and crunch. 0.1 = warm saturation, 0.3 = gritty, 0.7+ = fuzz. Great on bass and leads</p>
+                            <input type="range" id="distortion" min="0" max="1" step="0.01" value="0" data-default-value="0">
+                        </div>
+                        </div>
+                    </section>
+                    <section class="control-set" role="group" aria-label="Chorus">
+                        <h3 class="control-set-title">Chorus</h3>
+                        <div class="controls-grid">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="chorusRate">Chorus Rate</label>
+                                <span class="control-value" id="chorusRateValue">1.5 Hz</span>
+                                <button type="button" class="help-btn" aria-label="What does Chorus Rate do?" aria-expanded="false" aria-controls="chorusRateHint">?</button>
+                            </div>
+                            <p class="control-hint" id="chorusRateHint" hidden>Speed of the shimmer. 0.5 Hz = slow swirl, 2 Hz = classic 80s chorus, 6 Hz+ = wobbly leslie</p>
+                            <input type="range" id="chorusRate" min="0.1" max="10" step="0.1" value="1.5" data-default-value="1.5">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label">
+                                <label for="chorusMix">Chorus Mix</label>
+                                <span class="control-value" id="chorusMixValue">0.3</span>
+                                <button type="button" class="help-btn" aria-label="What does Chorus Mix do?" aria-expanded="false" aria-controls="chorusMixHint">?</button>
+                            </div>
+                            <p class="control-hint" id="chorusMixHint" hidden>How much of the widened copy you hear. 0 = off (keeps drums tight), 0.5 = wide stereo pad</p>
+                            <input type="range" id="chorusMix" min="0" max="1" step="0.01" value="0.3" data-default-value="0.3">
+                        </div>
+                        </div>
+                    </section>
                 </div>
             </div>
 
-            <div class="synth-panel scope-panel">
-                <div class="panel-header">
-                    <h2 class="panel-title" id="scopeHeading">Scope</h2>
-                    <div class="scope-modes" role="group" aria-label="Scope display mode">
-                        <button type="button" class="preset-btn scope-btn active" id="scopeModeWave" data-scope-mode="wave" aria-pressed="true">Wave</button>
-                        <button type="button" class="preset-btn scope-btn" id="scopeModeSpectrum" data-scope-mode="spectrum" aria-pressed="false">Spectrum</button>
-                    </div>
-                </div>
-                <p class="scope-hint" id="scopeHint">Live view of the signal you hear, taken after the effects. Hold a note and turn a knob to see the shape change.</p>
-                <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform"></canvas>
-            </div>
 
             <div class="keyboard-section">
                 <div class="synth-panel keyboard-panel">
@@ -229,19 +259,30 @@
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                         </div>
                     </div>
+                    <div class="info-display" role="status">
+                        <p>Play with your computer keyboard &middot; &#8592;/&#8594; change octave &middot; Playing: <span id="currentNote" aria-live="assertive">&#8212;</span></p>
+                    </div>
                 </div>
-            </div>
-
-            <div class="info-display" role="status">
-                <p>Play with your computer keyboard! | Press &#8592;/&#8594; arrow keys to change octaves</p>
-                <p>Currently playing: <span id="currentNote" aria-live="assertive" style="color: var(--accent-cyan); font-weight: bold;">&#8212;</span></p>
             </div>
         </main>
     </div>
 
     </div><!-- .crt-screen -->
 
-    <!-- App (native ES modules, no build step) -->
+    <!-- App (native ES modules, no build step). modulepreload flattens the
+         import waterfall: all 12 modules fetch in parallel instead of 4 rounds. -->
+    <link rel="modulepreload" href="js/main.js">
+    <link rel="modulepreload" href="js/state.js">
+    <link rel="modulepreload" href="js/crt.js">
+    <link rel="modulepreload" href="js/pwa.js">
+    <link rel="modulepreload" href="js/audio/effects.js">
+    <link rel="modulepreload" href="js/audio/synth.js">
+    <link rel="modulepreload" href="js/audio/presets.js">
+    <link rel="modulepreload" href="js/ui/knobs.js">
+    <link rel="modulepreload" href="js/ui/controls.js">
+    <link rel="modulepreload" href="js/ui/keyboard.js">
+    <link rel="modulepreload" href="js/ui/scope.js">
+    <link rel="modulepreload" href="js/ui/wavePreview.js">
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

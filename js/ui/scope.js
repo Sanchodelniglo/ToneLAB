@@ -1,0 +1,226 @@
+// Oscilloscope / spectrum analyser drawn on the CRT canvas, tapping the signal after the limiter.
+
+/* ============================================
+   SCOPE — oscilloscope / spectrum on the CRT
+   Taps the signal after the limiter (what you actually hear).
+   ============================================ */
+export const scope = (() => {
+    const canvas = document.getElementById('scopeCanvas');
+    if (!canvas) return { start() {}, setMode() {}, level: () => 0 };
+
+    const ctx = canvas.getContext('2d');
+    const WAVE_SIZE = 2048;   // samples per frame — ~46 ms at 44.1 kHz, enough for a 22 Hz period
+    const FFT_SIZE = 1024;    // bins — bin width ~21.5 Hz, log axis from ~21 Hz to Nyquist
+    const MIN_DB = -100;
+    const MAX_DB = -10;
+    const TRACE = '#00f0ff';
+    const TRACE_GLOW = 'rgba(0, 240, 255, 0.55)';
+    const GRID = 'rgba(0, 240, 255, 0.08)';
+    const GRID_STRONG = 'rgba(0, 240, 255, 0.2)';
+    const LABEL = 'rgba(160, 176, 208, 0.7)';
+    const PERSISTENCE = 'rgba(10, 14, 39, 0.4)'; // bg-primary at low alpha = phosphor afterglow
+
+    const labels = {
+        wave: 'Oscilloscope showing the output waveform',
+        spectrum: 'Spectrum analyser showing the output frequencies'
+    };
+
+    let waveform = null;
+    let fft = null;
+    let rafId = null;
+    let width = 0;
+    let height = 0;
+    let mode = localStorage.getItem('scopeMode') === 'spectrum' ? 'spectrum' : 'wave';
+    let sampleRate = 44100;
+    let lastPeak = 0; // peak of the last drawn waveform frame, 0..1
+
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = Math.max(1, Math.round(rect.width));
+        height = Math.max(1, Math.round(rect.height));
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = '#0a0e27';
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    // Log-frequency x position for a given Hz (spectrum mode)
+    function xForHz(hz) {
+        const minHz = sampleRate / (2 * FFT_SIZE); // bin 1
+        const maxHz = sampleRate / 2;
+        const t = (Math.log(hz) - Math.log(minHz)) / (Math.log(maxHz) - Math.log(minHz));
+        return t * width;
+    }
+
+    function drawGrid() {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = GRID;
+        ctx.beginPath();
+        for (let i = 1; i < 8; i++) {
+            const x = Math.round((i / 8) * width) + 0.5;
+            ctx.moveTo(x, 0); ctx.lineTo(x, height);
+        }
+        for (let i = 1; i < 4; i++) {
+            const y = Math.round((i / 4) * height) + 0.5;
+            ctx.moveTo(0, y); ctx.lineTo(width, y);
+        }
+        ctx.stroke();
+
+        ctx.font = '10px "Share Tech Mono", monospace';
+        ctx.fillStyle = LABEL;
+        ctx.textBaseline = 'bottom';
+
+        if (mode === 'wave') {
+            // Zero line
+            ctx.strokeStyle = GRID_STRONG;
+            ctx.beginPath();
+            const mid = Math.round(height / 2) + 0.5;
+            ctx.moveTo(0, mid); ctx.lineTo(width, mid);
+            ctx.stroke();
+            ctx.textAlign = 'left';
+            ctx.fillText(`${(WAVE_SIZE / 2 / sampleRate * 1000).toFixed(0)} ms`, 4, height - 3);
+        } else {
+            // Frequency ticks on the log axis
+            ctx.strokeStyle = GRID_STRONG;
+            ctx.beginPath();
+            const ticks = [['100', 100], ['1k', 1000], ['10k', 10000]];
+            for (const [, hz] of ticks) {
+                const x = Math.round(xForHz(hz)) + 0.5;
+                ctx.moveTo(x, 0); ctx.lineTo(x, height);
+            }
+            ctx.stroke();
+            ctx.textAlign = 'center';
+            for (const [text, hz] of ticks) ctx.fillText(text, xForHz(hz), height - 3);
+            ctx.textAlign = 'left';
+            ctx.fillText('Hz', 4, height - 3);
+        }
+    }
+
+    function drawWave() {
+        const values = waveform.getValue(); // Float32Array in -1..1
+        const n = values.length;
+        const span = n >> 1;
+
+        // Trigger on the first rising zero-crossing so periodic waves hold still
+        // instead of scrolling. Falls back to the buffer start for noise/silence.
+        let start = 0;
+        for (let i = 1; i < span; i++) {
+            if (values[i - 1] < 0 && values[i] >= 0) { start = i; break; }
+        }
+
+        const amp = (height / 2) * 0.9;
+        const mid = height / 2;
+        let peak = 0;
+        ctx.beginPath();
+        for (let i = 0; i < span; i++) {
+            const v = values[start + i];
+            if (v > peak) peak = v; else if (-v > peak) peak = -v;
+            const x = (i / (span - 1)) * width;
+            const y = mid - v * amp;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        lastPeak = peak;
+        strokeTrace();
+    }
+
+    function drawSpectrum() {
+        const values = fft.getValue(); // Float32Array of dB, index = bin
+        const n = values.length;
+        const logMax = Math.log(n);
+
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        for (let i = 1; i < n; i++) {
+            const x = (Math.log(i) / logMax) * width;
+            const db = Math.min(MAX_DB, Math.max(MIN_DB, values[i]));
+            const y = height - ((db - MIN_DB) / (MAX_DB - MIN_DB)) * height;
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(width, height);
+
+        const fill = ctx.createLinearGradient(0, 0, 0, height);
+        fill.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+        fill.addColorStop(1, 'rgba(0, 240, 255, 0.02)');
+        ctx.fillStyle = fill;
+        ctx.fill();
+        strokeTrace();
+    }
+
+    function strokeTrace() {
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        // Wide, soft pass = phosphor bloom; thin, bright pass = the beam
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = TRACE_GLOW;
+        ctx.stroke();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = TRACE;
+        ctx.stroke();
+    }
+
+    function render() {
+        // Fade instead of clear: previous traces linger like a real CRT phosphor
+        ctx.fillStyle = PERSISTENCE;
+        ctx.fillRect(0, 0, width, height);
+        drawGrid();
+        if (mode === 'wave') drawWave(); else drawSpectrum();
+        rafId = requestAnimationFrame(render);
+    }
+
+    function stop() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+
+    function run() {
+        if (!rafId && waveform) render();
+    }
+
+    function setMode(next) {
+        mode = next === 'spectrum' ? 'spectrum' : 'wave';
+        localStorage.setItem('scopeMode', mode);
+        canvas.setAttribute('aria-label', labels[mode]);
+        document.querySelectorAll('.scope-btn').forEach(btn => {
+            const active = btn.dataset.scopeMode === mode;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', String(active));
+        });
+    }
+
+    // Called once audio is running: tap the master bus and start drawing.
+    function start(source) {
+        if (waveform) return;
+        sampleRate = Tone.context.sampleRate;
+        waveform = new Tone.Waveform(WAVE_SIZE);
+        fft = new Tone.FFT({ size: FFT_SIZE, smoothing: 0.75 });
+        source.connect(waveform);
+        source.connect(fft);
+        resize();
+        run();
+    }
+
+    document.querySelectorAll('.scope-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setMode(btn.dataset.scopeMode);
+            btn.blur();
+        });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stop(); else run();
+    });
+
+    if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => { if (waveform) resize(); }).observe(canvas);
+    } else {
+        window.addEventListener('resize', () => { if (waveform) resize(); });
+    }
+
+    setMode(mode);
+    resize();
+    drawGrid();
+
+    return { start, setMode, level: () => lastPeak };
+})();

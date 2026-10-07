@@ -422,6 +422,13 @@ h1 {
     display: none;
 }
 
+/* Knobs / Sliders switch in the page header */
+.view-toggle {
+    display: inline-flex;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+}
+
 .preset-bar {
     display: flex;
     flex-wrap: wrap;
@@ -516,6 +523,7 @@ select:focus {
 }
 
 .control-group {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -551,18 +559,168 @@ select:focus {
     font-size: clamp(0.85rem, 1.4vw, 0.95rem);
 }
 
+/* Hint = overlay popover on the card. Never affects layout: shown on hover /
+   focus of the ? button, or pinned by clicking it (touch). */
 .control-hint {
+    display: none;
+    position: absolute;
+    top: 26px;
+    left: 4px;
+    right: 4px;
+    z-index: 5;
+    margin: 0;
+    padding: 0.5rem 0.6rem;
+    background: rgba(21, 25, 55, 0.96);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
     font-family: var(--font-body);
     font-size: clamp(0.6rem, 1.1vw, 0.7rem);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     line-height: 1.4;
-    margin-top: var(--space-xs);
-    margin-bottom: 0;
-    order: 10;
+    text-align: left;
+    pointer-events: none;
 }
 
+.control-hint:not([hidden]),
+.control-group:has(.help-btn:hover) .control-hint,
+.control-group:has(.help-btn:focus-visible) .control-hint {
+    display: block;
+}
+
+/* "?" help toggle, top-right of every control card */
+.help-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.help-btn:hover,
+.help-btn:focus-visible {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 240, 255, 0.6);
+}
+
+.help-btn[aria-expanded="true"] {
+    color: var(--bg-primary);
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+/* Knob mode (default): the range input is the hidden source of truth */
 input[type="range"] {
     display: none;
+}
+
+/* ---- Slider mode ---- */
+body[data-controls="sliders"] .knob-container {
+    display: none;
+}
+
+body[data-controls="sliders"] input[type="range"] {
+    display: block;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+body[data-controls="sliders"] input[type="range"]:focus-visible {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+}
+
+/* Track: cyan fill up to --fill-percent (set by updateSliderFill), dark remainder */
+body[data-controls="sliders"] input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+body[data-controls="sliders"] input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: rgba(30, 39, 73, 0.9);
+}
+
+body[data-controls="sliders"] input[type="range"]::-moz-range-progress {
+    height: 4px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+/* Thumb: square fader cap, magenta like the knob indicator */
+body[data-controls="sliders"] input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 18px;
+    margin-top: -7px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    transition: box-shadow var(--transition-fast);
+}
+
+body[data-controls="sliders"] input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 18px;
+    border-radius: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+}
+
+body[data-controls="sliders"] input[type="range"]:hover::-webkit-slider-thumb,
+body[data-controls="sliders"] input[type="range"]:active::-webkit-slider-thumb {
+    box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
+}
+
+/* Compact card: name + value on one line, slider below, hint (if open) under it */
+body[data-controls="sliders"] .control-group {
+    align-items: stretch;
+    text-align: left;
+    padding: 0.5rem 0.75rem 0.6rem;
+}
+
+body[data-controls="sliders"] .control-group:hover {
+    transform: none;
+}
+
+body[data-controls="sliders"] .control-label {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: 0.35rem;
+    padding-right: 22px; /* room for the ? button */
+}
+
+body[data-controls="sliders"] .control-value {
+    font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+}
+
+body[data-controls="sliders"] .wave-select {
+    width: 100%;
+}
+
+body[data-controls="sliders"] .controls-grid,
+body[data-controls="sliders"] .effect-controls {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: var(--space-sm);
 }
 
 .knob-container {
@@ -1238,9 +1396,11 @@ button:focus-visible {
 }
 
 .scope-hint {
-    order: 0;
-    margin-top: 0;
-    margin-bottom: var(--space-sm);
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-body);
+    font-size: clamp(0.6rem, 1.1vw, 0.7rem);
+    color: var(--text-muted);
+    line-height: 1.4;
 }
 
 .scope-canvas {

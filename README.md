@@ -65,7 +65,13 @@ Reference: [Alec Lownes - CRT Display](https://aleclownes.com/2017/02/01/crt-dis
 ```
 ToneLAB/
   index.html          Main HTML with CRT overlays
-  script.js           Synth engine, knobs, presets, keyboard, static noise
+  js/main.js          Entry: audio init, wiring (native ES modules, no build)
+  js/state.js         Shared mutable state + keyboard layouts / note labels
+  js/audio/           effects.js (rack, limiter), synth.js (engine, note triggers), presets.js
+  js/ui/              controls.js (knob grid, hints, view toggle), knobs.js (SVG knobs),
+                      keyboard.js (keys, octaves, touch), scope.js (oscilloscope / spectrum)
+  js/crt.js           Static snow canvas
+  js/pwa.js           Service worker registration, install prompt
   styles.css          CRT effects, knob layout, responsive design
   manifest.json       PWA manifest
   service-worker.js   Offline caching (precache + stale-while-revalidate)

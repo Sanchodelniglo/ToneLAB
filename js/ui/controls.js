@@ -105,6 +105,27 @@ function groupFor(type, id) {
 }
 
 // Returns the grid inside the named set, creating the set on first use.
+// Visible label drops the set name ("Filter Cutoff" inside FILTER → "Cutoff").
+// Help buttons and hints keep the full name.
+function shortName(name, group) {
+    const words = name.split(' ');
+    if (words.length > 1 && words[0].toLowerCase() === group.split(' ')[0].toLowerCase()) {
+        return words.slice(1).join(' ');
+    }
+    return name;
+}
+
+// Each set is a grid with one 84px column per knob and two per wave picker,
+// so a set is exactly as wide as its cells (no orphan wrap, no guesswork).
+function sizeControlSets(root = document) {
+    root.querySelectorAll('.control-set').forEach(set => {
+        const cells = [...set.querySelectorAll('.control-group')];
+        const cols = cells.reduce((n, cell) => n + (cell.querySelector('.wave-select') ? 2 : 1), 0);
+        set.style.setProperty('--cols', cols);
+        set.style.setProperty('--cells', cells.length);
+    });
+}
+
 function setGrid(container, sets, name) {
     if (!sets.has(name)) {
         const set = document.createElement('section');
@@ -286,12 +307,14 @@ function updateControls(type) {
         const uniqueId = `ctrl_${control.id}_${controlIndex++}`;
 
         const desc = descs[control.id] || '';
+        const group = groupFor(type, control.id);
+        const label = shortName(control.name, group);
 
         if (control.type === 'wave') {
             const labelId = `${uniqueId}_label`;
             controlGroup.innerHTML = `
                 <div class="control-label">
-                    <label id="${labelId}" for="${uniqueId}">${control.name}</label>
+                    <label id="${labelId}" for="${uniqueId}">${label}</label>
                     ${helpButton(uniqueId, control.name, desc)}
                 </div>
                 ${hintParagraph(uniqueId, desc)}
@@ -304,7 +327,7 @@ function updateControls(type) {
         } else {
             controlGroup.innerHTML = `
                 <div class="control-label">
-                    <label for="${uniqueId}">${control.name}</label>
+                    <label for="${uniqueId}">${label}</label>
                     <span class="control-value" id="${uniqueId}Value">${control.default}${control.suffix || ''}</span>
                     ${helpButton(uniqueId, control.name, desc)}
                 </div>
@@ -323,7 +346,7 @@ function updateControls(type) {
             `;
         }
 
-        setGrid(controlsDiv, sets, groupFor(type, control.id)).appendChild(controlGroup);
+        setGrid(controlsDiv, sets, group).appendChild(controlGroup);
     });
 
     // Add event listeners
@@ -357,7 +380,11 @@ function updateControls(type) {
             attachKnobToSlider(slider);
         }
     });
+    sizeControlSets(controlsDiv);
 }
+
+// Static effects sets (index.html) get their column count once
+sizeControlSets(document);
 
 // Instrument selector
 document.getElementById('instrumentType').addEventListener('change', (e) => {

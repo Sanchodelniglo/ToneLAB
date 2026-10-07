@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneLab — Interactive Sound Explorer</title>
+    <title>ToneLAB — Interactive Sound Explorer</title>
 
     <!-- PWA Meta Tags -->
     <meta name="description" content="Turn knobs, twist parameters, and explore how synthesizers shape sound. An interactive playground to experiment with waveforms, filters, and effects.">
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ToneLab">
+    <meta name="apple-mobile-web-app-title" content="ToneLAB">
     <link rel="manifest" href="manifest.json">
 
     <!-- Apple Touch Icons -->
@@ -34,7 +34,7 @@
     <!-- Audio activation overlay -->
     <div id="audioOverlay" class="audio-overlay">
         <div class="audio-overlay-content">
-            <h2 class="audio-overlay-title">ToneLab</h2>
+            <h2 class="audio-overlay-title">ToneLAB</h2>
             <p>Tap anywhere to activate audio</p>
             <div class="audio-overlay-icon">
                 <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
@@ -47,7 +47,7 @@
 
     <div class="container">
         <header>
-            <h1>ToneLab</h1>
+            <h1>ToneLAB</h1>
             <p class="subtitle">Interactive Sound Explorer</p>
             <button id="installBtn" style="display: none;">Install App</button>
         </header>
@@ -122,7 +122,7 @@
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="reverb">Reverb Mix</label>
+                                <label for="reverb">Mix</label>
                                 <span class="control-value" id="reverbValue">0.3</span>
                                 <button type="button" class="help-btn" aria-label="What does Reverb Mix do?" aria-expanded="false" aria-controls="reverbHint">?</button>
                             </div>
@@ -131,7 +131,7 @@
                         </div>
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="reverbSize">Reverb Size</label>
+                                <label for="reverbSize">Size</label>
                                 <span class="control-value" id="reverbSizeValue">2.5s</span>
                                 <button type="button" class="help-btn" aria-label="What does Reverb Size do?" aria-expanded="false" aria-controls="reverbSizeHint">?</button>
                             </div>
@@ -145,7 +145,7 @@
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="delayTime">Delay Time</label>
+                                <label for="delayTime">Time</label>
                                 <span class="control-value" id="delayTimeValue">0.25s</span>
                                 <button type="button" class="help-btn" aria-label="What does Delay Time do?" aria-expanded="false" aria-controls="delayTimeHint">?</button>
                             </div>
@@ -154,7 +154,7 @@
                         </div>
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="delayFeedback">Delay Feedback</label>
+                                <label for="delayFeedback">Feedback</label>
                                 <span class="control-value" id="delayFeedbackValue">0.3</span>
                                 <button type="button" class="help-btn" aria-label="What does Delay Feedback do?" aria-expanded="false" aria-controls="delayFeedbackHint">?</button>
                             </div>
@@ -163,7 +163,7 @@
                         </div>
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="delayMix">Delay Mix</label>
+                                <label for="delayMix">Mix</label>
                                 <span class="control-value" id="delayMixValue">0.3</span>
                                 <button type="button" class="help-btn" aria-label="What does Delay Mix do?" aria-expanded="false" aria-controls="delayMixHint">?</button>
                             </div>
@@ -177,7 +177,7 @@
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="filterFreq">Filter Cutoff</label>
+                                <label for="filterFreq">Cutoff</label>
                                 <span class="control-value" id="filterFreqValue">5000 Hz</span>
                                 <button type="button" class="help-btn" aria-label="What does Filter Cutoff do?" aria-expanded="false" aria-controls="filterFreqHint">?</button>
                             </div>
@@ -200,7 +200,7 @@
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="chorusRate">Chorus Rate</label>
+                                <label for="chorusRate">Rate</label>
                                 <span class="control-value" id="chorusRateValue">1.5 Hz</span>
                                 <button type="button" class="help-btn" aria-label="What does Chorus Rate do?" aria-expanded="false" aria-controls="chorusRateHint">?</button>
                             </div>
@@ -209,7 +209,7 @@
                         </div>
                         <div class="control-group">
                             <div class="control-label">
-                                <label for="chorusMix">Chorus Mix</label>
+                                <label for="chorusMix">Mix</label>
                                 <span class="control-value" id="chorusMixValue">0.3</span>
                                 <button type="button" class="help-btn" aria-label="What does Chorus Mix do?" aria-expanded="false" aria-controls="chorusMixHint">?</button>
                             </div>

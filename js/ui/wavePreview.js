@@ -213,21 +213,54 @@ function open(parts, select) {
     pickers.forEach(p => { if (p !== parts) close(p, false); });
     parts.list.hidden = false;
     parts.btn.setAttribute('aria-expanded', 'true');
-    // Flip to the left edge when the popup would run off the viewport
-    parts.list.classList.remove('wave-picker-list--right');
-    const rect = parts.list.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 8) parts.list.classList.add('wave-picker-list--right');
+    parts.openedAt = performance.now();
+    place(parts);
     const selected = parts.options.find(li => li.dataset.value === select.value) || parts.options[0];
     selected.focus();
     selected.scrollIntoView({ block: 'nearest' });
+}
+
+// The list is position: fixed so a scrolling control column (layout ≥1024)
+// cannot clip it. Anchor it to the button, flip above when the viewport
+// bottom is too close, clamp to the viewport sides.
+const LIST_GAP = 4;
+const LIST_MIN_WIDTH = 310;
+const VIEW_MARGIN = 8;
+function place(parts) {
+    const { list, btn } = parts;
+    const anchor = btn.getBoundingClientRect();
+    const width = Math.min(Math.max(anchor.width, LIST_MIN_WIDTH), window.innerWidth - VIEW_MARGIN * 2);
+    list.style.width = `${width}px`;
+    list.style.left = `${Math.max(VIEW_MARGIN, Math.min(anchor.left, window.innerWidth - width - VIEW_MARGIN))}px`;
+    const height = list.offsetHeight;
+    const below = anchor.bottom + LIST_GAP;
+    const fitsBelow = below + height <= window.innerHeight - VIEW_MARGIN;
+    const top = fitsBelow ? below : Math.max(VIEW_MARGIN, anchor.top - LIST_GAP - height);
+    list.style.top = `${top}px`;
 }
 
 function close(parts, focusButton) {
     if (parts.list.hidden) return;
     parts.list.hidden = true;
     parts.btn.setAttribute('aria-expanded', 'false');
+    parts.list.style.cssText = '';
     if (focusButton) parts.btn.focus();
 }
+
+// A fixed popup would detach from its button when the page or the control
+// column scrolls, or on resize: close instead of chasing it.
+function closeAll() {
+    pickers.forEach(parts => close(parts, false));
+}
+const SCROLL_GRACE_MS = 100; // a scroll queued before the click must not close it
+document.addEventListener('scroll', (e) => {
+    pickers.forEach(parts => {
+        if (parts.list.hidden || parts.list.contains(e.target)) return;
+        if (performance.now() - parts.openedAt < SCROLL_GRACE_MS) return;
+        close(parts, false);
+    });
+}, true);
+window.addEventListener('resize', closeAll);
 
 // Click outside closes any open picker
 document.addEventListener('pointerdown', (e) => {

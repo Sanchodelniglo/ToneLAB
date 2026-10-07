@@ -1,4 +1,4 @@
-# ToneLab
+# ToneLAB
 
 Interactive Sound Explorer -- turn knobs, twist parameters, and explore how synthesizers shape sound.
 

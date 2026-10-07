@@ -44,6 +44,7 @@
     /* Weights: 400 body/mono, 700 emphasis + titles, 900 hero only */
     --weight-normal: 400;
     --weight-bold: 700;
+    --knob-cell: 100px; /* fits HARMONICITY on one line */
     --weight-black: 900;
 
     /* Font Families */
@@ -292,7 +293,6 @@ body::after {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     margin-bottom: var(--space-lg);
 }
@@ -346,7 +346,6 @@ select, .wave-select { animation-delay: -5.1s; }
 .knob-container { animation-delay: -4.2s; }
 
 .synth-panel,
-.control-group,
 .keyboard,
 .key,
 .key.black,
@@ -373,7 +372,6 @@ h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     margin-bottom: 0.35rem;
 }
@@ -551,7 +549,7 @@ select:focus {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
-    flex: 0 0 auto;
+    flex: 1 0 auto; /* exact cell width, then stretch to tile the row */
     max-width: 100%;
     padding: var(--space-sm);
     border: 1px solid rgba(0, 240, 255, 0.12);
@@ -568,15 +566,22 @@ select:focus {
     color: var(--text-muted);
 }
 
+/* --cols / --cells are set per set by controls.js (sizeControlSets) */
 .controls-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), var(--knob-cell));
     gap: var(--space-sm);
+    align-items: start;
 }
 
+/* Knob cell (default mode): a bare hardware-style cell — knob on top, readout
+   inside the cap, name under it. No card chrome: the set box is the frame. */
 .control-set .control-group {
-    flex: 0 0 160px;
-    max-width: 100%;
+    min-width: 0;
+}
+
+.control-set .control-group:has(.wave-select) {
+    grid-column: span 2;
 }
 
 @media (max-width: 600px) {
@@ -584,46 +589,75 @@ select:focus {
         width: 100%;
     }
 
-    .control-set .control-group {
-        flex: 1 1 calc(50% - var(--space-sm));
+    .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); /* four knobs per row on a phone */
     }
 }
 
 .control-group {
+    --knob-size: 72px;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background: rgba(30, 39, 73, 0.5);
-    padding: clamp(0.75rem, 2vw, 1.25rem);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(0, 240, 255, 0.15);
-    transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
-}
-
-.control-group:hover {
-    border-color: rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-    transform: translateY(-2px);
+    padding: 2px 2px 4px;
 }
 
 .control-label {
+    order: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    margin-bottom: var(--space-sm);
-    font-size: var(--text-xs);
+    margin: 2px 0 0;
+    max-width: 100%;
+    font-size: var(--text-2xs);
+    line-height: 1.2;
     color: var(--accent-cyan);
     text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-tight);
+    overflow-wrap: break-word;
+}
+
+/* Wave cells have no knob: name first, picker under it */
+.control-group:has(.wave-select) .control-label {
+    order: 0;
+    margin: 0 0 4px;
 }
 
 .control-value {
     color: var(--accent-magenta);
     font-weight: var(--weight-bold);
-    font-size: var(--text-sm);
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+}
+
+/* Knob cells stack readout · knob · name. The label block is unwrapped
+   (display: contents) so its children take their own slot in the column. */
+.control-group:has(.knob-container) .control-label {
+    display: contents;
+}
+
+/* Beats the global `label` rule (text-sm, wide tracking) */
+.control-group .control-label label {
+    font-size: var(--text-xs);
+    color: var(--accent-cyan);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.2;
+}
+
+.control-group:has(.knob-container) label {
+    order: 2;
+    margin-top: 2px;
+    max-width: 100%;
+}
+
+.control-group:has(.knob-container) .control-value {
+    order: 0;
+    margin-bottom: 2px;
+    letter-spacing: 0;
+    text-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
 }
 
 /* Hint = overlay popover on the card. Never affects layout: shown on hover /
@@ -631,9 +665,10 @@ select:focus {
 .control-hint {
     display: none;
     position: absolute;
-    top: 26px;
-    left: 4px;
-    right: 4px;
+    top: 22px;
+    left: 0;
+    width: 240px;
+    max-width: calc(100vw - 2 * var(--space-md));
     z-index: 5;
     margin: 0;
     padding: 0.5rem 0.6rem;
@@ -654,13 +689,20 @@ select:focus {
     display: block;
 }
 
+/* Cells at the right edge of a set open their hint to the left */
+.control-group:last-child:not(:first-child) .control-hint {
+    left: auto;
+    right: 0;
+}
+
 /* "?" help toggle, top-right of every control card */
 .help-btn {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 18px;
-    height: 18px;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    opacity: 0.35;
     padding: 0;
     border: 1px solid rgba(0, 240, 255, 0.25);
     border-radius: 0;
@@ -671,6 +713,19 @@ select:focus {
     line-height: 1;
     cursor: pointer;
     transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.control-group:hover .help-btn,
+.control-group:focus-within .help-btn,
+.help-btn:focus-visible,
+.help-btn[aria-expanded="true"] {
+    opacity: 1;
+}
+
+@media (pointer: coarse) {
+    .help-btn {
+        opacity: 1;
+    }
 }
 
 .help-btn:hover,
@@ -754,58 +809,550 @@ input[type="range"]:active::-webkit-slider-thumb {
     box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
 }
 
-/* ---- Slider mode (user toggle): sliders replace the knobs ---- */
+/* ---- Slider mode (user toggle): vertical faders replace the knobs ----
+   Same cell stack as knobs (readout · fader · name). The range input keeps
+   its horizontal skin and is rotated, so its left→right fill reads bottom→top.
+   The desktop effects rack re-flattens them (see LAYOUT A). */
 body[data-controls="sliders"] .knob-container {
     display: none;
 }
 
-body[data-controls="sliders"] input[type="range"] {
-    display: block;
-}
-
-/* Compact card: name + value on one line, slider below, hint (if open) under it */
 body[data-controls="sliders"] .control-group {
-    align-items: stretch;
-    text-align: left;
-    padding: 0.5rem 0.75rem 0.6rem;
+    --fader-len: 76px;
+    --fader-thick: 30px;
 }
 
-body[data-controls="sliders"] .control-group:hover {
-    transform: none;
+body[data-controls="sliders"] .control-group input[type="range"] {
+    display: block;
+    order: 1;
+    width: var(--fader-len);
+    height: var(--fader-thick);
+    margin: calc((var(--fader-len) - var(--fader-thick)) / 2) 0;
+    transform: rotate(-90deg);
 }
 
-body[data-controls="sliders"] .control-label {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-sm);
-    margin-bottom: 0.35rem;
-    padding-right: 22px; /* room for the ? button */
+/* Fader track: deep slot with a glowing fill */
+body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(8, 11, 30, 0.95) var(--fill-percent, 0%));
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-track {
+    height: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    background: rgba(8, 11, 30, 0.95);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-progress {
+    height: 10px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* Fader cap: tall block with a magenta centre line */
+body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider-thumb {
+    width: 14px;
+    height: 28px;
+    margin-top: -10px;
+    background:
+        linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
+        linear-gradient(to bottom, #2a3270, #161b3d);
+    border: 1px solid rgba(255, 0, 170, 0.8);
+    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 28px;
+    background:
+        linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
+        linear-gradient(to bottom, #2a3270, #161b3d);
+    border: 1px solid rgba(255, 0, 170, 0.8);
+    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 body[data-controls="sliders"] .wave-select {
     width: 100%;
 }
 
-/* Slider cards share the knob card size; the readout never wraps */
-body[data-controls="sliders"] .control-value {
+.knob-container { animation-delay: -4.2s; }
+
+.synth-panel,
+.keyboard,
+.key,
+.key.black,
+select,
+.wave-select,
+.preset-btn,
+.octave-btn,
+.keyboard-key-label,
+.info-display {
+    animation: crt-chromatic-box 8s infinite;
+}
+
+header {
+    text-align: center;
+    margin-bottom: clamp(1.25rem, 4vw, 2rem);
+    position: relative;
+}
+
+h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-black);
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: var(--tracking-display);
+    margin-bottom: 0.35rem;
+}
+
+header #installBtn {
+    margin-top: var(--space-md);
+}
+
+.subtitle {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+}
+
+.synth-panel {
+    background: linear-gradient(135deg, rgba(21, 25, 55, 0.9), rgba(30, 39, 73, 0.9));
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: var(--radius-xl);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow:
+        0 4px 30px rgba(0, 0, 0, 0.3),
+        inset 0 0 60px rgba(0, 240, 255, 0.03);
+    position: relative;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.panel-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+}
+
+.panel-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+}
+
+.synth-description {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+    padding: var(--space-sm) var(--space-md);
+    border-left: 2px solid rgba(0, 240, 255, 0.3);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.synth-description:empty {
+    display: none;
+}
+
+/* Instrument header tools: Type select + Knobs / Sliders switch */
+.panel-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.view-toggle {
+    display: inline-flex;
+    gap: var(--space-xs);
+}
+
+.preset-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.preset-bar:empty {
+    display: none;
+}
+
+.preset-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-family: var(--font-mono);
+    margin-right: var(--space-xs);
+}
+
+.preset-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--ease-out);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-tight);
+}
+
+.preset-btn:hover {
+    border-color: rgba(0, 240, 255, 0.5);
+    color: var(--accent-cyan);
+    background: rgba(0, 240, 255, 0.05);
+}
+
+.preset-btn.active {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.instrument-select {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: stretch;
+}
+
+label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+}
+
+select {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-radius: var(--radius-md);
+    padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.75rem, 2vw, 1rem);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+select:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+select:focus {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+/* Control sets: knobs grouped by meaning (Oscillator, Envelope, Filter...).
+   Sets pack side by side and wrap; cards inside a set wrap too. */
+.control-sets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* sets keep their own height */
+    gap: var(--space-md);
+    margin-top: clamp(1rem, 3vw, 2rem);
+}
+
+/* A set never shrinks: if it does not fit on the row it moves to the next one
+   whole. Only a set wider than the panel (narrow screens) wraps its cards. */
+.control-set {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    flex: 1 0 auto; /* exact cell width, then stretch to tile the row */
+    max-width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.control-set-title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* --cols / --cells are set per set by controls.js (sizeControlSets) */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), var(--knob-cell));
+    gap: var(--space-sm);
+    align-items: start;
+}
+
+/* Knob cell (default mode): a bare hardware-style cell — knob on top, readout
+   inside the cap, name under it. No card chrome: the set box is the frame. */
+.control-set .control-group {
+    min-width: 0;
+}
+
+.control-set .control-group:has(.wave-select) {
+    grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+    .control-set {
+        width: 100%;
+    }
+
+    .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); /* four knobs per row on a phone */
+    }
+}
+
+.control-group {
+    --knob-size: 72px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2px 2px 4px;
+}
+
+.control-label {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin: 2px 0 0;
+    max-width: 100%;
+    font-size: var(--text-2xs);
+    line-height: 1.2;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-tight);
+    overflow-wrap: break-word;
+}
+
+/* Wave cells have no knob: name first, picker under it */
+.control-group:has(.wave-select) .control-label {
+    order: 0;
+    margin: 0 0 4px;
+}
+
+.control-value {
+    color: var(--accent-magenta);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-2xs);
     white-space: nowrap;
 }
 
-.knob-container {
-    display: block;
-    position: relative;
-    width: 64px;
-    animation: crt-chromatic-knob 8s infinite;
-    height: 64px;
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    margin: var(--space-xs) 0;
+/* Knob cells stack readout · knob · name. The label block is unwrapped
+   (display: contents) so its children take their own slot in the column. */
+.control-group:has(.knob-container) .control-label {
+    display: contents;
 }
 
-.knob-container:active {
-    cursor: grabbing;
+.control-group:has(.knob-container) label {
+    order: 2;
+    margin-top: 2px;
+    max-width: 100%;
+}
+
+.control-group:has(.knob-container) .control-value {
+    order: 0;
+    margin-bottom: 2px;
+    letter-spacing: 0;
+    text-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+}
+
+/* Hint = overlay popover on the card. Never affects layout: shown on hover /
+   focus of the ? button, or pinned by clicking it (touch). */
+.control-hint {
+    display: none;
+    position: absolute;
+    top: 22px;
+    left: 0;
+    width: 240px;
+    max-width: calc(100vw - 2 * var(--space-md));
+    z-index: 5;
+    margin: 0;
+    padding: 0.5rem 0.6rem;
+    background: rgba(21, 25, 55, 0.96);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+    font-family: var(--font-body);
+    font-size: var(--text-2xs);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    text-align: left;
+    pointer-events: none;
+}
+
+.control-hint:not([hidden]),
+.control-group:has(.help-btn:hover) .control-hint,
+.control-group:has(.help-btn:focus-visible) .control-hint {
+    display: block;
+}
+
+/* Cells at the right edge of a set open their hint to the left */
+.control-group:last-child:not(:first-child) .control-hint {
+    left: auto;
+    right: 0;
+}
+
+/* "?" help toggle, top-right of every control card */
+.help-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    opacity: 0.35;
+    padding: 0;
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: 1;
+    cursor: pointer;
+    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.control-group:hover .help-btn,
+.control-group:focus-within .help-btn,
+.help-btn:focus-visible,
+.help-btn[aria-expanded="true"] {
+    opacity: 1;
+}
+
+@media (pointer: coarse) {
+    .help-btn {
+        opacity: 1;
+    }
+}
+
+.help-btn:hover,
+.help-btn:focus-visible {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 240, 255, 0.6);
+}
+
+.help-btn[aria-expanded="true"] {
+    color: var(--bg-primary);
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+/* Knob mode (default): the range input is the hidden source of truth */
+input[type="range"] {
+    display: none;
+}
+
+/* ---- Slider skin ----
+   Styles every range input. Harmless in knob mode (the inputs are display: none
+   there); which inputs are shown is decided by the mode switch below and, on
+   desktop, by the effects rack (see LAYOUT A at the end of the file). */
+input[type="range"] {
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]:focus-visible {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+}
+
+/* Track: cyan fill up to --fill-percent (set by updateSliderFill), dark remainder */
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: rgba(30, 39, 73, 0.9);
+}
+
+input[type="range"]::-moz-range-progress {
+    height: 4px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+/* Thumb: square fader cap, magenta like the knob indicator */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 18px;
+    margin-top: -7px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    transition: box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 18px;
+    border-radius: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+}
+
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:active::-webkit-slider-thumb {
+    box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
+}
+
+
+.knob-container {
+    order: 1;
+    display: block;
+    position: relative;
+    width: var(--knob-size);
+    height: var(--knob-size);
+    animation: crt-chromatic-knob 8s infinite;
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+    margin: 0;
+    outline: none;
+}
+
+.knob-container.is-dragging {
+    cursor: ns-resize;
 }
 
 .knob-svg {
@@ -815,42 +1362,48 @@ body[data-controls="sliders"] .control-value {
 
 .knob-track {
     fill: none;
-    stroke: rgba(30, 39, 73, 0.8);
-    stroke-width: 5;
-    stroke-linecap: round;
+    stroke: rgba(0, 240, 255, 0.14);
+    stroke-width: 4;
+    stroke-linecap: butt;
 }
 
 .knob-fill {
     fill: none;
     stroke: var(--accent-cyan);
-    stroke-width: 5;
-    stroke-linecap: round;
-    filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.5));
+    stroke-width: 4;
+    stroke-linecap: butt;
+    filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.55));
 }
 
 .knob-body {
-    fill: linear-gradient(135deg, #1a2040, #252d54);
-    fill: var(--bg-tertiary);
-    stroke: rgba(0, 240, 255, 0.2);
+    fill: #161b3d;
+    stroke: rgba(0, 240, 255, 0.28);
     stroke-width: 1;
-    transition: stroke var(--transition-fast);
+    transition: stroke var(--transition-fast), fill var(--transition-fast);
 }
 
-.knob-container:hover .knob-body {
-    stroke: rgba(0, 240, 255, 0.5);
-    filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.15));
+.knob-container:hover .knob-body,
+.knob-container.is-dragging .knob-body {
+    fill: #1c2350;
+    stroke: rgba(0, 240, 255, 0.7);
+    filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.25));
+}
+
+.knob-container:focus-visible .knob-body {
+    stroke: var(--accent-magenta);
+    stroke-width: 2;
 }
 
 .knob-indicator {
     stroke: var(--accent-magenta);
-    stroke-width: 2;
+    stroke-width: 2.5;
     stroke-linecap: round;
-    filter: drop-shadow(0 0 4px rgba(255, 0, 170, 0.5));
+    filter: drop-shadow(0 0 4px rgba(255, 0, 170, 0.6));
 }
 
 .knob-notch {
-    stroke: rgba(0, 240, 255, 0.1);
-    stroke-width: 0.8;
+    stroke: rgba(0, 240, 255, 0.3);
+    stroke-width: 1;
 }
 
 .keyboard {
@@ -1570,10 +2123,9 @@ button:focus-visible {
 }
 
 .wave-picker-list {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    width: max(100%, 310px);
+    /* fixed: top/left/width are set by wavePreview.js when it opens, so a
+       scrolling control column cannot clip it */
+    position: fixed;
     max-height: 240px;
     overflow-y: auto;
     z-index: 30;
@@ -1598,11 +2150,6 @@ button:focus-visible {
 
 .synth-panel:has(.wave-picker-list:not([hidden])) {
     z-index: 50;
-}
-
-.wave-picker-list--right {
-    left: auto;
-    right: 0;
 }
 
 .wave-picker-list[hidden] {
@@ -1653,7 +2200,7 @@ button:focus-visible {
    LAYOUT A — "WORKSTATION" (desktop, ≥ 1024px)
    One screen, no page scroll. Mobile keeps the stacked layout above.
 
-   ┌ TONELAB [install] │ INSTRUMENT · Type ▾ · [Knobs][Sliders]   ┐ bar
+   ┌ ToneLAB [install] │ INSTRUMENT · Type ▾ · [Knobs][Sliders]   ┐ bar
    ├ PRESETS ▢ ▢ ▢ ▢ · description                                 ┤ intro
    ├ sets (scrolls internally)            │ SCOPE  [Wave][Spectrum] ┤
    │                                      │ ~~~~~ fills height ~~~~ │
@@ -1844,6 +2391,8 @@ button:focus-visible {
     }
 
     .effects-rack .controls-grid {
+        display: flex;
+        flex-wrap: wrap;
         flex: 1 1 auto;
         min-width: 0;
         gap: var(--space-xs) var(--space-sm);
@@ -1871,7 +2420,7 @@ button:focus-visible {
         box-shadow: none;
     }
 
-    .effects-rack .controls-grid .control-label {
+    .effects-rack .controls-grid .control-group .control-label {
         display: contents;
     }
 
@@ -1887,21 +2436,64 @@ button:focus-visible {
         color: var(--accent-cyan);
     }
 
-    .effects-rack input[type="range"] {
+    .effects-rack .controls-grid .control-group input[type="range"] {
         display: block;
         grid-column: 2;
         grid-row: 1;
+        order: 0;
+        width: auto;
+        height: 22px;
         min-width: 0;
+        margin: 0;
+        transform: none;
     }
 
-    .effects-rack .control-value {
+    .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px;
+        border: none;
+        box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
+    }
+
+    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-track {
+        height: 4px;
+        border: none;
+        box-shadow: none;
+        background: rgba(30, 39, 73, 0.9);
+    }
+
+    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-progress {
+        height: 4px;
+    }
+
+    .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-thumb {
+        width: 10px;
+        height: 18px;
+        margin-top: -7px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--accent-magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    }
+
+    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-thumb {
+        width: 10px;
+        height: 18px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--accent-magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    }
+
+    .effects-rack .controls-grid .control-group .control-value {
+        margin: 0;
+        letter-spacing: inherit;
+        text-shadow: none;
         grid-column: 3;
         grid-row: 1;
         font-size: var(--text-2xs);
         white-space: nowrap;
     }
 
-    .effects-rack .help-btn {
+    .effects-rack .controls-grid .control-group .help-btn {
         position: static;
         grid-column: 4;
         grid-row: 1;
@@ -1914,7 +2506,7 @@ button:focus-visible {
     }
 
     /* Hint popover opens under the row, wide enough to read */
-    .effects-rack .control-hint {
+    .effects-rack .controls-grid .control-group .control-hint {
         top: calc(100% + 2px);
         left: 0;
         right: auto;
@@ -1922,7 +2514,7 @@ button:focus-visible {
         max-width: 100%;
     }
 
-    .effects-rack .control-group:last-child .control-hint {
+    .effects-rack .controls-grid .control-group:last-child .control-hint {
         left: auto;
         right: 0;
     }

@@ -1,6 +1,6 @@
 {
-  "name": "ToneLab — Interactive Sound Explorer",
-  "short_name": "ToneLab",
+  "name": "ToneLAB — Interactive Sound Explorer",
+  "short_name": "ToneLAB",
   "description": "Turn knobs, twist parameters, and explore how synthesizers shape sound",
   "start_url": "/",
   "scope": "/",
@@ -37,9 +37,9 @@
   "categories": ["music", "entertainment", "utilities"],
   "shortcuts": [
     {
-      "name": "Open ToneLab",
-      "short_name": "ToneLab",
-      "description": "Launch ToneLab Sound Explorer",
+      "name": "Open ToneLAB",
+      "short_name": "ToneLAB",
+      "description": "Launch ToneLAB Sound Explorer",
       "url": "/",
       "icons": [
         {

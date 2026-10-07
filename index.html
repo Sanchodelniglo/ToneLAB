@@ -49,11 +49,11 @@
         <header>
             <h1>ToneLab</h1>
             <p class="subtitle">Interactive Sound Explorer</p>
-            <button id="installBtn" style="display: none; margin-top: 1rem;">Install App</button>
+            <button id="installBtn" style="display: none;">Install App</button>
         </header>
 
         <main id="main-content">
-            <div class="synth-panel">
+            <div class="synth-panel instrument-panel">
                 <div class="panel-header">
                     <h2 class="panel-title" id="instrumentHeading">Instrument</h2>
                     <div class="panel-tools">
@@ -100,11 +100,11 @@
                 <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
             </div>
 
-            <div class="synth-panel">
+            <div class="synth-panel effects-panel">
                 <div class="panel-header">
                     <h2 class="panel-title" id="effectsHeading">Effects</h2>
                 </div>
-                <div class="effect-controls control-sets" role="group" aria-labelledby="effectsHeading">
+                <div class="effect-controls control-sets effects-rack" role="group" aria-labelledby="effectsHeading">
                     <section class="control-set" role="group" aria-label="Master">
                         <h3 class="control-set-title">Master</h3>
                         <div class="controls-grid">
@@ -260,7 +260,7 @@
                         </div>
                     </div>
                     <div class="info-display" role="status">
-                        <p>Play with your computer keyboard &middot; &#8592;/&#8594; change octave &middot; Playing: <span id="currentNote" aria-live="assertive">&#8212;</span></p>
+                        <p><span class="info-hint">Play with your computer keyboard &middot; &#8592;/&#8594; change octave &middot;</span> Playing: <span id="currentNote" aria-live="assertive">&#8212;</span></p>
                     </div>
                 </div>
             </div>

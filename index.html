@@ -50,6 +50,8 @@
             <h1>ToneLAB</h1>
             <p class="subtitle">Interactive Sound Explorer</p>
             <button id="installBtn" style="display: none;">Install App</button>
+            <div id="typeSlot" class="type-slot"></div>
+            <button type="button" id="moreBtn" class="more-btn" aria-label="More options" aria-expanded="false" aria-controls="moreSheet">&#8943;</button>
         </header>
 
         <main id="main-content">
@@ -57,8 +59,9 @@
                 <div class="panel-header">
                     <h2 class="panel-title" id="instrumentHeading">Instrument</h2>
                     <div class="panel-tools">
-                    <div class="instrument-select">
+                    <div class="instrument-select type-stepper">
                         <label for="instrumentType">Type:</label>
+                        <button type="button" class="step-btn" data-step="-1" aria-label="Previous instrument">&#9664;</button>
                         <select id="instrumentType">
                             <option value="Synth">Synth</option>
                             <option value="AMSynth">AM Synth</option>
@@ -71,6 +74,9 @@
                             <option value="PolySynth">Poly Synth</option>
                             <option value="DuoSynth">Duo Synth</option>
                         </select>
+                        <button type="button" class="help-btn type-help" id="typeHelp" aria-label="About this instrument" aria-expanded="false" aria-controls="typeHint">?</button>
+                        <button type="button" class="step-btn" data-step="1" aria-label="Next instrument">&#9654;</button>
+                        <p class="control-hint type-hint" id="typeHint" hidden></p>
                     </div>
                     <div class="view-toggle" role="group" aria-label="Control style">
                         <button type="button" class="preset-btn view-btn active" data-controls="knobs" aria-pressed="true">Knobs</button>
@@ -94,10 +100,31 @@
                             </div>
                         </div>
                         <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform" title="What you hear, after the effects. Hold a note and turn a knob."></canvas>
+                        <div class="scope-preset" aria-live="polite">
+                            <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
+                            <span id="scopePresetName">swipe for presets</span>
+                            <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
+                        </div>
                     </div>
                 </div>
 
-                <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
+                <nav class="tab-bar" id="tabBar" role="tablist" aria-label="Control pages"></nav>
+                <div class="pages" id="pages">
+                    <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
+                    <section class="control-set xy-set" id="xySet" role="group" aria-label="XY pad">
+                        <div class="xy-targets">
+                            <label>X <select id="xyTargetX" aria-label="X axis parameter"></select></label>
+                            <label>Y <select id="xyTargetY" aria-label="Y axis parameter"></select></label>
+                        </div>
+                        <div class="xy-pad" role="application" aria-label="XY pad: drag to control two parameters at once">
+                            <span class="xy-read xy-read-x" id="xyReadX"></span>
+                            <span class="xy-read xy-read-y" id="xyReadY"></span>
+                            <div class="xy-cross-x" aria-hidden="true"></div>
+                            <div class="xy-cross-y" aria-hidden="true"></div>
+                            <div class="xy-dot" aria-hidden="true"></div>
+                        </div>
+                    </section>
+                </div>
             </div>
 
             <div class="synth-panel effects-panel">
@@ -268,6 +295,16 @@
         </main>
     </div>
 
+    <!-- ⋯ sheet (pocket layout): description, view toggle, scope mode, notation, install -->
+    <div class="sheet" id="moreSheet" hidden>
+        <div class="sheet-body" role="dialog" aria-modal="true" aria-label="More options">
+            <div class="sheet-head">
+                <span class="sheet-title">ToneLAB</span>
+                <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">&#10005;</button>
+            </div>
+            <div class="sheet-slots" id="sheetSlots"></div>
+        </div>
+    </div>
     </div><!-- .crt-screen -->
 
     <!-- App (native ES modules, no build step). modulepreload flattens the
@@ -284,6 +321,8 @@
     <link rel="modulepreload" href="js/ui/keyboard.js">
     <link rel="modulepreload" href="js/ui/scope.js">
     <link rel="modulepreload" href="js/ui/wavePreview.js">
+    <link rel="modulepreload" href="js/ui/mobile.js">
+    <link rel="modulepreload" href="js/ui/xypad.js">
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

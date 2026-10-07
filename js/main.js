@@ -9,6 +9,7 @@ import { updateControls } from './ui/controls.js';
 import { createKeyboard } from './ui/keyboard.js';
 import { scope } from './ui/scope.js';
 import './pwa.js';
+import './ui/mobile.js';
 
 // Initialize
 let audioInitStarted = false;

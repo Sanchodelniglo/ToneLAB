@@ -2370,163 +2370,6 @@ button:focus-visible {
         font-size: var(--text-sm);
     }
 
-    .effects-rack {
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        gap: 0;
-        margin-top: 0;
-    }
-
-    /* One row per set: title at the left, controls inline after it */
-    .effects-rack .control-set {
-        flex-direction: row;
-        align-items: center;
-        gap: var(--space-sm);
-        max-width: none;
-        padding: var(--space-xs) 0;
-        border: none;
-        border-top: 1px solid rgba(0, 240, 255, 0.08);
-        background: none;
-    }
-
-    .effects-rack .control-set:first-child {
-        border-top: none;
-    }
-
-    .effects-rack .control-set-title {
-        flex: 0 0 56px;
-    }
-
-    .effects-rack .controls-grid {
-        display: flex;
-        flex-wrap: wrap;
-        flex: 1 1 auto;
-        min-width: 0;
-        gap: var(--space-xs) var(--space-sm);
-    }
-
-    /* Each control: label · slider · value · ? on one line. The label block
-       becomes display: contents so its children sit in the row grid. The
-       .controls-grid hop keeps these ahead of body[data-controls="sliders"]. */
-    .effects-rack .controls-grid .control-group {
-        flex: 1 1 150px;
-        min-width: 0;
-        display: grid;
-        grid-template-columns: minmax(0, max-content) minmax(56px, 1fr) auto auto;
-        align-items: center;
-        column-gap: var(--space-xs);
-        padding: 0;
-        background: none;
-        border: none;
-        text-align: left;
-        animation: none; /* no chromatic box glitch on an invisible box */
-    }
-
-    .effects-rack .controls-grid .control-group:hover {
-        transform: none;
-        box-shadow: none;
-    }
-
-    .effects-rack .controls-grid .control-group .control-label {
-        display: contents;
-    }
-
-    .effects-rack .control-label label {
-        grid-column: 1;
-        grid-row: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: var(--text-2xs);
-        letter-spacing: var(--tracking-tight);
-        color: var(--accent-cyan);
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"] {
-        display: block;
-        grid-column: 2;
-        grid-row: 1;
-        order: 0;
-        width: auto;
-        height: 22px;
-        min-width: 0;
-        margin: 0;
-        transform: none;
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-runnable-track {
-        height: 4px;
-        border: none;
-        box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
-        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-track {
-        height: 4px;
-        border: none;
-        box-shadow: none;
-        background: rgba(30, 39, 73, 0.9);
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-progress {
-        height: 4px;
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-thumb {
-        width: 10px;
-        height: 18px;
-        margin-top: -7px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--accent-magenta);
-        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-    }
-
-    .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-thumb {
-        width: 10px;
-        height: 18px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--accent-magenta);
-        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-    }
-
-    .effects-rack .controls-grid .control-group .control-value {
-        margin: 0;
-        letter-spacing: inherit;
-        text-shadow: none;
-        grid-column: 3;
-        grid-row: 1;
-        font-size: var(--text-2xs);
-        white-space: nowrap;
-    }
-
-    .effects-rack .controls-grid .control-group .help-btn {
-        position: static;
-        grid-column: 4;
-        grid-row: 1;
-        width: 12px;
-        height: 12px;
-    }
-
-    .effects-rack .knob-container {
-        display: none;
-    }
-
-    /* Hint popover opens under the row, wide enough to read */
-    .effects-rack .controls-grid .control-group .control-hint {
-        top: calc(100% + 2px);
-        left: 0;
-        right: auto;
-        width: 260px;
-        max-width: 100%;
-    }
-
-    .effects-rack .controls-grid .control-group:last-child .control-hint {
-        left: auto;
-        right: 0;
-    }
-
     /* ---- Bottom row: keyboard, always visible ---- */
     .keyboard-section {
         grid-area: kbd;
@@ -2598,5 +2441,936 @@ button:focus-visible {
 
     .key.black {
         height: 60px;
+    }
+}
+
+/* ============================================
+   POCKET LAYOUT (< 1024px): 100dvh app, no page scroll
+   bar · scope strip · tabs · one page · keyboard. js/ui/mobile.js moves the
+   type stepper into the header, secondary controls into the ⋯ sheet and the
+   effects rack into the pages carousel; CSS does the rest.
+   ============================================ */
+
+/* Desktop: the extra nodes stay out of the way */
+.pages { display: contents; }
+.xy-set, .tab-bar, .more-btn, .step-btn, .scope-preset, .sheet, .type-help, .type-hint { display: none; }
+
+@media (max-width: 1023px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .crt-screen {
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .container {
+        height: 100%;
+        max-width: none;
+        padding: 0;
+        display: grid;
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "scope" "tabs" "pages" "kbd";
+    }
+
+    main,
+    .instrument-panel,
+    .instrument-top,
+    .effects-panel {
+        display: contents;
+    }
+
+    /* Gone on a phone: the ⋯ sheet keeps what matters */
+    .instrument-panel > .panel-header,
+    .effects-panel > .panel-header,
+    .instrument-intro,
+    .scope-head,
+    .subtitle,
+    header #installBtn,
+    .keyboard-panel .panel-title,
+    .keyboard-panel .info-display,
+    .skip-link {
+        display: none;
+    }
+
+    /* ---- top bar ---- */
+    header {
+        grid-area: bar;
+        display: flex;
+        flex-wrap: wrap; /* line 1: ToneLAB … ⋯ · line 2: ◂ type ▸ */
+        align-items: center;
+        gap: var(--space-xs) var(--space-sm);
+        margin: 0;
+        padding: 6px var(--space-md) 6px var(--space-md);
+        padding-top: calc(6px + env(safe-area-inset-top, 0));
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        text-align: left;
+    }
+
+    header h1 {
+        font-size: var(--text-lg);
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .type-slot {
+        flex: 1 1 100%;
+        order: 3;
+        min-width: 0;
+        display: flex;
+    }
+
+    /* .instrument-select is a column below 480px; the stepper is always a row */
+    .type-stepper {
+        position: relative; /* anchors the description popover */
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--space-xs);
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* ? between the select and ▸: the synth description as a popover */
+    .type-help {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 36px;
+        height: 36px;
+        opacity: 1;
+        border-color: rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-size: var(--text-xs);
+    }
+
+    .type-hint {
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        width: auto;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .type-hint:not([hidden]) {
+        display: block;
+    }
+
+    .type-stepper label {
+        display: none;
+    }
+
+    .type-stepper select {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
+        padding: 6px 8px;
+        font-size: var(--text-xs);
+        text-align: center;
+    }
+
+    .step-btn,
+    .more-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        cursor: pointer;
+    }
+
+    .more-btn {
+        flex: 0 0 auto;
+        margin-left: auto;
+        font-size: var(--text-md);
+        line-height: 1;
+    }
+
+    .step-btn:active,
+    .more-btn:active {
+        background: rgba(0, 240, 255, 0.15);
+    }
+
+    /* ---- scope strip: swipe left / right = preset ---- */
+    .scope-block {
+        grid-area: scope;
+        position: relative;
+        height: 96px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        touch-action: pan-y;
+    }
+
+    .scope-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        border: none;
+    }
+
+    .scope-preset {
+        position: absolute;
+        inset: 0 0 auto 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 4px 0;
+        pointer-events: none;
+    }
+
+    .scope-preset .step-btn {
+        pointer-events: auto;
+        width: 32px;
+        height: 28px;
+        border-color: transparent;
+    }
+
+    .scope-preset span {
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        color: var(--accent-magenta);
+        text-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+    }
+
+    /* ---- tabs ---- */
+    .tab-bar {
+        grid-area: tabs;
+        display: flex;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        flex: 1 0 auto;
+        min-width: 56px;
+        height: 38px;
+        padding: 0 var(--space-sm);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .tab-btn[aria-selected="true"] {
+        color: var(--accent-cyan);
+        border-bottom-color: var(--accent-cyan);
+        text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+    }
+
+    /* ---- pages carousel ---- */
+    .pages {
+        grid-area: pages;
+        display: flex;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+    }
+
+    .pages::-webkit-scrollbar {
+        display: none;
+    }
+
+    #controls {
+        display: contents;
+    }
+
+    /* A drag on a fader or rack slider must not swipe the page */
+    .pages input[type="range"] {
+        touch-action: none;
+    }
+
+    .pages > .control-set,
+    .pages > #controls > .control-set,
+    .pages > .effect-controls {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        overflow-y: auto;
+        margin: 0;
+        padding: var(--space-sm) var(--space-md);
+        border: none;
+        background: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    /* The tab already names the set */
+    .pages > #controls > .control-set > .control-set-title {
+        display: none;
+    }
+
+    .pages .controls-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        justify-items: center;
+        gap: var(--space-sm) 4px;
+    }
+
+    .pages .control-group {
+        --knob-size: 84px;
+        --fader-len: 92px;
+        width: 100%;
+    }
+
+    /* FX page: the five effect sets stacked, scrolls inside the page.
+       nowrap: .control-sets wraps by default and a column that wraps spills
+       into a second column off the right edge. */
+    .pages > .effect-controls {
+        flex-wrap: nowrap;
+        align-items: stretch;
+    }
+
+    .pages > .effect-controls .control-group {
+        --knob-size: 72px;
+        --fader-len: 80px;
+    }
+
+    .pages > .effect-controls .control-set {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+        padding: var(--space-xs) 0;
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        background: none;
+    }
+
+    .pages > .effect-controls .control-set:first-child {
+        border-top: none;
+    }
+
+    .pages > .effect-controls .control-set-title {
+        margin-bottom: 2px;
+    }
+
+    /* ---- XY page ---- */
+    .xy-set {
+        display: flex;
+    }
+
+    .xy-set[hidden] {
+        display: none;
+    }
+
+    .xy-targets {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .xy-targets label {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        color: var(--accent-cyan);
+    }
+
+    .xy-targets select {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 4px 6px;
+        font-size: var(--text-2xs);
+    }
+
+    .xy-pad {
+        --x: 0.5;
+        --y: 0.5;
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 120px;
+        touch-action: none;
+        user-select: none;
+        cursor: crosshair;
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        background:
+            repeating-linear-gradient(to right, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 12.5%),
+            repeating-linear-gradient(to bottom, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 25%),
+            radial-gradient(ellipse at center, rgba(0, 240, 255, 0.06), transparent 70%),
+            rgba(8, 11, 30, 0.9);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+
+    .xy-pad.is-active {
+        border-color: var(--accent-magenta);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 0, 170, 0.3);
+    }
+
+    .xy-cross-x,
+    .xy-cross-y {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(255, 0, 170, 0.45);
+    }
+
+    .xy-cross-x {
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        left: calc(var(--x) * 100%);
+    }
+
+    .xy-cross-y {
+        left: 0;
+        right: 0;
+        height: 1px;
+        top: calc(var(--y) * 100%);
+    }
+
+    .xy-dot {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: calc(var(--x) * 100%);
+        top: calc(var(--y) * 100%);
+        transform: translate(-50%, -50%);
+        border: 2px solid var(--accent-magenta);
+        background: rgba(255, 0, 170, 0.25);
+        box-shadow: 0 0 12px rgba(255, 0, 170, 0.7);
+        pointer-events: none;
+    }
+
+    .xy-read {
+        position: absolute;
+        top: 4px;
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        color: var(--accent-cyan);
+        pointer-events: none;
+        max-width: 48%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .xy-read-x { left: 6px; }
+    .xy-read-y { right: 6px; text-align: right; }
+
+    /* ---- keyboard dock ---- */
+    .keyboard-section {
+        grid-area: kbd;
+        position: static;
+        width: auto;
+        margin: 0;
+        padding: 0;
+        z-index: auto;
+        background: none;
+    }
+
+    .keyboard-panel {
+        margin: 0;
+        padding: 0 0 env(safe-area-inset-bottom, 0);
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 0;
+        background: linear-gradient(180deg, rgba(10, 14, 39, 0.98), rgba(15, 18, 40, 1));
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+
+    .keyboard-panel .panel-header {
+        flex-direction: row;
+        margin: 0;
+        padding: 4px var(--space-md) 2px;
+    }
+
+    .keyboard-controls {
+        padding: 0;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .keyboard-controls .instrument-select {
+        display: none;
+    }
+
+    .keyboard-controls .octave-controls {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+
+    .keyboard-controls .octave-btn {
+        min-height: 36px;
+        padding: 0 var(--space-sm);
+    }
+
+    .keyboard {
+        margin: 0;
+        padding: 2px 0 6px;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: none;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    /* White keys share the width (7 per octave fit any phone, 14 in landscape);
+       black keys keep a fixed width and their negative margins */
+    .key {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        height: 140px;
+    }
+
+    .key.black {
+        flex: 0 0 36px;
+        width: 36px;
+        min-width: 36px;
+        height: 92px;
+    }
+
+    .keyboard {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    .keyboard-scroll-indicator {
+        display: none;
+    }
+
+    /* ---- ⋯ sheet ---- */
+    .sheet {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+        background: rgba(5, 7, 20, 0.7);
+    }
+
+    .sheet[hidden] {
+        display: none;
+    }
+
+    .sheet-body {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: 85dvh;
+        overflow-y: auto;
+        padding: var(--space-md) var(--space-md) calc(var(--space-lg) + env(safe-area-inset-bottom, 0));
+        background: linear-gradient(135deg, rgba(21, 25, 55, 0.98), rgba(30, 39, 73, 0.98));
+        border-top: 1px solid rgba(0, 240, 255, 0.4);
+        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .sheet-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-md);
+    }
+
+    .sheet-title {
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        font-weight: var(--weight-black);
+        letter-spacing: var(--tracking-display);
+        color: var(--accent-cyan);
+    }
+
+    .sheet-close {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        color: var(--text-secondary);
+        font-size: var(--text-sm);
+        cursor: pointer;
+    }
+
+    .sheet-slots {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sheet-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+        padding: var(--space-sm) 0;
+        border-top: 1px solid rgba(0, 240, 255, 0.1);
+    }
+
+    .sheet-row:first-child {
+        border-top: none;
+    }
+
+    /* Install only when the browser offers it (pwa.js flips the inline display) */
+    .sheet-row:has(> #installBtn[style*="none"]) {
+        display: none;
+    }
+
+    .sheet-row-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sheet-row-title {
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+    }
+
+    .sheet-row-hint {
+        font-family: var(--font-body);
+        font-size: var(--text-xs);
+        line-height: 1.4;
+        color: var(--text-secondary);
+    }
+
+    .sheet-row > :last-child {
+        flex: 0 0 auto;
+    }
+
+    /* The row title replaces the select's own "Notes:" / "Layout:" label */
+    .sheet-row .instrument-select label {
+        display: none;
+    }
+
+    .sheet-slots .view-toggle,
+    .sheet-slots .scope-modes {
+        display: flex;
+        gap: var(--space-xs);
+    }
+
+    .sheet-slots .instrument-select {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+/* Phone on its side: scope left, tabs + page right, keys full width */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .container {
+        grid-template-columns: 2fr 3fr;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar bar" "scope tabs" "scope pages" "kbd kbd";
+    }
+
+    .scope-block {
+        height: auto;
+        border-right: 1px solid rgba(0, 240, 255, 0.15);
+    }
+
+    .key {
+        height: 94px;
+    }
+
+    .key.black {
+        height: 60px;
+    }
+
+    .keyboard-panel .panel-header {
+        padding: 2px var(--space-md) 0;
+    }
+
+    .pages .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    }
+
+    /* Type stepper shares the bar line with the logo and ⋯ */
+    .type-slot {
+        flex: 1 1 auto;
+        order: 0;
+        padding: 0 var(--space-md);
+    }
+
+    .type-stepper select {
+        max-width: 240px;
+    }
+
+    /* FX page = rack rows (shared block below); keep them on one line each */
+    .pages > .effect-controls .control-set {
+        padding: 2px 0;
+    }
+
+    .pages > .effect-controls .controls-grid .control-group {
+        flex-basis: 100px;
+        grid-template-columns: minmax(0, max-content) minmax(36px, 1fr) auto auto; /* label keeps its word */
+    }
+
+    .tab-btn {
+        height: 30px;
+    }
+
+    .keyboard-controls .octave-btn {
+        min-height: 32px;
+    }
+}
+
+/* ============================================
+   EFFECTS RACK ROWS — label · slider · value · ?
+   Shared by the desktop workstation (right column) and the pocket landscape
+   FX page, where a short page cannot fit stacked knobs and a nested vertical
+   scroll fights the horizontal page swipe.
+   ============================================ */
+@media (min-width: 1024px), ((max-width: 1023px) and (orientation: landscape) and (max-height: 500px)) {
+    body[data-controls="sliders"] .effects-rack {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 0;
+        margin-top: 0;
+    }
+
+    /* One row per set: title at the left, controls inline after it */
+    body[data-controls="sliders"] .effects-rack .control-set {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-sm);
+        max-width: none;
+        padding: var(--space-xs) 0;
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        background: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-set:first-child {
+        border-top: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-set-title {
+        flex: 0 0 56px;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid {
+        display: flex;
+        flex-wrap: wrap;
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: var(--space-xs) var(--space-sm);
+    }
+
+    /* Each control: label · slider · value · ? on one line. The label block
+       becomes display: contents so its children sit in the row grid. The
+       .controls-grid hop keeps these ahead of body[data-controls="sliders"]. */
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group {
+        flex: 1 1 150px;
+        width: auto;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(0, max-content) minmax(56px, 1fr) auto auto;
+        align-items: center;
+        column-gap: var(--space-xs);
+        padding: 0;
+        background: none;
+        border: none;
+        text-align: left;
+        animation: none; /* no chromatic box glitch on an invisible box */
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-label {
+        display: contents;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-label label {
+        grid-column: 1;
+        grid-row: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: var(--text-2xs);
+        letter-spacing: var(--tracking-tight);
+        color: var(--accent-cyan);
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"] {
+        display: block;
+        grid-column: 2;
+        grid-row: 1;
+        order: 0;
+        width: auto;
+        height: 22px;
+        min-width: 0;
+        margin: 0;
+        transform: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px;
+        border: none;
+        box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-track {
+        height: 4px;
+        border: none;
+        box-shadow: none;
+        background: rgba(30, 39, 73, 0.9);
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-progress {
+        height: 4px;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-thumb {
+        width: 10px;
+        height: 18px;
+        margin-top: -7px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--accent-magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-thumb {
+        width: 10px;
+        height: 18px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--accent-magenta);
+        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-value {
+        margin: 0;
+        letter-spacing: inherit;
+        text-shadow: none;
+        grid-column: 3;
+        grid-row: 1;
+        font-size: var(--text-2xs);
+        white-space: nowrap;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .help-btn {
+        position: static;
+        grid-column: 4;
+        grid-row: 1;
+        width: 12px;
+        height: 12px;
+    }
+
+    body[data-controls="sliders"] .effects-rack .knob-container {
+        display: none;
+    }
+
+    /* Hint popover opens under the row, wide enough to read */
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-hint {
+        top: calc(100% + 2px);
+        left: 0;
+        right: auto;
+        width: 260px;
+        max-width: 100%;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group:last-child .control-hint {
+        left: auto;
+        right: 0;
+    }
+
+    /* ---- Knob mode: the same rack as a compact knob grid. Sets flow inline
+       and wrap as units (Master · Reverb · Delay / Tone · Chorus), 52px knobs
+       so ten of them fit under the scope. ---- */
+    body[data-controls="knobs"] .effects-rack {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--space-xs) var(--space-md);
+        margin-top: 0;
+    }
+
+    body[data-controls="knobs"] .effects-rack .control-set {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        border: none;
+        background: none;
+    }
+
+    body[data-controls="knobs"] .effects-rack .control-set-title {
+        flex: 0 0 auto;
+        margin: 0 0 2px;
+        font-size: var(--text-2xs);
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 2px;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid .control-group {
+        --knob-size: 52px;
+        flex: 0 0 68px;
+        width: 68px;
+        min-width: 0;
+        padding: 0 0 2px;
+        display: flex;
+        grid-template-columns: none;
+    }
+
+    body[data-controls="knobs"] .effects-rack .control-label label {
+        font-size: var(--text-2xs);
+    }
+
+    body[data-controls="knobs"] .effects-rack .help-btn {
+        width: 12px;
+        height: 12px;
     }
 }

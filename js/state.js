@@ -16,6 +16,8 @@ export const state = {
     maxOctave: 7,
     activeKeys: new Set(),
     activeTouches: new Map(),
+    hold: false,              // HOLD (latch) switch on the keyboard panel
+    heldNotes: new Set(),     // notes latched by HOLD, e.g. 'C4'; they ring until unlatched
     userLayout: 'qwerty',
     noteNotation: localStorage.getItem('noteNotation') || 'english',
     audioInitialized: false

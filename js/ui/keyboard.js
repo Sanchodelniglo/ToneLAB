@@ -3,6 +3,83 @@
 import { state, keyboardLayouts, deadKeyCodeMap, getDisplayLabel } from '../state.js';
 import { playNote, stopNote } from '../audio/synth.js';
 
+/* ============================================
+   NOTE ON/OFF WITH HOLD (LATCH)
+   Every input path (mouse, computer keyboard, touch) goes through noteOn /
+   noteOff so HOLD behaves the same everywhere.
+   ============================================ */
+
+function keysForNote(note) {
+    return document.querySelectorAll(`.key[data-note="${note}"]`);
+}
+
+// Start a note. With HOLD on, pressing a key that is already latched releases
+// it instead and returns false, so the caller must not track that press.
+// Mono instruments have a single voice: a new note takes over any latched one.
+function noteOn(note, el) {
+    if (state.hold && state.heldNotes.has(note)) {
+        unlatch(note);
+        return false;
+    }
+    if (state.hold && state.currentInstrumentType !== 'PolySynth') {
+        clearHeldVisuals();
+    }
+    playNote(note);
+    el.classList.add('pressed');
+    return true;
+}
+
+// End a press. With HOLD on the note latches and keeps its .pressed look;
+// otherwise it is released as usual.
+function noteOff(note, el) {
+    if (state.hold) {
+        state.heldNotes.add(note);
+        return;
+    }
+    el.classList.remove('pressed');
+    stopNote(note);
+}
+
+function unlatch(note) {
+    state.heldNotes.delete(note);
+    keysForNote(note).forEach(k => k.classList.remove('pressed'));
+    stopNote(note);
+    // stopNote blanks the readout when nothing is physically pressed; if other
+    // notes are still latched, show the most recent one instead.
+    if (state.heldNotes.size > 0) {
+        const last = Array.from(state.heldNotes).pop();
+        document.getElementById('currentNote').textContent =
+            getDisplayLabel(last.replace(/\d+/, '')) + (last.match(/\d+/)?.[0] || '');
+    }
+}
+
+// Forget latched notes without releasing the voice (mono: the new attack owns it)
+function clearHeldVisuals() {
+    state.heldNotes.forEach(note => keysForNote(note).forEach(k => k.classList.remove('pressed')));
+    state.heldNotes.clear();
+}
+
+// Release every latched note: HOLD switched off, or the instrument changed.
+function releaseHeld() {
+    Array.from(state.heldNotes).forEach(unlatch);
+}
+
+function setHold(on) {
+    state.hold = on;
+    const btn = document.getElementById('holdBtn');
+    if (btn) {
+        btn.setAttribute('aria-pressed', String(on));
+        btn.classList.toggle('active', on);
+    }
+    if (!on) releaseHeld();
+}
+
+// Haptic tick. Only meaningful inside a touch handler (Android needs the user
+// gesture; iOS has no API, so the guard simply skips it there).
+function vibrate(ms) {
+    if (typeof navigator.vibrate === 'function') navigator.vibrate(ms);
+}
+
 // Create keyboard
 function createKeyboard() {
     const keyboard = document.getElementById('keyboard');
@@ -51,42 +128,56 @@ function createKeyboard() {
         keyEl.setAttribute('aria-label', `${n.label.replace('#', ' sharp')} octave ${noteOctave}`);
         keyEl.setAttribute('tabindex', '0');
 
-        // Mouse handlers
+        // Mouse handlers. The flag makes mouseup/mouseleave a no-op when the
+        // mousedown only unlatched a held note (noteOn returned false).
+        let mouseHeld = false;
         keyEl.addEventListener('mousedown', () => {
-            playNote(n.note);
-            keyEl.classList.add('pressed');
+            mouseHeld = noteOn(n.note, keyEl);
         });
-        keyEl.addEventListener('mouseup', () => {
-            keyEl.classList.remove('pressed');
-            stopNote(n.note);
-        });
-        keyEl.addEventListener('mouseleave', () => {
-            keyEl.classList.remove('pressed');
-            stopNote(n.note);
-        });
+        const mouseRelease = () => {
+            if (!mouseHeld) return;
+            mouseHeld = false;
+            noteOff(n.note, keyEl);
+        };
+        keyEl.addEventListener('mouseup', mouseRelease);
+        keyEl.addEventListener('mouseleave', mouseRelease);
 
         // Keyboard activation (Enter/Space) for accessibility
+        let keyHeld = false;
         keyEl.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                playNote(n.note);
-                keyEl.classList.add('pressed');
+                if (e.repeat || keyHeld) return;
+                keyHeld = noteOn(n.note, keyEl);
             }
         });
         keyEl.addEventListener('keyup', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                keyEl.classList.remove('pressed');
-                stopNote(n.note);
+                if (!keyHeld) return;
+                keyHeld = false;
+                noteOff(n.note, keyEl);
             }
         });
 
         keyboard.appendChild(keyEl);
     });
 
+    // Latched notes keep ringing across octave/layout rebuilds: restore their lit look
+    state.heldNotes.forEach(note => keysForNote(note).forEach(k => k.classList.add('pressed')));
+
     // Initialize mobile touch handling (only once)
     enhanceMobileTouchHandling();
 }
+
+// HOLD (latch) toggle
+document.getElementById('holdBtn')?.addEventListener('click', () => {
+    setHold(!state.hold);
+});
+
+// Switching instrument rebuilds the synth (controls.js): drop the latched notes with it.
+// controls.js registers first (module order), so by now the old voice has been released.
+document.getElementById('instrumentType')?.addEventListener('change', () => releaseHeld());
 
 // Octave controls
 document.getElementById('octaveUp').addEventListener('click', () => {
@@ -152,10 +243,9 @@ document.addEventListener('keydown', (e) => {
 
     const keyElement = document.querySelector(`[data-keyboard-key="${key}"]`);
     if (keyElement && !state.activeKeys.has(key)) {
-        state.activeKeys.add(key);
-        const note = keyElement.dataset.note;
-        playNote(note);
-        keyElement.classList.add('pressed');
+        if (noteOn(keyElement.dataset.note, keyElement)) {
+            state.activeKeys.add(key);
+        }
     }
 });
 
@@ -169,10 +259,8 @@ document.addEventListener('keyup', (e) => {
 
     const keyElement = document.querySelector(`[data-keyboard-key="${key}"]`);
     if (keyElement && state.activeKeys.has(key)) {
-        const note = keyElement.dataset.note;
         state.activeKeys.delete(key);
-        keyElement.classList.remove('pressed');
-        stopNote(note);
+        noteOff(keyElement.dataset.note, keyElement);
     }
 });
 
@@ -203,7 +291,7 @@ let isPlayingNotes = false;
 // Configuration
 const touchConfig = {
     slideGestureEnabled: true,
-    hapticDuration: 15,
+    hapticDuration: 8,
     touchMoveThreshold: 5
 };
 
@@ -277,6 +365,9 @@ function handleTouchStart(e) {
         if (key && !state.activeTouches.has(touch.identifier)) {
             const note = key.dataset.note;
 
+            // A tap on a latched key releases it and is not tracked as a touch
+            if (!noteOn(note, key)) return;
+
             state.activeTouches.set(touch.identifier, {
                 key: key.dataset.note,
                 note: note,
@@ -285,12 +376,7 @@ function handleTouchStart(e) {
                 startY: touch.clientY
             });
 
-            playNote(note);
-            key.classList.add('pressed');
-
-            if (navigator.vibrate) {
-                navigator.vibrate(touchConfig.hapticDuration);
-            }
+            vibrate(touchConfig.hapticDuration);
         }
     });
 }
@@ -313,24 +399,22 @@ function handleTouchMove(e) {
 
             if (newKey && newKey !== touchData.element) {
                 const oldNote = touchData.note;
+                const oldEl = touchData.element;
                 const newNote = newKey.dataset.note;
 
-                touchData.element.classList.remove('pressed');
-
-                // Release old note for PolySynth before playing new one
-                if (state.currentInstrumentType === 'PolySynth') {
-                    try { state.synth.triggerRelease(oldNote); } catch(err) { /* ignore */ }
-                }
+                // Legato glide: leaving the old key ends its press (it latches
+                // under HOLD; mono voices keep sounding since the touch is still
+                // active, so the new attack slides the pitch), then the new key starts.
+                noteOff(oldNote, oldEl);
 
                 touchData.element = newKey;
                 touchData.note = newNote;
-                touchData.key = newKey.dataset.note;
+                touchData.key = newNote;
 
-                playNote(newNote);
-                newKey.classList.add('pressed');
-
-                if (navigator.vibrate) {
-                    navigator.vibrate(8);
+                // Sliding onto an already-latched key just adopts it: no retrigger
+                if (!(state.hold && state.heldNotes.has(newNote))) {
+                    noteOn(newNote, newKey);
+                    vibrate(touchConfig.hapticDuration);
                 }
             }
         }
@@ -344,9 +428,8 @@ function handleTouchEnd(e) {
         const touchData = state.activeTouches.get(touch.identifier);
 
         if (touchData) {
-            touchData.element.classList.remove('pressed');
             state.activeTouches.delete(touch.identifier);
-            stopNote(touchData.note);
+            noteOff(touchData.note, touchData.element);
         }
     });
 
@@ -362,9 +445,8 @@ function handleTouchCancel(e) {
         const touchData = state.activeTouches.get(touch.identifier);
 
         if (touchData) {
-            touchData.element.classList.remove('pressed');
             state.activeTouches.delete(touch.identifier);
-            stopNote(touchData.note);
+            noteOff(touchData.note, touchData.element);
         }
     });
 
@@ -420,4 +502,4 @@ if (keyboardEl) {
     }, { passive: false });
 }
 
-export { createKeyboard, updateOctaveButtons, updateScrollIndicators, centerKeyboard };
+export { createKeyboard, updateOctaveButtons, updateScrollIndicators, centerKeyboard, releaseHeld, setHold };

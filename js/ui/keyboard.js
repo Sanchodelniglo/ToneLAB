@@ -48,8 +48,8 @@ function unlatch(note) {
     // notes are still latched, show the most recent one instead.
     if (state.heldNotes.size > 0) {
         const last = Array.from(state.heldNotes).pop();
-        document.getElementById('currentNote').textContent =
-            getDisplayLabel(last.replace(/\d+/, '')) + (last.match(/\d+/)?.[0] || '');
+        const el = document.getElementById('currentNote');
+        if (el) el.textContent = getDisplayLabel(last.replace(/\d+/, '')) + (last.match(/\d+/)?.[0] || '');
     }
 }
 
@@ -81,6 +81,30 @@ function vibrate(ms) {
 }
 
 // Create keyboard
+// Pocket layout (< 1024px): as many octaves as fit at a thumb-wide white key,
+// capped by the computer-key mapping (two octaves). Desktop keys are fixed
+// width, always two octaves.
+const MIN_WHITE_KEY_PX = 46;
+const MAX_OCTAVES = 2;
+const pocketQuery = window.matchMedia('(max-width: 1023px)');
+let drawnOctaves = 0;
+
+function octaveCountFor() {
+    if (!pocketQuery.matches) return MAX_OCTAVES;
+    const keyboard = document.getElementById('keyboard');
+    const width = keyboard?.clientWidth || window.innerWidth;
+    return Math.max(1, Math.min(MAX_OCTAVES, Math.floor(width / (7 * MIN_WHITE_KEY_PX))));
+}
+
+// Rotating the phone or resizing the window changes how many octaves fit
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (state.audioInitialized && octaveCountFor() !== drawnOctaves) createKeyboard();
+    }, 120);
+});
+
 function createKeyboard() {
     const keyboard = document.getElementById('keyboard');
     keyboard.innerHTML = '';
@@ -101,8 +125,8 @@ function createKeyboard() {
         { label: 'B', white: true },
     ];
 
-    const isMobile = window.innerWidth <= 768;
-    const octaveCount = isMobile ? 1 : 2;
+    const octaveCount = octaveCountFor();
+    drawnOctaves = octaveCount;
     const notes = [];
     let keyIndex = 0;
     for (let oct = 0; oct < octaveCount; oct++) {
@@ -186,7 +210,7 @@ document.getElementById('octaveUp').addEventListener('click', () => {
         document.getElementById('currentOctave').textContent = state.currentOctave;
         createKeyboard();
         updateOctaveButtons();
-        if (window.innerWidth <= 768) {
+        if (pocketQuery.matches) {
             centerKeyboard();
         }
     }
@@ -198,7 +222,7 @@ document.getElementById('octaveDown').addEventListener('click', () => {
         document.getElementById('currentOctave').textContent = state.currentOctave;
         createKeyboard();
         updateOctaveButtons();
-        if (window.innerWidth <= 768) {
+        if (pocketQuery.matches) {
             centerKeyboard();
         }
     }
@@ -467,7 +491,7 @@ function enhanceMobileTouchHandling() {
     keyboard.addEventListener('touchcancel', handleTouchCancel, { passive: false });
     keyboard.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    if (window.innerWidth <= 768) {
+    if (pocketQuery.matches) {
         updateScrollIndicators();
 
         let scrollTimeout;
@@ -500,6 +524,35 @@ if (keyboardEl) {
         }
         lastTouchEnd = now;
     }, { passive: false });
+}
+
+// Key labels: the note name and the computer key are two independent
+// toggles (chips in the keyboard bar, rows in the ⋯ sheet). Computer keys
+// default to off on touch devices, where there is no keyboard to map.
+const KEY_LABEL_STORE = { note: 'noteLabels', key: 'keyLabels' };
+const KEY_LABEL_DATA = { note: 'noteLabels', key: 'keyLabels' };
+
+function setKeyLabel(kind, on) {
+    document.body.dataset[KEY_LABEL_DATA[kind]] = on ? 'on' : 'off';
+    document.querySelectorAll(`.chip[data-key-label="${kind}"]`).forEach(btn => {
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', String(on));
+    });
+    try { localStorage.setItem(KEY_LABEL_STORE[kind], on ? 'on' : 'off'); } catch (_) { /* private mode */ }
+}
+
+document.querySelectorAll('.chip[data-key-label]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        setKeyLabel(btn.dataset.keyLabel, btn.getAttribute('aria-pressed') !== 'true');
+        btn.blur();
+    });
+});
+
+for (const kind of ['note', 'key']) {
+    let stored = null;
+    try { stored = localStorage.getItem(KEY_LABEL_STORE[kind]); } catch (_) { /* private mode */ }
+    const fallback = kind === 'key' && pocketQuery.matches ? 'off' : 'on';
+    setKeyLabel(kind, (stored || fallback) === 'on');
 }
 
 export { createKeyboard, updateOctaveButtons, updateScrollIndicators, centerKeyboard, releaseHeld, setHold };

@@ -667,26 +667,33 @@ select:focus {
     position: absolute;
     top: 22px;
     left: 0;
-    width: 240px;
+    width: 280px;
     max-width: calc(100vw - 2 * var(--space-md));
     z-index: 5;
     margin: 0;
-    padding: 0.5rem 0.6rem;
-    background: rgba(21, 25, 55, 0.96);
+    padding: 0.6rem 0.75rem;
+    background: rgba(21, 25, 55, 0.97);
     border: 1px solid rgba(0, 240, 255, 0.4);
     box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
     font-family: var(--font-body);
-    font-size: var(--text-2xs);
-    color: var(--text-secondary);
-    line-height: 1.4;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    line-height: 1.45;
     text-align: left;
     pointer-events: none;
 }
 
 .control-hint:not([hidden]),
-.control-group:has(.help-btn:hover) .control-hint,
 .control-group:has(.help-btn:focus-visible) .control-hint {
     display: block;
+}
+
+/* Hover preview only where hover exists: on touch the :hover state sticks to
+   the last tapped button and would keep a closed hint on screen. */
+@media (hover: hover) {
+    .control-group:has(.help-btn:hover) .control-hint {
+        display: block;
+    }
 }
 
 /* Cells at the right edge of a set open their hint to the left */
@@ -878,465 +885,6 @@ body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-thu
 body[data-controls="sliders"] .wave-select {
     width: 100%;
 }
-
-.knob-container { animation-delay: -4.2s; }
-
-.synth-panel,
-.keyboard,
-.key,
-.key.black,
-select,
-.wave-select,
-.preset-btn,
-.octave-btn,
-.keyboard-key-label,
-.info-display {
-    animation: crt-chromatic-box 8s infinite;
-}
-
-header {
-    text-align: center;
-    margin-bottom: clamp(1.25rem, 4vw, 2rem);
-    position: relative;
-}
-
-h1 {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: var(--weight-black);
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: var(--tracking-display);
-    margin-bottom: 0.35rem;
-}
-
-header #installBtn {
-    margin-top: var(--space-md);
-}
-
-.subtitle {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    letter-spacing: var(--tracking-display);
-    text-transform: uppercase;
-}
-
-.synth-panel {
-    background: linear-gradient(135deg, rgba(21, 25, 55, 0.9), rgba(30, 39, 73, 0.9));
-    border: 1px solid rgba(0, 240, 255, 0.25);
-    border-radius: var(--radius-xl);
-    padding: clamp(1.25rem, 3vw, 2rem);
-    margin-bottom: clamp(1rem, 3vw, 1.5rem);
-    box-shadow:
-        0 4px 30px rgba(0, 0, 0, 0.3),
-        inset 0 0 60px rgba(0, 240, 255, 0.03);
-    position: relative;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-}
-
-.panel-header {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-    margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.15);
-}
-
-.panel-title {
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: var(--weight-bold);
-    color: var(--accent-cyan);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-display);
-}
-
-.synth-description {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    line-height: 1.5;
-    margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
-    padding: var(--space-sm) var(--space-md);
-    border-left: 2px solid rgba(0, 240, 255, 0.3);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-
-.synth-description:empty {
-    display: none;
-}
-
-/* Instrument header tools: Type select + Knobs / Sliders switch */
-.panel-tools {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-sm) var(--space-md);
-}
-
-.view-toggle {
-    display: inline-flex;
-    gap: var(--space-xs);
-}
-
-.preset-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
-}
-
-.preset-bar:empty {
-    display: none;
-}
-
-.preset-label {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-    font-family: var(--font-mono);
-    margin-right: var(--space-xs);
-}
-
-.preset-btn {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid rgba(0, 240, 255, 0.15);
-    border-radius: var(--radius-sm);
-    padding: 0.3rem 0.7rem;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    cursor: pointer;
-    transition: all var(--transition-fast) var(--ease-out);
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-tight);
-}
-
-.preset-btn:hover {
-    border-color: rgba(0, 240, 255, 0.5);
-    color: var(--accent-cyan);
-    background: rgba(0, 240, 255, 0.05);
-}
-
-.preset-btn.active {
-    background: rgba(0, 240, 255, 0.1);
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-}
-
-.instrument-select {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    align-items: stretch;
-}
-
-label {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-}
-
-select {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    border-radius: var(--radius-md);
-    padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.75rem, 2vw, 1rem);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-select:hover {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
-}
-
-select:focus {
-    outline: 2px solid var(--accent-magenta);
-    outline-offset: 2px;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-}
-
-/* Control sets: knobs grouped by meaning (Oscillator, Envelope, Filter...).
-   Sets pack side by side and wrap; cards inside a set wrap too. */
-.control-sets {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start; /* sets keep their own height */
-    gap: var(--space-md);
-    margin-top: clamp(1rem, 3vw, 2rem);
-}
-
-/* A set never shrinks: if it does not fit on the row it moves to the next one
-   whole. Only a set wider than the panel (narrow screens) wraps its cards. */
-.control-set {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    flex: 1 0 auto; /* exact cell width, then stretch to tile the row */
-    max-width: 100%;
-    padding: var(--space-sm);
-    border: 1px solid rgba(0, 240, 255, 0.12);
-    background: rgba(0, 240, 255, 0.02);
-}
-
-.control-set-title {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    font-weight: var(--weight-normal);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--text-muted);
-}
-
-/* --cols / --cells are set per set by controls.js (sizeControlSets) */
-.controls-grid {
-    display: grid;
-    grid-template-columns: repeat(var(--cols, 4), var(--knob-cell));
-    gap: var(--space-sm);
-    align-items: start;
-}
-
-/* Knob cell (default mode): a bare hardware-style cell — knob on top, readout
-   inside the cap, name under it. No card chrome: the set box is the frame. */
-.control-set .control-group {
-    min-width: 0;
-}
-
-.control-set .control-group:has(.wave-select) {
-    grid-column: span 2;
-}
-
-@media (max-width: 600px) {
-    .control-set {
-        width: 100%;
-    }
-
-    .controls-grid {
-        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); /* four knobs per row on a phone */
-    }
-}
-
-.control-group {
-    --knob-size: 72px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 2px 2px 4px;
-}
-
-.control-label {
-    order: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    margin: 2px 0 0;
-    max-width: 100%;
-    font-size: var(--text-2xs);
-    line-height: 1.2;
-    color: var(--accent-cyan);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-tight);
-    overflow-wrap: break-word;
-}
-
-/* Wave cells have no knob: name first, picker under it */
-.control-group:has(.wave-select) .control-label {
-    order: 0;
-    margin: 0 0 4px;
-}
-
-.control-value {
-    color: var(--accent-magenta);
-    font-weight: var(--weight-bold);
-    font-size: var(--text-2xs);
-    white-space: nowrap;
-}
-
-/* Knob cells stack readout · knob · name. The label block is unwrapped
-   (display: contents) so its children take their own slot in the column. */
-.control-group:has(.knob-container) .control-label {
-    display: contents;
-}
-
-.control-group:has(.knob-container) label {
-    order: 2;
-    margin-top: 2px;
-    max-width: 100%;
-}
-
-.control-group:has(.knob-container) .control-value {
-    order: 0;
-    margin-bottom: 2px;
-    letter-spacing: 0;
-    text-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-}
-
-/* Hint = overlay popover on the card. Never affects layout: shown on hover /
-   focus of the ? button, or pinned by clicking it (touch). */
-.control-hint {
-    display: none;
-    position: absolute;
-    top: 22px;
-    left: 0;
-    width: 240px;
-    max-width: calc(100vw - 2 * var(--space-md));
-    z-index: 5;
-    margin: 0;
-    padding: 0.5rem 0.6rem;
-    background: rgba(21, 25, 55, 0.96);
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
-    font-family: var(--font-body);
-    font-size: var(--text-2xs);
-    color: var(--text-secondary);
-    line-height: 1.4;
-    text-align: left;
-    pointer-events: none;
-}
-
-.control-hint:not([hidden]),
-.control-group:has(.help-btn:hover) .control-hint,
-.control-group:has(.help-btn:focus-visible) .control-hint {
-    display: block;
-}
-
-/* Cells at the right edge of a set open their hint to the left */
-.control-group:last-child:not(:first-child) .control-hint {
-    left: auto;
-    right: 0;
-}
-
-/* "?" help toggle, top-right of every control card */
-.help-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 14px;
-    height: 14px;
-    opacity: 0.35;
-    padding: 0;
-    border: 1px solid rgba(0, 240, 255, 0.25);
-    border-radius: 0;
-    background: transparent;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-2xs);
-    line-height: 1;
-    cursor: pointer;
-    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
-}
-
-.control-group:hover .help-btn,
-.control-group:focus-within .help-btn,
-.help-btn:focus-visible,
-.help-btn[aria-expanded="true"] {
-    opacity: 1;
-}
-
-@media (pointer: coarse) {
-    .help-btn {
-        opacity: 1;
-    }
-}
-
-.help-btn:hover,
-.help-btn:focus-visible {
-    color: var(--accent-cyan);
-    border-color: rgba(0, 240, 255, 0.6);
-}
-
-.help-btn[aria-expanded="true"] {
-    color: var(--bg-primary);
-    background: var(--accent-cyan);
-    border-color: var(--accent-cyan);
-}
-
-/* Knob mode (default): the range input is the hidden source of truth */
-input[type="range"] {
-    display: none;
-}
-
-/* ---- Slider skin ----
-   Styles every range input. Harmless in knob mode (the inputs are display: none
-   there); which inputs are shown is decided by the mode switch below and, on
-   desktop, by the effects rack (see LAYOUT A at the end of the file). */
-input[type="range"] {
-    width: 100%;
-    height: 22px;
-    margin: 0;
-    background: transparent;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-input[type="range"]:focus-visible {
-    outline: 2px solid var(--accent-magenta);
-    outline-offset: 2px;
-}
-
-/* Track: cyan fill up to --fill-percent (set by updateSliderFill), dark remainder */
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 4px;
-    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
-    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
-}
-
-input[type="range"]::-moz-range-track {
-    height: 4px;
-    background: rgba(30, 39, 73, 0.9);
-}
-
-input[type="range"]::-moz-range-progress {
-    height: 4px;
-    background: var(--accent-cyan);
-    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
-}
-
-/* Thumb: square fader cap, magenta like the knob indicator */
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 10px;
-    height: 18px;
-    margin-top: -7px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-magenta);
-    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-    transition: box-shadow var(--transition-fast);
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 10px;
-    height: 18px;
-    border-radius: 0;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-magenta);
-    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-}
-
-input[type="range"]:hover::-webkit-slider-thumb,
-input[type="range"]:active::-webkit-slider-thumb {
-    box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
-}
-
 
 .knob-container {
     order: 1;
@@ -2014,16 +1562,7 @@ button:focus-visible {
    SCOPE — oscilloscope / spectrum panel
    ============================================ */
 /* Instrument intro (description + presets) beside the live scope */
-.instrument-top {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-md);
-    align-items: start;
-}
 
-.instrument-intro {
-    min-width: 0;
-}
 
 .scope-block {
     display: flex;
@@ -2044,11 +1583,6 @@ button:focus-visible {
     gap: var(--space-xs);
 }
 
-@media (min-width: 1024px) {
-    .instrument-top {
-        grid-template-columns: minmax(0, 1fr) 360px;
-    }
-}
 
 .scope-canvas {
     display: block;
@@ -2087,14 +1621,15 @@ button:focus-visible {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.5rem;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.4rem 0.6rem;
     background: var(--bg-tertiary);
     color: var(--text-primary);
     border: 2px solid var(--accent-cyan);
     border-radius: 0;
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     letter-spacing: 0;
     text-transform: none;
     text-align: left;
@@ -2132,12 +1667,13 @@ button:focus-visible {
 }
 
 .wave-picker-list {
-    /* fixed: top/left/width are set by wavePreview.js when it opens, so a
-       scrolling control column cannot clip it */
+    /* fixed and moved onto <body> while open (see wavePreview.js): top/left/
+       width are set on open, so neither a scrolling column nor a panel with
+       backdrop-filter can clip or offset it */
     position: fixed;
+    z-index: 300;
     max-height: 240px;
     overflow-y: auto;
-    z-index: 30;
     margin: 0;
     padding: 2px;
     list-style: none;
@@ -2232,31 +1768,104 @@ button:focus-visible {
         grid-template-columns: auto minmax(0, 1fr) clamp(480px, 42%, 640px); /* wider right column: room for 60px effect knobs */
         /* Scope row is content-sized (canvas height is a viewport clamp);
            the effects row takes whatever height is left. */
-        grid-template-rows: auto auto auto minmax(auto, 1fr) auto;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
         grid-template-areas:
-            "brand tools tools"
-            "intro intro intro"
+            "brand brand brand"
             "sets  sets  scope"
             "sets  sets  fx"
             "kbd   kbd   kbd";
         gap: var(--space-xs) var(--space-md);
     }
 
-    main,
-    .instrument-panel,
-    .instrument-panel > .panel-header,
-    .instrument-top {
+    main {
         display: contents;
     }
 
-    /* ---- Top bar: brand | instrument heading + Type + Knobs/Sliders ---- */
+    /* ---- Top bar: brand · ◂ instrument ▸ ? · PRESET ◂ select ▸ · install,
+       with the description and the preset hint on a second line ---- */
     header {
         grid-area: brand;
-        display: flex;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "logo . install";
         align-items: center;
-        gap: var(--space-md);
+        column-gap: var(--space-md);
         margin: 0;
+        padding-bottom: var(--space-xs);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12);
         text-align: left;
+    }
+
+    header h1 {
+        grid-area: logo;
+    }
+
+    .instrument-bar .type-stepper {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .instrument-bar .type-stepper label {
+        display: none;
+    }
+
+    .instrument-bar .type-stepper select {
+        min-width: 150px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
+    }
+
+    .instrument-bar .type-help {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+        border-color: rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-size: var(--text-xs);
+    }
+
+    .instrument-bar .type-hint {
+        top: calc(100% + 4px);
+        left: 0;
+        width: 360px;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .instrument-bar .type-hint:not([hidden]) {
+        display: block;
+    }
+
+    header .type-slot,
+    header .more-btn,
+    header .synth-description {
+        display: none;
+    }
+
+    /* Preset ? popover hangs under the preset row */
+    .preset-stepper-row {
+        position: relative;
+    }
+
+    .preset-help:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+
+    header #installBtn {
+        grid-area: install;
     }
 
     h1 {
@@ -2275,56 +1884,99 @@ button:focus-visible {
         font-size: var(--text-xs);
     }
 
+    /* ---- Instrument box: title + Knobs/Sliders on the header line, sets scroll under it ---- */
+    .instrument-panel {
+        grid-area: sets;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
     .instrument-panel > .panel-header {
         display: flex;
-        grid-area: tools;
+        flex-direction: row;
         align-items: center;
         justify-content: space-between;
         gap: var(--space-md);
         margin: 0;
-        padding: 0 0 0 var(--space-md);
-        border-bottom: none;
-        border-left: 1px solid rgba(0, 240, 255, 0.15);
+        padding: var(--space-sm) var(--space-md) var(--space-xs);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+    }
+
+    .instrument-panel .panel-title {
+        font-size: var(--text-sm);
     }
 
     .panel-tools {
         flex-wrap: nowrap;
     }
 
-    /* ---- Intro strip: presets first (actions), description clamped ---- */
-    .instrument-intro {
-        grid-area: intro;
+    .preset-bar {
+        display: none;
+    }
+
+    /* ---- Instrument bar: ◂ type ▸ ? · PRESET ◂ select ▸ ?, under the box header ---- */
+    .instrument-bar {
         display: flex;
-        flex-direction: row-reverse;
         align-items: center;
         gap: var(--space-md);
-        min-width: 0;
-        padding: var(--space-xs) 0;
-        border-top: 1px solid rgba(0, 240, 255, 0.12);
+        padding: var(--space-xs) var(--space-md);
         border-bottom: 1px solid rgba(0, 240, 255, 0.12);
     }
 
-    .instrument-intro .synth-description {
-        flex: 1 1 auto;
+    .instrument-bar .preset-stepper {
+        display: flex;
+        align-items: center;
         min-width: 0;
-        margin: 0;
-        padding: 0 var(--space-sm);
-        line-height: 1.3;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
     }
 
-    .instrument-intro .preset-bar {
-        flex: 0 0 auto;
-        flex-wrap: nowrap;
-        margin: 0;
+    .preset-stepper-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .preset-label {
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+    }
+
+    .preset-stepper .step-btn,
+    .instrument-bar .type-stepper .step-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        cursor: pointer;
+    }
+
+    .preset-stepper .step-btn:hover,
+    .instrument-bar .type-stepper .step-btn:hover {
+        border-color: rgba(0, 240, 255, 0.6);
+    }
+
+    #presetSelect {
+        width: 190px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
     }
 
     /* ---- Left column: control sets, scrolls on their own ---- */
     #controls {
-        grid-area: sets;
+        flex: 1 1 auto;
         min-height: 0;
         margin: 0;
         padding: var(--space-md);
@@ -2333,11 +1985,15 @@ button:focus-visible {
         overflow-x: hidden;
         scrollbar-width: thin;
         scrollbar-color: rgba(0, 240, 255, 0.35) rgba(10, 14, 39, 0.6);
-        background: linear-gradient(135deg, rgba(21, 25, 55, 0.9), rgba(30, 39, 73, 0.9));
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        box-shadow:
-            0 4px 30px rgba(0, 0, 0, 0.3),
-            inset 0 0 60px rgba(0, 240, 255, 0.03);
+    }
+
+    /* Scope title matches the other box titles */
+    .scope-head .control-set-title {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: var(--weight-bold);
+        letter-spacing: var(--tracking-display);
+        color: var(--accent-cyan);
     }
 
     /* ---- Right column, top: scope strip, short so the effects get the room ---- */
@@ -2382,10 +2038,10 @@ button:focus-visible {
 
     .keyboard-panel {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
-            "head info"
-            "keys keys";
+            "head"
+            "keys";
         align-items: center;
         column-gap: var(--space-md);
         margin: 0;
@@ -2402,6 +2058,17 @@ button:focus-visible {
     .keyboard-panel .keyboard-controls {
         flex-wrap: nowrap;
         gap: var(--space-md);
+    }
+
+    /* The option text says it all ("C D E", "QWERTY"); the chips sit first */
+    .keyboard-panel .keyboard-controls .instrument-select label {
+        display: none;
+    }
+
+    .keyboard-panel .keyboard-controls select {
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
     }
 
     .keyboard-panel .octave-controls {
@@ -2457,7 +2124,19 @@ button:focus-visible {
 
 /* Desktop: the extra nodes stay out of the way */
 .pages { display: contents; }
-.xy-set, .tab-bar, .more-btn, .step-btn, .scope-preset, .sheet, .type-help, .type-hint { display: none; }
+.xy-set, .tab-bar, .more-btn, .step-btn, .scope-preset, .sheet, .type-help, .type-hint, .preset-stepper { display: none; }
+
+/* Key labels (⋯ sheet on mobile, keyboard bar on desktop): note name and
+   computer key are two independent toggles */
+body[data-note-labels="off"] .note-label {
+    display: none;
+}
+
+body[data-key-labels="off"] .keyboard-key-label {
+    display: none;
+}
+
+/* .chip = independent on/off toggle (the active fill says it is on) */
 
 @media (max-width: 1023px) {
     html, body {
@@ -2483,7 +2162,6 @@ button:focus-visible {
 
     main,
     .instrument-panel,
-    .instrument-top,
     .effects-panel {
         display: contents;
     }
@@ -2491,9 +2169,9 @@ button:focus-visible {
     /* Gone on a phone: the ⋯ sheet keeps what matters */
     .instrument-panel > .panel-header,
     .effects-panel > .panel-header,
-    .instrument-intro,
+    .instrument-bar,
+    .preset-stepper,
     .scope-head,
-    .subtitle,
     header #installBtn,
     .keyboard-panel .panel-title,
     .keyboard-panel .info-display,
@@ -2649,6 +2327,34 @@ button:focus-visible {
         width: 44px;
         height: 36px;
         border-color: transparent;
+    }
+
+    .scope-preset .preset-help {
+        pointer-events: auto;
+        width: 36px;
+        height: 36px;
+        border-color: transparent;
+    }
+
+    .scope-preset .preset-help:disabled {
+        opacity: 0.3;
+    }
+
+    .scope-preset .type-hint {
+        top: calc(100% + 2px);
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .scope-preset .type-hint:not([hidden]) {
+        display: block;
     }
 
     .scope-preset span {
@@ -2817,7 +2523,7 @@ button:focus-visible {
 
     .pages .control-hint {
         font-size: var(--text-sm);
-        width: 280px;
+        width: min(360px, calc(100vw - 32px)); /* near full width on a phone */
     }
 
     .pages .wave-picker-btn {
@@ -3203,6 +2909,37 @@ button:focus-visible {
         grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
     }
 
+    /* FX page: the five sets flow side by side (Master · Reverb · Delay, then
+       Tone · Chorus) instead of one under the other, so the short page shows
+       a whole row of cells before it scrolls. */
+    .pages > .effect-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: var(--space-xs) 12px; /* 1 + 2 + 3 cells of 72px + 2 gaps = 468px: one row at 844 wide */
+    }
+
+    .pages > .effect-controls .control-set {
+        width: auto;
+        max-width: 100%;
+        flex: 0 0 auto;
+        border-top: none;
+        padding: 0;
+    }
+
+    .pages > .effect-controls .controls-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .pages > .effect-controls .controls-grid .control-group {
+        --knob-size: 64px;
+        --fader-len: 72px;
+        width: 72px;
+        flex: 0 0 72px;
+    }
+
     /* Type stepper shares the bar line with the logo and ⋯ */
     .type-slot {
         flex: 1 1 auto;
@@ -3214,16 +2951,6 @@ button:focus-visible {
         max-width: 240px;
     }
 
-    /* FX page = rack rows (shared block below); keep them on one line each */
-    .pages > .effect-controls .control-set {
-        padding: 2px 0;
-    }
-
-    .pages > .effect-controls .controls-grid .control-group {
-        flex-basis: 100px;
-        grid-template-columns: minmax(0, max-content) minmax(36px, 1fr) auto auto; /* label keeps its word */
-    }
-
     .tab-btn {
         height: 36px;
     }
@@ -3231,24 +2958,21 @@ button:focus-visible {
     .keyboard-controls .octave-btn {
         min-height: 36px;
     }
-
-    /* FX page in knob mode: desktop rack knobs are mouse-sized, thumbs need more */
-    body[data-controls="knobs"] .pages > .effect-controls .controls-grid .control-group {
-        --knob-size: 64px;
-        flex-basis: 84px;
-        width: 84px;
-    }
 }
 
 /* ============================================
-   EFFECTS RACK ROWS — label · slider · value · ?
-   Shared by the desktop workstation (right column) and the pocket landscape
-   FX page, where a short page cannot fit stacked knobs and a nested vertical
-   scroll fights the horizontal page swipe.
+   EFFECTS RACK — desktop right column only. Slider mode: label · slider ·
+   value · ? rows. Knob mode: compact knob grid. The pocket FX page (portrait
+   and landscape) keeps the same stacked cells as the other pages.
    ============================================ */
-@media (min-width: 1024px), ((max-width: 1023px) and (orientation: landscape) and (max-height: 500px)) {
-    body[data-controls="sliders"] .effects-rack {
+@media (min-width: 1024px) {
+    /* Only inside the desktop panel: in the pocket carousel the rack is a page
+       with flex: 0 0 100%, and a shrinkable basis would squash it to 32px. */
+    body[data-controls="sliders"] .effects-panel > .effects-rack {
         flex: 1 1 auto;
+    }
+
+    body[data-controls="sliders"] .effects-rack {
         flex-direction: column;
         flex-wrap: nowrap;
         align-items: stretch;
@@ -3334,48 +3058,18 @@ button:focus-visible {
         grid-column: 2;
         grid-row: 1;
         order: 0;
-        width: auto;
-        height: 26px;
+        width: 100%; /* not the intrinsic 129px: that would squeeze the label column */
+        height: 30px; /* room for the 28px fader cap */
         min-width: 0;
         margin: 0;
         transform: none;
         cursor: ew-resize; /* the fader rule above sets ns-resize on every slider-mode input */
     }
 
-    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-runnable-track {
-        height: 6px;
-        border: none;
-        box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
-        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
-    }
 
-    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-track {
-        height: 6px;
-        border: none;
-        box-shadow: none;
-        background: rgba(30, 39, 73, 0.9);
-    }
 
-    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-progress {
-        height: 6px;
-    }
 
-    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-webkit-slider-thumb {
-        width: 12px;
-        height: 22px;
-        margin-top: -8px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--accent-magenta);
-        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-    }
 
-    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"]::-moz-range-thumb {
-        width: 12px;
-        height: 22px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--accent-magenta);
-        box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
-    }
 
     body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-value {
         margin: 0;
@@ -3413,48 +3107,56 @@ button:focus-visible {
         right: 0;
     }
 
-    /* ---- Knob mode: the same rack as a compact knob grid. Sets flow inline
-       and wrap as units (Master · Reverb · Delay / Tone · Chorus), 52px knobs
-       so ten of them fit under the scope. ---- */
+    /* ---- Knob mode: one 6-column grid for the whole rack. Every knob sits
+       on the same column (Master 1 · Reverb 2 · Delay 3 / Tone 2 · Chorus 2),
+       the two rows share the panel height, knob size follows the viewport. ---- */
     body[data-controls="knobs"] .effects-rack {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        gap: 12px 10px; /* 6 cells + 2 set gaps must fit the ~485px column: 2 rows, not 3 */
-        align-content: flex-start;
+        display: grid;
+        flex: 1 1 auto;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        gap: var(--space-sm);
         margin-top: 0;
     }
 
+    /* Each set is its own box, like the instrument sets */
     body[data-controls="knobs"] .effects-rack .control-set {
-        flex: 0 0 auto;
-        width: auto;
-        max-width: 100%;
+        grid-column: span var(--cols, 1);
         display: flex;
         flex-direction: column;
-        gap: 0;
-        padding: 0;
-        border: none;
-        background: none;
+        justify-content: flex-start;
+        gap: var(--space-xs);
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        padding: var(--space-xs) var(--space-xs) var(--space-sm);
+        border: 1px solid rgba(0, 240, 255, 0.12);
+        background: rgba(0, 240, 255, 0.02);
     }
 
     body[data-controls="knobs"] .effects-rack .control-set-title {
         flex: 0 0 auto;
-        margin: 0 0 2px;
+        margin: 0;
         font-size: var(--text-xs);
     }
 
     body[data-controls="knobs"] .effects-rack .controls-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 2px;
+        flex: 1 1 auto;
+        align-content: center;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+        column-gap: 4px;
+        justify-items: center;
     }
 
     /* Cell = small grid: readout and ? paired on top, knob, name */
     body[data-controls="knobs"] .effects-rack .controls-grid .control-group {
-        --knob-size: 60px;
-        flex: 0 0 74px;
-        width: 74px;
+        --knob-size: clamp(52px, 8vh, 80px);
+        width: 100%;
+        max-width: none;
         min-width: 0;
         padding: 0 0 2px;
         display: grid;

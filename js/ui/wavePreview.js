@@ -211,6 +211,10 @@ export function buildWavePicker(select, labelId) {
 function open(parts, select) {
     // Only one picker open at a time
     pickers.forEach(p => { if (p !== parts) close(p, false); });
+    // The panels carry backdrop-filter, which makes them the containing block
+    // of fixed descendants: viewport coordinates would land offset. The list
+    // lives on <body> while open and goes back into its wrapper on close.
+    document.body.appendChild(parts.list);
     parts.list.hidden = false;
     parts.btn.setAttribute('aria-expanded', 'true');
     parts.openedAt = performance.now();
@@ -244,6 +248,7 @@ function close(parts, focusButton) {
     parts.list.hidden = true;
     parts.btn.setAttribute('aria-expanded', 'false');
     parts.list.style.cssText = '';
+    parts.wrap.appendChild(parts.list);
     if (focusButton) parts.btn.focus();
 }
 
@@ -265,7 +270,7 @@ window.addEventListener('resize', closeAll);
 // Click outside closes any open picker
 document.addEventListener('pointerdown', (e) => {
     pickers.forEach(parts => {
-        if (!parts.list.hidden && !parts.wrap.contains(e.target)) close(parts, false);
+        if (!parts.list.hidden && !parts.wrap.contains(e.target) && !parts.list.contains(e.target)) close(parts, false);
     });
 });
 

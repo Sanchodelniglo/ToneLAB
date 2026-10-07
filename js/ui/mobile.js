@@ -29,8 +29,9 @@ function restoreAll() {
 }
 
 const SHEET_ROWS = [
-    { sel: '.view-toggle', title: 'Controls', hint: 'Turn knobs or slide faders. Same parameters, pick what your thumb likes.' },
+    { sel: '.controls-toggle', title: 'Controls', hint: 'Turn knobs or slide faders. Same parameters, pick what your thumb likes.' },
     { sel: '.scope-modes', title: 'Scope', hint: 'The strip under the instrument: the waveform you hear, or its spectrum.' },
+    { sel: '.key-labels-toggle', title: 'Key labels', hint: 'What is printed on each key: the note name, the computer key.' },
     { sel: '.keyboard-controls .instrument-select:has(#noteNotation)', title: 'Note names', hint: 'C D E or Do Re Mi on the keys.' },
     { sel: '.keyboard-controls .instrument-select:has(#keyboardLayout)', title: 'Computer keyboard', hint: 'Only matters with a physical keyboard plugged in.' },
     { sel: '#installBtn', title: 'Install', hint: 'Add ToneLAB to your home screen. Works offline, no browser bar.' }
@@ -78,7 +79,7 @@ function buildTabs() {
         // from the positioned .container and lands one page off in landscape.
         btn.addEventListener('click', () => {
             markTab(i); // highlight now, the scroll event confirms it later
-            pages.scrollTo({ left: i * pages.clientWidth, behavior: scrollBehavior() });
+            slideTo(pages, i * pages.clientWidth);
         });
         bar.appendChild(btn);
     });
@@ -86,9 +87,30 @@ function buildTabs() {
     syncTabs();
 }
 
-// Smooth page slide, instant for people who asked for less motion
-function scrollBehavior() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+// Quick page slide (the browser's smooth scroll takes ~500 ms, too slow for a
+// tab tap); instant for people who asked for less motion.
+const SLIDE_MS = 120;
+const SLIDE_MAX_FRAMES = 8; // ~130 ms at 60 fps, and a cap if the clock stalls
+let slideRaf = null;
+function slideTo(el, target) {
+    cancelAnimationFrame(slideRaf);
+    // Mandatory scroll-snap would re-snap every intermediate scrollLeft, so it
+    // is paused for the duration of the slide.
+    const finish = () => { el.scrollLeft = target; el.style.scrollSnapType = ''; };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
+    el.style.scrollSnapType = 'none';
+    const from = el.scrollLeft;
+    const start = performance.now();
+    let frames = 0;
+    const step = (now) => {
+        frames++;
+        const t = Math.min(1, Math.max((now - start) / SLIDE_MS, frames / SLIDE_MAX_FRAMES));
+        const eased = 1 - (1 - t) * (1 - t); // ease-out
+        if (t >= 1) { finish(); return; }
+        el.scrollLeft = from + (target - from) * eased;
+        slideRaf = requestAnimationFrame(step);
+    };
+    slideRaf = requestAnimationFrame(step);
 }
 
 function markTab(idx) {
@@ -110,7 +132,7 @@ function activePresetIndex() {
 
 function syncPresetName() {
     const btn = $('#presetBar .preset-btn.active');
-    $('#scopePresetName').textContent = btn ? btn.textContent : 'swipe for presets';
+    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = btn ? btn.textContent : 'swipe for presets'; });
 }
 
 function stepPreset(step) {
@@ -220,6 +242,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!typeHint.hidden && !e.target.closest('.type-stepper')) closeTypeHint();
     });
     $('#instrumentType').addEventListener('change', closeTypeHint);
+
+    // Preset ? popovers (header on desktop, scope strip on mobile): text is
+    // filled by applyPreset through data-preset-hint; outside tap closes them
+    document.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.preset-stepper-row, .scope-preset')) return;
+        document.querySelectorAll('.preset-help[aria-expanded="true"]').forEach(btn => {
+            const hint = document.getElementById(btn.getAttribute('aria-controls'));
+            if (hint) hint.hidden = true;
+            btn.setAttribute('aria-expanded', 'false');
+        });
+    });
 
     $('#moreBtn').addEventListener('click', () => openSheet($('#moreSheet').hidden));
     $('#sheetClose').addEventListener('click', () => openSheet(false));

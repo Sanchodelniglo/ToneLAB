@@ -1,7 +1,17 @@
 // PWA plumbing: service-worker registration with update reload, and the install prompt button.
 
+// Local dev server: no service worker, and drop any that an earlier visit
+// left behind. Otherwise stale-while-revalidate hands you yesterday's JS on
+// every first load after an edit.
+const isLocalDev = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) || /^192\.168\.|^10\./.test(location.hostname);
+
+if ('serviceWorker' in navigator && isLocalDev) {
+    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+    if (window.caches) caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+}
+
 // Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !isLocalDev) {
     // Reload once when a *new* worker takes over so the page runs the assets
     // that worker just precached. Skipped on first install (no previous
     // controller) so the initial visit is not interrupted.

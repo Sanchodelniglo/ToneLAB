@@ -3,13 +3,20 @@
 import { state, getDisplayLabel } from '../state.js';
 
 // Initialize synth
+// The "Playing:" readout is optional (the desktop bar dropped it); any
+// element with id currentNote still receives the note name.
+function setNoteReadout(text) {
+    const el = document.getElementById('currentNote');
+    if (el) el.textContent = text;
+}
+
 function initSynth(type) {
     if (state.synth) {
         // Clear active state before disposing
         state.activeKeys.clear();
         state.activeTouches.clear();
         document.querySelectorAll('.key.pressed').forEach(k => k.classList.remove('pressed'));
-        document.getElementById('currentNote').textContent = '\u2014';
+        setNoteReadout('\u2014');
         // Let the old voice ring out instead of cutting it with a click,
         // then free it once its longest plausible release tail has passed.
         const old = state.synth;
@@ -289,7 +296,7 @@ function playNote(note) {
     // Display note in chosen notation (e.g. "C#4" → "Do#4")
     const noteName = note.replace(/\d+/, '');
     const octaveNum = note.match(/\d+/)?.[0] || '';
-    document.getElementById('currentNote').textContent = getDisplayLabel(noteName) + octaveNum;
+    setNoteReadout(getDisplayLabel(noteName) + octaveNum);
 
     const trigger = (time) => {
         if (state.currentInstrumentType === 'NoiseSynth') {
@@ -344,7 +351,7 @@ function stopNote(note) {
     }
 
     if (state.activeKeys.size === 0 && state.activeTouches.size === 0) {
-        document.getElementById('currentNote').textContent = '\u2014';
+        setNoteReadout('\u2014');
     }
 }
 

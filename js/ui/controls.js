@@ -16,24 +16,55 @@ function hintParagraph(id, desc) {
 }
 
 // One delegated listener covers instrument knobs (rebuilt per synth) and the static effects rack.
+function closeHint(btn) {
+    const hint = document.getElementById(btn.getAttribute('aria-controls'));
+    if (hint) { hint.hidden = true; hint.style.transform = ''; }
+    btn.setAttribute('aria-expanded', 'false');
+}
+
+function closeAllHints(except) {
+    document.querySelectorAll('.help-btn[aria-expanded="true"]').forEach(btn => { if (btn !== except) closeHint(btn); });
+}
+
+// Keep the popover inside the viewport: cells at the edge of a page would
+// otherwise push it off screen (it is absolute inside the cell).
+function fitHint(hint) {
+    hint.style.transform = '';
+    const r = hint.getBoundingClientRect();
+    const margin = 8;
+    let dx = 0;
+    if (r.right > window.innerWidth - margin) dx = window.innerWidth - margin - r.right;
+    if (r.left + dx < margin) dx = margin - r.left;
+    if (dx) hint.style.transform = `translateX(${dx}px)`;
+}
+
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.help-btn');
     if (!btn) return;
     const hint = document.getElementById(btn.getAttribute('aria-controls'));
     if (!hint) return;
-    const open = hint.hidden;
-    hint.hidden = !open;
-    btn.setAttribute('aria-expanded', String(open));
+    if (btn.getAttribute('aria-expanded') === 'true') { closeHint(btn); return; }
+    closeAllHints(btn); // one at a time
+    // Header popovers (instrument / preset ?) hang under their own button,
+    // not under the start of the row; the mobile scope strip one spans the strip
+    hint.hidden = false; // offsetParent is null while hidden
+    if (hint.classList.contains('type-hint') && !btn.closest('.scope-preset') && btn.offsetParent === hint.offsetParent) {
+        hint.style.left = `${btn.offsetLeft}px`;
+    }
+    btn.setAttribute('aria-expanded', 'true');
+    fitHint(hint);
+});
+
+// Tap anywhere else closes a pinned hint
+document.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.help-btn, .control-hint')) return;
+    closeAllHints();
 });
 
 // Escape closes every open hint
 document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    document.querySelectorAll('.help-btn[aria-expanded="true"]').forEach(btn => {
-        btn.setAttribute('aria-expanded', 'false');
-        const hint = document.getElementById(btn.getAttribute('aria-controls'));
-        if (hint) hint.hidden = true;
-    });
+    closeAllHints();
 });
 
 // Control style: knobs (default) or sliders. The range input is always the
@@ -43,14 +74,16 @@ function setControlStyle(style) {
     style = style === 'sliders' ? 'sliders' : 'knobs';
     document.body.dataset.controls = style;
     try { localStorage.setItem(CONTROL_STYLE_KEY, style); } catch (e) { /* private mode */ }
-    document.querySelectorAll('.view-btn').forEach(btn => {
+    // Only the Knobs / Sliders pair: .view-btn is a shared skin (the ⋯ sheet
+    // reuses it for other toggles)
+    document.querySelectorAll('.view-btn[data-controls]').forEach(btn => {
         const active = btn.dataset.controls === style;
         btn.classList.toggle('active', active);
         btn.setAttribute('aria-pressed', String(active));
     });
 }
 
-document.querySelectorAll('.view-btn').forEach(btn => {
+document.querySelectorAll('.view-btn[data-controls]').forEach(btn => {
     btn.addEventListener('click', () => {
         setControlStyle(btn.dataset.controls);
         btn.blur();

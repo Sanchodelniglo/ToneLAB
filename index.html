@@ -7,7 +7,7 @@
 
     <!-- PWA Meta Tags -->
     <meta name="description" content="Turn knobs, twist parameters, and explore how synthesizers shape sound. An interactive playground to experiment with waveforms, filters, and effects.">
-    <meta name="theme-color" content="#00f0ff">
+    <meta name="theme-color" content="#2a1a5e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ToneLAB">
@@ -48,8 +48,8 @@
     <div class="container">
         <header>
             <h1>ToneLAB</h1>
-            <p class="subtitle">Interactive Sound Explorer</p>
             <button id="installBtn" style="display: none;">Install App</button>
+            <p class="synth-description" id="synthDescription" aria-live="polite" hidden></p>
             <div id="typeSlot" class="type-slot"></div>
             <button type="button" id="moreBtn" class="more-btn" aria-label="More options" aria-expanded="false" aria-controls="moreSheet">&#8943;</button>
         </header>
@@ -59,6 +59,16 @@
                 <div class="panel-header">
                     <h2 class="panel-title" id="instrumentHeading">Instrument</h2>
                     <div class="panel-tools">
+                    <div class="view-toggle controls-toggle" role="group" aria-label="Control style">
+                        <button type="button" class="preset-btn view-btn active" data-controls="knobs" aria-pressed="true">Knobs</button>
+                        <button type="button" class="preset-btn view-btn" data-controls="sliders" aria-pressed="false">Sliders</button>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Instrument and preset steppers: the two things you change while playing -->
+                <div class="instrument-bar">
+                    <!-- Instrument and preset: the two things you change while playing -->
                     <div class="instrument-select type-stepper">
                         <label for="instrumentType">Type:</label>
                         <button type="button" class="step-btn" data-step="-1" aria-label="Previous instrument">&#9664;</button>
@@ -78,32 +88,15 @@
                         <button type="button" class="step-btn" data-step="1" aria-label="Next instrument">&#9654;</button>
                         <p class="control-hint type-hint" id="typeHint" hidden></p>
                     </div>
-                    <div class="view-toggle" role="group" aria-label="Control style">
-                        <button type="button" class="preset-btn view-btn active" data-controls="knobs" aria-pressed="true">Knobs</button>
-                        <button type="button" class="preset-btn view-btn" data-controls="sliders" aria-pressed="false">Sliders</button>
-                    </div>
-                    </div>
-                </div>
-
-                <!-- Intro (description + presets) on the left, live scope on the right -->
-                <div class="instrument-top">
-                    <div class="instrument-intro">
-                        <p class="synth-description" id="synthDescription" aria-live="polite"></p>
+                    <div class="preset-stepper">
                         <div class="preset-bar" id="presetBar" role="group" aria-label="Presets"></div>
-                    </div>
-                    <div class="scope-block" role="group" aria-labelledby="scopeHeading">
-                        <div class="scope-head">
-                            <h3 class="control-set-title" id="scopeHeading">Scope</h3>
-                            <div class="scope-modes" role="group" aria-label="Scope display mode">
-                                <button type="button" class="preset-btn scope-btn active" id="scopeModeWave" data-scope-mode="wave" aria-pressed="true">Wave</button>
-                                <button type="button" class="preset-btn scope-btn" id="scopeModeSpectrum" data-scope-mode="spectrum" aria-pressed="false">Spectrum</button>
-                            </div>
-                        </div>
-                        <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform" title="What you hear, after the effects. Hold a note and turn a knob."></canvas>
-                        <div class="scope-preset" aria-live="polite">
+                        <div class="preset-stepper-row">
+                            <span class="preset-label">Preset:</span>
                             <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
-                            <span id="scopePresetName">swipe for presets</span>
+                            <select id="presetSelect" aria-label="Preset"></select>
+                            <button type="button" class="help-btn type-help preset-help" id="presetHelp" aria-label="About this preset" aria-expanded="false" aria-controls="presetHint">?</button>
                             <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
+                            <p class="control-hint type-hint" id="presetHint" data-preset-hint hidden></p>
                         </div>
                     </div>
                 </div>
@@ -126,6 +119,25 @@
                     </section>
                 </div>
             </div>
+
+            <!-- Live scope: its own box on desktop (right column), strip on mobile -->
+                <div class="scope-block" role="group" aria-labelledby="scopeHeading">
+                    <div class="scope-head">
+                        <h3 class="control-set-title" id="scopeHeading">Scope</h3>
+                        <div class="scope-modes" role="group" aria-label="Scope display mode">
+                            <button type="button" class="preset-btn scope-btn active" id="scopeModeWave" data-scope-mode="wave" aria-pressed="true">Wave</button>
+                            <button type="button" class="preset-btn scope-btn" id="scopeModeSpectrum" data-scope-mode="spectrum" aria-pressed="false">Spectrum</button>
+                        </div>
+                    </div>
+                    <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform" title="What you hear, after the effects. Hold a note and turn a knob."></canvas>
+                    <div class="scope-preset" aria-live="polite">
+                        <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
+                        <span id="scopePresetName" data-preset-name>swipe for presets</span>
+                        <button type="button" class="help-btn type-help preset-help" id="presetHelpMobile" aria-label="About this preset" aria-expanded="false" aria-controls="presetHintMobile">?</button>
+                        <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
+                        <p class="control-hint type-hint" id="presetHintMobile" data-preset-hint hidden></p>
+                    </div>
+                </div>
 
             <div class="synth-panel effects-panel">
                 <div class="panel-header">
@@ -254,6 +266,17 @@
                     <div class="panel-header">
                         <h2 class="panel-title">Keyboard</h2>
                         <div class="keyboard-controls">
+                            <div class="view-toggle key-labels-toggle" role="group" aria-label="Key labels">
+                                <button type="button" class="preset-btn view-btn chip active" data-key-label="note" aria-pressed="true">Notes</button>
+                                <button type="button" class="preset-btn view-btn chip active" data-key-label="key" aria-pressed="true">Keys</button>
+                            </div>
+                            <div class="instrument-select">
+                                <label for="noteNotation">Notes:</label>
+                                <select id="noteNotation">
+                                    <option value="english">C D E</option>
+                                    <option value="solfege">Do Re Mi</option>
+                                </select>
+                            </div>
                             <div class="instrument-select">
                                 <label for="keyboardLayout">Layout:</label>
                                 <select id="keyboardLayout">
@@ -261,13 +284,6 @@
                                     <option value="azerty">AZERTY</option>
                                     <option value="qwertz">QWERTZ</option>
                                     <option value="dvorak">Dvorak</option>
-                                </select>
-                            </div>
-                            <div class="instrument-select">
-                                <label for="noteNotation">Notes:</label>
-                                <select id="noteNotation">
-                                    <option value="english">American</option>
-                                    <option value="solfege">Solfege</option>
                                 </select>
                             </div>
                             <div class="octave-controls">
@@ -286,9 +302,6 @@
                         <div class="keyboard-scroll-indicator right" id="scrollIndicatorRight" aria-hidden="true">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                         </div>
-                    </div>
-                    <div class="info-display" role="status">
-                        <p><span class="info-hint">Play with your computer keyboard &middot; &#8592;/&#8594; change octave &middot;</span> Playing: <span id="currentNote" aria-live="assertive">&#8212;</span></p>
                     </div>
                 </div>
             </div>

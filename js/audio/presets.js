@@ -4,6 +4,7 @@ import { updateSynthParameter } from './synth.js';
 import { setEffect, EFFECT_DEFAULTS, effectHandlers } from './effects.js';
 import { updateSliderFill } from '../ui/knobs.js';
 import { createKeyboard, updateOctaveButtons } from '../ui/keyboard.js';
+import { refreshWavePreview } from '../ui/wavePreview.js';
 
 const synthDescriptions = {
     'Synth': 'One oscillator shaped by a volume envelope \u2014 the simplest synth and the best place to learn the basics. Start with Sharp Lead, then switch Oscillator Type to hear how each wave shape changes the tone.',
@@ -70,7 +71,7 @@ const synthPresets = {
     'PolySynth': [
         { name: 'Dreamy Pad', octave: 3, effects: { reverb: 0.5, reverbSize: 6, delayTime: 0.45, delayFeedback: 0.35, delayMix: 0.2, distortion: 0, filterFreq: 3000, chorusRate: 0.5, chorusMix: 0.55 }, params: { oscType: 'triangle', attack: 1.2, decay: 0.5, sustain: 0.8, release: 4 } },
         { name: 'Synth Brass', octave: 3, effects: { reverb: 0.25, reverbSize: 2, delayTime: 0.2, delayFeedback: 0.2, delayMix: 0.1, distortion: 0.05, filterFreq: 4500, chorusRate: 1, chorusMix: 0.3 }, params: { oscType: 'sawtooth', attack: 0.05, decay: 0.25, sustain: 0.6, release: 0.4 } },
-        { name: 'Organ', octave: 3, effects: { reverb: 0.3, reverbSize: 2.2, delayTime: 0.25, delayFeedback: 0, delayMix: 0, distortion: 0.08, filterFreq: 5000, chorusRate: 6, chorusMix: 0.3 }, params: { oscType: 'square6', attack: 0.01, decay: 0.05, sustain: 1, release: 0.15 } },
+        { name: 'Organ', octave: 3, effects: { reverb: 0.3, reverbSize: 2.2, delayTime: 0.25, delayFeedback: 0, delayMix: 0, distortion: 0.08, filterFreq: 5000, chorusRate: 6, chorusMix: 0.3 }, params: { oscType: 'square5', attack: 0.01, decay: 0.05, sustain: 1, release: 0.15 } },
         { name: 'Glass Keys', octave: 4, effects: { reverb: 0.4, reverbSize: 3.5, delayTime: 0.3, delayFeedback: 0.3, delayMix: 0.18, distortion: 0, filterFreq: 9000, chorusRate: 0.8, chorusMix: 0.2 }, params: { oscType: 'triangle', attack: 0.005, decay: 0.8, sustain: 0.1, release: 2 } },
     ],
     'DuoSynth': [
@@ -95,6 +96,7 @@ function applyPreset(type, presetIndex) {
 
         if (el.tagName === 'SELECT') {
             el.value = value;
+            refreshWavePreview(el);
         } else {
             el.value = value;
             const valueDisplay = document.getElementById(`${el.id}Value`);

@@ -3,6 +3,7 @@
 import { initSynth, updateSynthParameter } from '../audio/synth.js';
 import { synthDescriptions, updatePresetBar } from '../audio/presets.js';
 import { updateSliderFill, attachKnobToSlider } from './knobs.js';
+import { buildWavePicker, refreshWavePreview, waveLabel } from './wavePreview.js';
 
 // Hints are collapsed behind a "?" button so the grid stays compact.
 function helpButton(id, name, desc) {
@@ -84,14 +85,17 @@ function updateControls(type) {
     updatePresetBar(type);
 
     const allWaveforms = ['sine', 'square', 'triangle', 'sawtooth', 'pulse', 'pwm'];
-    const extendedWaveforms = [...allWaveforms, 'sine2', 'sine3', 'sine4', 'sine5', 'sine6', 'sine7', 'sine8',
-                                'square2', 'square3', 'square4', 'square5', 'square6', 'square7', 'square8',
-                                'triangle2', 'triangle3', 'triangle4', 'triangle5', 'triangle6', 'triangle7', 'triangle8',
+    // "<shape>N" = first N partials. Square and triangle only have odd harmonics,
+    // so squareN with even N sounds identical to N-1 and sineN is always a sine.
+    // Only the distinct shapes are listed.
+    const extendedWaveforms = [...allWaveforms,
+                                'square3', 'square5', 'square7',
+                                'triangle3', 'triangle5', 'triangle7',
                                 'sawtooth2', 'sawtooth3', 'sawtooth4', 'sawtooth5', 'sawtooth6', 'sawtooth7', 'sawtooth8'];
 
     // Human-readable descriptions for each parameter
     const descs = {
-        oscType: 'Wave shape \u2014 sine is pure, triangle soft, square hollow, sawtooth bright; try sawtooth for leads, sine for sub bass.',
+        oscType: 'Wave shape \u2014 sine is pure, triangle soft, square hollow, sawtooth bright; numbered ones keep only those harmonics, so fewer = softer.',
         attack: 'Fade-in time \u2014 low hits instantly, high swells in; try 0.01s for stabs and drums, 1s+ for slow pads.',
         decay: 'Time to fall from the peak to the sustain level \u2014 try 0.1s for snappy plucks, 1s+ for ringing keys.',
         sustain: 'Level held while the key is down \u2014 0 makes a pluck that dies away, 0.8+ gives a steady organ-like note.',
@@ -237,7 +241,7 @@ function updateControls(type) {
                 ${hintParagraph(uniqueId, desc)}
                 <select class="wave-select" id="${uniqueId}" data-control="${control.id}" aria-labelledby="${labelId}">
                     ${control.values.map(val =>
-                        `<option value="${val}" ${val === control.default ? 'selected' : ''}>${val}</option>`
+                        `<option value="${val}" ${val === control.default ? 'selected' : ''}>${waveLabel(val)}</option>`
                     ).join('')}
                 </select>
             `;
@@ -273,8 +277,9 @@ function updateControls(type) {
             const select = document.getElementById(uniqueId);
             select.addEventListener('change', (e) => {
                 updateSynthParameter(control.id, e.target.value);
-                e.target.blur();
+                refreshWavePreview(select);
             });
+            buildWavePicker(select, `${uniqueId}_label`);
         } else {
             const slider = document.getElementById(uniqueId);
             const valueDisplay = document.getElementById(`${uniqueId}Value`);

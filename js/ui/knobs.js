@@ -175,13 +175,18 @@ function attachKnobToSlider(slider) {
     knob.addEventListener('pointerup', onPointerUp);
     knob.addEventListener('pointercancel', onPointerUp);
 
-    // ---- wheel: one notch = 1 % of the range (or one step if that is bigger)
-    knob.addEventListener('wheel', (e) => {
+    // ---- wheel: one notch = 1 % of the range (or one step if that is bigger).
+    // Same on the knob and on the slider itself (vertical fader or rack row):
+    // swipe up on a trackpad (natural scrolling: deltaY > 0) turns the value up.
+    const onWheel = (e) => {
+        if (e.deltaY === 0) return;
         e.preventDefault();
         const notch = Math.max(step, range / 100) * (e.shiftKey ? FINE_FACTOR : 1);
-        const direction = e.deltaY < 0 ? 1 : -1;
+        const direction = e.deltaY > 0 ? 1 : -1;
         setValue(parseFloat(slider.value) + direction * Math.max(step, notch));
-    }, { passive: false });
+    };
+    knob.addEventListener('wheel', onWheel, { passive: false });
+    slider.addEventListener('wheel', onWheel, { passive: false });
 
     // ---- keyboard, same as a native range input
     knob.addEventListener('keydown', (e) => {

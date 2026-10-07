@@ -41,9 +41,9 @@ function setReverbDecay(seconds) {
 
 const effectHandlers = {
     reverb:        { suffix: '',    apply: v => { if (state.reverb) state.reverb.wet.value = v; } },
-    reverbSize:    { suffix: 's',   apply: v => setReverbDecay(v) },
+    reverbSize:    { suffix: ' Sec',   apply: v => setReverbDecay(v) },
     // Ramp instead of jump: a hard delayTime change produces a click / pitch zip.
-    delayTime:     { suffix: 's',   apply: v => { if (state.delay) state.delay.delayTime.rampTo(v, 0.05); } },
+    delayTime:     { suffix: ' Sec',   apply: v => { if (state.delay) state.delay.delayTime.rampTo(v, 0.05); } },
     delayFeedback: { suffix: '',    apply: v => { if (state.delay) state.delay.feedback.value = v; } },
     delayMix:      { suffix: '',    apply: v => { if (state.delay) state.delay.wet.value = v; } },
     // Wet follows drive so the first few percent add warmth rather than a sudden 50% blend.

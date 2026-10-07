@@ -204,43 +204,43 @@ function updateControls(type) {
     const controlSets = {
         'Synth': [
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' },
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
             { name: 'Volume', id: 'volume', min: -60, max: 0, step: 1, default: -10, suffix: ' dB' }
         ],
         'AMSynth': [
             { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.1, default: 3 },
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
             { name: 'Modulation Type', id: 'modType', type: 'wave', values: extendedWaveforms, default: 'square' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' },
-            { name: 'Mod Attack', id: 'modAttack', min: 0, max: 2, step: 0.001, default: 0.5, suffix: 's' },
-            { name: 'Mod Release', id: 'modRelease', min: 0, max: 5, step: 0.01, default: 0.5, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
+            { name: 'Mod Attack', id: 'modAttack', min: 0, max: 2, step: 0.001, default: 0.5, suffix: ' Sec' },
+            { name: 'Mod Release', id: 'modRelease', min: 0, max: 5, step: 0.01, default: 0.5, suffix: ' Sec' }
         ],
         'FMSynth': [
             { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.1, default: 3 },
             { name: 'Modulation Index', id: 'modulationIndex', min: 0, max: 100, step: 1, default: 10 },
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
             { name: 'Modulation Type', id: 'modType', type: 'wave', values: extendedWaveforms, default: 'square' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' },
-            { name: 'Mod Attack', id: 'modAttack', min: 0, max: 2, step: 0.001, default: 0.2, suffix: 's' },
-            { name: 'Mod Release', id: 'modRelease', min: 0, max: 5, step: 0.01, default: 0.5, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
+            { name: 'Mod Attack', id: 'modAttack', min: 0, max: 2, step: 0.001, default: 0.2, suffix: ' Sec' },
+            { name: 'Mod Release', id: 'modRelease', min: 0, max: 5, step: 0.01, default: 0.5, suffix: ' Sec' }
         ],
         'MembraneSynth': [
-            { name: 'Pitch Decay', id: 'pitchDecay', min: 0.001, max: 1, step: 0.001, default: 0.05, suffix: 's' },
+            { name: 'Pitch Decay', id: 'pitchDecay', min: 0.001, max: 1, step: 0.001, default: 0.05, suffix: ' Sec' },
             { name: 'Octaves', id: 'octaves', min: 0.5, max: 16, step: 0.5, default: 10 },
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.001, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.4, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.001, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.4, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.01 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1.4, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1.4, suffix: ' Sec' }
         ],
         'MetalSynth': [
             { name: 'Frequency', id: 'frequency', min: 50, max: 1000, step: 1, default: 200, suffix: ' Hz' },
@@ -248,29 +248,29 @@ function updateControls(type) {
             { name: 'Modulation Index', id: 'modulationIndex', min: 0, max: 100, step: 1, default: 32 },
             { name: 'Resonance', id: 'resonance', min: 500, max: 8000, step: 10, default: 4000, suffix: ' Hz' },
             { name: 'Octaves', id: 'octaves', min: 0.1, max: 8, step: 0.1, default: 1.5 },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.001, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 5, step: 0.01, default: 1.4, suffix: 's' },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 0.2, suffix: 's' }
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.001, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 5, step: 0.01, default: 1.4, suffix: ' Sec' },
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 0.2, suffix: ' Sec' }
         ],
         'MonoSynth': [
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'square' },
             { name: 'Filter Q', id: 'filterQ', min: 0, max: 20, step: 0.1, default: 6 },
             { name: 'Filter Cutoff', id: 'filterCutoff', min: 20, max: 20000, step: 10, default: 1000, suffix: ' Hz' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.9 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' },
-            { name: 'Filter Attack', id: 'filterAttack', min: 0, max: 2, step: 0.001, default: 0.06, suffix: 's' },
-            { name: 'Filter Decay', id: 'filterDecay', min: 0, max: 2, step: 0.01, default: 0.2, suffix: 's' },
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
+            { name: 'Filter Attack', id: 'filterAttack', min: 0, max: 2, step: 0.001, default: 0.06, suffix: ' Sec' },
+            { name: 'Filter Decay', id: 'filterDecay', min: 0, max: 2, step: 0.01, default: 0.2, suffix: ' Sec' },
             { name: 'Filter Sustain', id: 'filterSustain', min: 0, max: 1, step: 0.01, default: 0.5 },
-            { name: 'Filter Release', id: 'filterRelease', min: 0, max: 5, step: 0.01, default: 2, suffix: 's' }
+            { name: 'Filter Release', id: 'filterRelease', min: 0, max: 5, step: 0.01, default: 2, suffix: ' Sec' }
         ],
         'NoiseSynth': [
             { name: 'Noise Type', id: 'noiseType', type: 'wave', values: ['white', 'brown', 'pink'], default: 'white' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' }
         ],
         'PluckSynth': [
             { name: 'Attack Noise', id: 'attackNoise', min: 0.1, max: 20, step: 0.1, default: 1 },
@@ -279,10 +279,10 @@ function updateControls(type) {
         ],
         'PolySynth': [
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' }
         ],
         'DuoSynth': [
             { name: 'Vibrato Amount', id: 'vibratoAmount', min: 0, max: 1, step: 0.01, default: 0.5 },
@@ -290,10 +290,10 @@ function updateControls(type) {
             { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.01, default: 1.5 },
             { name: 'Voice 0 Osc', id: 'voice0Type', type: 'wave', values: extendedWaveforms, default: 'sine' },
             { name: 'Voice 1 Osc', id: 'voice1Type', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: 's' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: 's' },
+            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
+            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: 's' }
+            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' }
         ]
     };
 

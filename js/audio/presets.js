@@ -101,7 +101,7 @@ function applyPreset(type, presetIndex) {
             el.value = value;
             const valueDisplay = document.getElementById(`${el.id}Value`);
             if (valueDisplay) {
-                // Extract suffix from current display text (e.g. "s", " Hz", " dB")
+                // Extract suffix from current display text (e.g. " Sec", " Hz", " dB")
                 const suffix = valueDisplay.textContent.replace(/^[\d.\-]+/, '');
                 valueDisplay.textContent = value + suffix;
             }

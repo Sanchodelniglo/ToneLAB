@@ -1,0 +1,445 @@
+/*@split 11-arp.css: Arpeggiator strip, step lights, pocket ARP page (split from styles.css, no rule changes) */
+
+/* ============================================
+   ARPEGGIATOR STRIP — under the keyboard title line while ARP is on
+   mode ▾ · rate ▾ · OCT 1 2 3 · LEN 8 12 16 · BPM ◯ TAP · GATE ◯ · SWING ◯
+   16 step lights: tap = mute, double tap = accent
+   ============================================ */
+.arp-strip {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+}
+
+.arp-strip[hidden] {
+    display: none;
+}
+
+.arp-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.arp-row select {
+    height: 30px;
+    padding: 0 8px;
+    font-size: var(--text-xs);
+}
+
+.arp-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.arp-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.arp-tap {
+    height: 30px;
+}
+
+.arp-bpm-stepper,
+.arp-touch-stepper,
+.arp-chips {
+    display: none;
+}
+
+.arp-live,
+.arp-settings {
+    display: contents;
+}
+
+/* Settings rows first, lights last, whatever the DOM order */
+.arp-strip .arp-steps {
+    order: 2;
+}
+
+.arp-help {
+    position: relative;
+}
+
+.arp-help-btn {
+    position: static;
+    width: 22px;
+    height: 22px;
+    opacity: 1;
+}
+
+.arp-help .control-hint {
+    top: calc(100% + 4px);
+    left: 0;
+    width: 320px;
+}
+
+/* Small knobs, always knobs (the strip is a toolbar, not a control page) */
+.arp-knob {
+    --knob-size: 36px;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-areas: "label help knob" "value value knob";
+    align-items: center;
+    column-gap: 4px;
+    padding: 0;
+    width: auto;
+}
+
+.arp-knob .control-label {
+    display: contents;
+}
+
+.arp-knob label {
+    grid-area: label;
+    order: 0;
+    margin: 0;
+    font-size: var(--text-2xs);
+}
+
+.arp-knob .control-value {
+    grid-area: value;
+    order: 0;
+    margin: 0;
+    font-size: var(--text-2xs);
+}
+
+.arp-knob .help-btn {
+    grid-area: help;
+    position: static;
+    width: 14px;
+    height: 14px;
+    opacity: 0.5;
+}
+
+.arp-knob:hover .help-btn,
+.arp-knob .help-btn[aria-expanded="true"] {
+    opacity: 1;
+}
+
+.arp-knob .control-hint {
+    top: calc(100% + 4px);
+    left: 0;
+    width: 260px;
+}
+
+/* Above the keys (black keys sit at z-index 10) */
+.arp-strip .control-hint {
+    z-index: 60;
+}
+
+.arp-knob .knob-container,
+body[data-controls="sliders"] .arp-knob .knob-container {
+    grid-area: knob;
+    display: block;
+}
+
+.arp-knob input[type="range"],
+body[data-controls="sliders"] .arp-knob input[type="range"] {
+    display: none;
+}
+
+.arp-steps {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    gap: 4px;
+    max-width: 640px;
+}
+
+.arp-step {
+    height: 18px;
+    padding: 0;
+    background: rgba(0, 240, 255, 0.35);
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    border-radius: 0;
+    cursor: pointer;
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* beat marks: every fourth step a hair taller */
+.arp-step:nth-child(4n + 1) {
+    height: 22px;
+}
+
+.arp-step.off {
+    background: transparent;
+    border-color: rgba(0, 240, 255, 0.2);
+}
+
+.arp-step.accent {
+    background: var(--accent-magenta);
+    border-color: var(--accent-magenta);
+    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+}
+
+.arp-step.beyond {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.arp-step.running {
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.9);
+}
+
+/* ARP switch lit like HOLD, and the key the pattern is on */
+.arp-btn[aria-pressed="true"],
+.arp-btn[aria-pressed="true"]:hover {
+    background: var(--accent-magenta);
+    color: var(--bg-primary);
+    border-color: var(--accent-magenta);
+    box-shadow: 0 0 25px rgba(255, 0, 170, 0.4);
+}
+
+/* Cyan = you played it (pressed), magenta = the arp plays it, on every key */
+.key.arp-playing,
+.key.black.arp-playing {
+    background: linear-gradient(180deg, rgba(255, 0, 170, 0.7), rgba(200, 0, 130, 0.5));
+    border-color: var(--accent-magenta);
+    box-shadow: 0 0 18px rgba(255, 0, 170, 0.6);
+}
+
+@media (min-width: 1024px) {
+    .keyboard-panel {
+        grid-template-areas:
+            "head"
+            "arp"
+            "keys";
+    }
+
+    .keyboard-panel .arp-strip {
+        grid-area: arp;
+        margin-top: var(--space-xs);
+    }
+}
+
+/* ---- Pocket: the whole arp is one page in the carousel (ARP tab, shown
+   while the arp runs). The keyboard box keeps only the ARP switch, so the
+   keys never move. Lights are big, gate / swing are sliders. ---- */
+@media (max-width: 1023px) {
+    .arp-chips {
+        display: none;
+    }
+
+    .arp-set {
+        display: flex;
+    }
+
+    .arp-set[hidden] {
+        display: none;
+    }
+
+    .arp-set.control-set {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* The strip is one grid: mode row, lights, then the rest. .arp-live and
+       .arp-settings are display: contents so their children place themselves. */
+    .arp-set .arp-strip {
+        display: grid;
+        grid-template-columns: 40px repeat(6, minmax(0, 1fr));
+        grid-template-areas:
+            "help mode mode mode rate rate rate"
+            "lights lights lights lights lights lights lights"
+            "oct  oct  oct  oct  len  len  len"
+            "bpm  bpm  bpm  bpm  tap  tap  tap"
+            "gate gate gate gate gate gate gate"
+            "swng swng swng swng swng swng swng";
+        gap: var(--space-sm);
+        align-items: stretch;
+        padding: 0;
+        border: none;
+    }
+
+    .arp-live,
+    .arp-settings,
+    .arp-set .arp-row {
+        display: contents;
+    }
+
+    .arp-set .arp-steps {
+        grid-area: lights;
+        margin: var(--space-xs) 0;
+    }
+
+    .arp-help { grid-area: help; display: flex; }
+    #arpMode  { grid-area: mode; }
+    #arpRate  { grid-area: rate; }
+    .arp-group[aria-label="Octaves"]        { grid-area: oct; }
+    .arp-group[aria-label="Pattern length"] { grid-area: len; }
+    .arp-bpm-stepper { grid-area: bpm; }
+    .arp-tap  { grid-area: tap; }
+    .arp-knob:has(#arpGate)  { grid-area: gate; }
+    .arp-knob:has(#arpSwing) { grid-area: swng; }
+    .pages .arp-settings .control-group.arp-knob:has(#arpBpm) { display: none; }
+
+    .arp-help-btn,
+    .arp-row select,
+    .arp-tap {
+        height: 44px;
+        width: 100%;
+        font-size: var(--text-sm);
+    }
+
+    .arp-group {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        align-items: stretch;
+        gap: 0;
+        height: 44px;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .arp-group .arp-label,
+    .arp-bpm-readout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+    }
+
+    .arp-group .chip {
+        border: none;
+        border-left: 1px solid rgba(0, 240, 255, 0.2);
+        padding: 0;
+        font-size: var(--text-sm);
+    }
+
+    .arp-bpm-stepper {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr 1fr;
+    }
+
+    .arp-bpm-readout {
+        font-size: var(--text-md);
+        color: var(--accent-magenta);
+        border-left: 1px solid rgba(0, 240, 255, 0.2);
+    }
+
+    /* Gate / swing: label · slider · value on one line, the slider is the
+       horizontal fader skin (same as the desktop effects rack rows) */
+    .pages .arp-settings .control-group.arp-knob,
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) {
+        --knob-size: 0px;
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr) 56px 22px;
+        grid-template-areas: "label slider value help";
+        align-items: center;
+        column-gap: var(--space-sm);
+        width: auto;
+        padding: 0;
+    }
+
+    /* Each child names its area; selectors carry the .pages … :has() prefix to
+       outrank the generic pocket knob-cell rules (0,4,1) */
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .control-label { display: contents; }
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) label { grid-area: label; margin: 0; font-size: var(--text-xs); text-align: left; justify-self: start; }
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .control-value { grid-area: value; margin: 0; font-size: var(--text-sm); justify-self: end; }
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .help-btn { grid-area: help; position: static; width: 22px; height: 22px; opacity: 1; justify-self: start; }
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .knob-container,
+    body[data-controls="sliders"] .pages .arp-settings .control-group.arp-knob .knob-container { display: none; }
+
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) input[type="range"],
+    body[data-controls="sliders"] .pages .control-group.arp-knob input[type="range"] {
+        display: block;
+        order: 0;
+        grid-area: slider;
+        width: 100%;
+        height: 30px;
+        margin: 0;
+        transform: none;
+        cursor: ew-resize;
+        touch-action: none;
+    }
+
+    .arp-settings .arp-knob input[type="range"]::-webkit-slider-runnable-track {
+        height: 10px;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(8, 11, 30, 0.95) var(--fill-percent, 0%));
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 240, 255, 0.25);
+    }
+
+    .arp-settings .arp-knob input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 28px;
+        margin-top: -10px;
+        background:
+            linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
+            linear-gradient(to bottom, #2a3270, #161b3d);
+        border: 1px solid rgba(255, 0, 170, 0.8);
+        box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .arp-settings .arp-knob .control-hint {
+        top: calc(100% + 4px);
+        left: 0;
+        width: min(360px, calc(100vw - 32px));
+    }
+
+    .arp-steps {
+        max-width: none;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .arp-step,
+    .arp-step:nth-child(4n + 1) {
+        height: 44px;
+    }
+
+    .arp-step.accent {
+        box-shadow: 0 0 10px rgba(255, 0, 170, 0.6), inset 0 -5px 0 rgba(255, 255, 255, 0.35);
+    }
+
+}
+
+/* Landscape phone: two columns, lights left, settings right */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .arp-set .arp-strip {
+        grid-template-columns: 40px repeat(6, minmax(0, 1fr)) repeat(6, minmax(0, 1fr));
+        grid-template-areas:
+            "help mode mode mode rate rate rate lights lights lights lights lights lights"
+            "oct  oct  oct  oct  len  len  len  lights lights lights lights lights lights"
+            "bpm  bpm  bpm  bpm  tap  tap  tap  gate   gate   gate   gate   gate   gate"
+            ".    .    .    .    .    .    .    swng   swng   swng   swng   swng   swng";
+        gap: var(--space-xs) var(--space-sm);
+    }
+
+    .arp-set .arp-steps {
+        margin: 0;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 4px;
+    }
+
+    .arp-step,
+    .arp-step:nth-child(4n + 1) {
+        height: 36px;
+    }
+
+    .arp-row {
+        grid-template-columns: 40px repeat(6, minmax(0, 1fr));
+        gap: var(--space-xs);
+    }
+
+    .arp-help-btn,
+    .arp-row select,
+    .arp-tap,
+    .arp-group {
+        height: 36px;
+    }
+}
+

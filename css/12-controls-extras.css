@@ -1,0 +1,179 @@
+/*@split 12-controls-extras.css: RND button, disabled controls, envelope preview and its placements, desktop knob size (split from styles.css, no rule changes) */
+
+/* RND button: three letters, so it outgrows the 30px square of the arrow steppers */
+.preset-stepper .step-btn.rnd-btn {
+    width: auto;
+    min-width: 38px;
+    padding: 0 6px;
+    letter-spacing: var(--tracking-wide);
+}
+
+/* Spread (and any control that does not apply right now): dimmed and untouchable, ? stays clickable */
+.control-group.is-disabled .knob-container,
+.control-group.is-disabled input[type="range"] {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Envelope preview: ADSR curve above the knobs of an envelope set.
+   A little oscilloscope: graticule, scanlines, glowing trace. */
+.env-preview {
+    position: relative;
+    width: 100%;
+    flex-shrink: 0; /* never let a short flex column squash it */
+    height: 64px;
+    margin: 2px 0 6px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 240, 255, 0.32);
+    border-left: 2px solid var(--accent-cyan);
+    background:
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.07) 1px, transparent 1px) 0 0 / 100% 25%,
+        linear-gradient(to right, rgba(0, 240, 255, 0.07) 1px, transparent 1px) 0 0 / 12.5% 100%,
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.06), rgba(5, 8, 24, 0.55));
+    box-shadow: inset 0 0 22px rgba(0, 240, 255, 0.1), 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+/* Scanlines over the trace */
+.env-preview::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+}
+
+.env-preview svg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.env-area {
+    stroke: none;
+}
+
+.env-base {
+    fill: none;
+    stroke: rgba(0, 240, 255, 0.35);
+    stroke-width: 1;
+}
+
+.env-guides {
+    fill: none;
+    stroke: rgba(255, 0, 170, 0.45);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+}
+
+.env-line {
+    fill: none;
+    stroke: var(--accent-cyan);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 7px rgba(0, 240, 255, 0.55));
+}
+
+.env-dot {
+    fill: none;
+    stroke: var(--accent-magenta);
+    stroke-width: 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px rgba(255, 0, 170, 0.9));
+}
+
+/* A D S R under the baseline, centred on their stage; hidden when the stage is too thin */
+.env-stage {
+    position: absolute;
+    bottom: 2px;
+    z-index: 3;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: 1;
+    letter-spacing: var(--tracking-wide);
+    color: rgba(255, 0, 170, 0.8);
+    text-shadow: 0 0 6px rgba(255, 0, 170, 0.6);
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+@media (max-width: 1023px) {
+    .env-preview { height: 84px; }
+}
+
+/* Short landscape: the page is only ~150px tall and the knobs fill it, so a stacked
+   preview was squeezed to 2px. Wide enough: preview beside the knobs. Too narrow: no preview. */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .env-preview { display: none; }
+}
+
+@media (min-width: 800px) and (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .pages > #controls > .control-set:has(> .env-preview) {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 14px; /* room between the curve and the first knob */
+    }
+
+    .pages > #controls > .control-set > .env-preview {
+        display: block;
+        flex: 1 1 100px;
+        min-width: 100px;
+        height: auto;
+        margin: 0;
+    }
+
+    /* 78px cells and 6px gaps, wider than the 4px of the other pages, so the knobs
+       breathe next to the curve. The width is exact so the grid keeps its columns. */
+    .pages > #controls > .control-set:has(> .env-preview) > .controls-grid {
+        flex: 0 0 auto;
+        column-gap: 6px;
+        width: calc(var(--cols, 4) * 78px + (var(--cols, 4) - 1) * 6px);
+    }
+}
+
+/* Wide desktop: the envelope preview sits to the right of the knobs / faders, title on top.
+   Under 1200px the controls column is too narrow for four knobs plus a preview, so it
+   stays stacked above them. */
+@media (min-width: 1200px) {
+    .control-set:has(> .env-preview) {
+        display: grid;
+        grid-template-columns: auto minmax(120px, 1fr);
+        grid-template-areas:
+            "title title"
+            "grid  env";
+        column-gap: var(--space-md);
+    }
+
+    .control-set:has(> .env-preview) > .control-set-title { grid-area: title; }
+    .control-set:has(> .env-preview) > .controls-grid { grid-area: grid; }
+
+    .control-set > .env-preview {
+        grid-area: env;
+        height: auto;
+        min-height: 64px;
+        margin: 0;
+    }
+}
+
+/* Desktop: instrument knobs match the effects rack (same --knob-desk) */
+@media (min-width: 1024px) {
+    #controls .control-group {
+        --knob-size: var(--knob-desk);
+    }
+}
+
+/* CRT toggles (js/crt.js sets body[data-crt-*]; all on by default) */
+body[data-crt-scan="off"]::before { display: none; }        /* scanlines + RGB sub-pixels */
+body[data-crt-vignette="off"]::after { display: none; }
+body[data-crt-flicker="off"] .crt-flicker,
+body[data-crt-flicker="off"] #crtStatic { display: none; }  /* the snow also stops drawing (crt.js) */
+body[data-crt-glitch="off"] {
+    --glitch-text: none;
+    --glitch-box: none;
+    --glitch-knob: none;
+}
+

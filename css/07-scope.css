@@ -1,0 +1,185 @@
+/*@split 07-scope.css: Scope panel and the wave picker (split from styles.css, no rule changes) */
+
+/* ============================================
+   SCOPE — oscilloscope / spectrum panel
+   ============================================ */
+/* Instrument intro (description + presets) beside the live scope */
+
+
+.scope-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+.scope-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.scope-modes {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+
+.scope-canvas {
+    display: block;
+    width: 100%;
+    height: clamp(110px, 14vw, 150px);
+    background: var(--bg-primary);
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.06), var(--glow-cyan-soft);
+}
+
+/* Tiny waveform preview (inside the wave picker button and its options) */
+.wave-preview {
+    display: block;
+    width: 40px;
+    height: 13px;
+    flex: none;
+    overflow: visible;
+}
+
+.wave-preview path {
+    fill: none;
+    stroke: var(--accent-cyan);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.5));
+}
+
+/* Wave picker: button shows shape + name, popup lists every shape */
+.wave-picker {
+    position: relative;
+    width: 100%;
+}
+
+.wave-picker-btn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.4rem 0.6rem;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+    text-transform: none;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--glow-cyan-soft);
+    transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.wave-picker-btn .wave-preview {
+    width: 26px;
+    height: 11px;
+}
+
+.wave-picker-btn::after {
+    content: '\25BE';
+    color: var(--accent-cyan);
+    font-size: 0.8em;
+}
+
+.wave-picker-btn:hover,
+.wave-picker-btn[aria-expanded="true"] {
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+}
+
+.wave-picker-btn:focus-visible {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+    border-color: var(--accent-magenta);
+}
+
+.wave-picker-name {
+    min-width: 0;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.wave-picker-list {
+    /* fixed and moved onto <body> while open (see wavePreview.js): top/left/
+       width are set on open, so neither a scrolling column nor a panel with
+       backdrop-filter can clip or offset it */
+    position: fixed;
+    z-index: 300;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 2px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: rgba(21, 25, 55, 0.98);
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+    text-align: left;
+}
+
+/* An open popup must paint above sibling cards and the panels below:
+   cards (position + hover transform) and panels (position: relative) each
+   form stacking contexts, so lift the ones that contain the open list. */
+.control-group:has(.wave-picker-list:not([hidden])) {
+    z-index: 40;
+}
+
+.synth-panel:has(.wave-picker-list:not([hidden])) {
+    z-index: 50;
+}
+
+.wave-picker-list[hidden] {
+    display: none;
+}
+
+.wave-picker-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.4rem;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+}
+
+.wave-picker-option .wave-preview {
+    width: 34px;
+    height: 12px;
+}
+
+.wave-picker-option:hover,
+.wave-picker-option:focus {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 240, 255, 0.5);
+    background: rgba(0, 240, 255, 0.06);
+}
+
+.wave-picker-option[aria-selected="true"] {
+    color: var(--accent-magenta);
+    border-color: rgba(255, 0, 170, 0.5);
+}
+
+.wave-picker-option[aria-selected="true"] .wave-preview path {
+    stroke: var(--accent-magenta);
+}
+
+#currentNote {
+    color: var(--accent-cyan);
+    font-weight: var(--weight-bold);
+}
+

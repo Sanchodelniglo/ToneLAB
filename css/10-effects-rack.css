@@ -1,0 +1,238 @@
+/*@split 10-effects-rack.css: Effects rack (desktop right column) (split from styles.css, no rule changes) */
+
+/* ============================================
+   EFFECTS RACK — desktop right column only. Slider mode: label · slider ·
+   value · ? rows. Knob mode: compact knob grid. The pocket FX page (portrait
+   and landscape) keeps the same stacked cells as the other pages.
+   ============================================ */
+@media (min-width: 1024px) {
+    /* Only inside the desktop panel: in the pocket carousel the rack is a page
+       with flex: 0 0 100%, and a shrinkable basis would squash it to 32px. */
+    body[data-controls="sliders"] .effects-panel > .effects-rack {
+        flex: 1 1 auto;
+    }
+
+    body[data-controls="sliders"] .effects-rack {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: space-evenly; /* rows breathe when the panel is taller than they are */
+        gap: 0;
+        margin-top: 0;
+    }
+
+    /* One row per set: title at the left, controls inline after it */
+    body[data-controls="sliders"] .effects-rack .control-set {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-sm);
+        max-width: none;
+        padding: var(--space-xs) 0;
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        background: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-set:first-child {
+        border-top: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-set-title {
+        flex: 0 0 56px;
+    }
+
+    /* Two controls per line: every label keeps its full word; Delay's third
+       control (Mix) takes a second line; a lone control spans both columns */
+    body[data-controls="sliders"] .effects-rack .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: var(--space-xs) var(--space-sm);
+    }
+
+    /* Each control: label · slider · value · ? on one line. The label block
+       becomes display: contents so its children sit in the row grid. The
+       .controls-grid hop keeps these ahead of body[data-controls="sliders"]. */
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group:only-child {
+        grid-column: 1 / -1;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group {
+        width: auto;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(0, max-content) minmax(40px, 1fr) auto auto; /* label keeps its word, slider gives way */
+        align-items: center;
+        column-gap: var(--space-xs);
+        padding: 0;
+        background: none;
+        border: none;
+        text-align: left;
+        animation: none; /* no chromatic box glitch on an invisible box */
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-label {
+        display: contents;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-label label {
+        grid-column: 1;
+        grid-row: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: var(--text-2xs);
+        letter-spacing: var(--tracking-tight);
+        color: var(--accent-cyan);
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"] {
+        display: block;
+        grid-column: 2;
+        grid-row: 1;
+        order: 0;
+        width: 100%; /* not the intrinsic 129px: that would squeeze the label column */
+        height: 30px; /* room for the 28px fader cap */
+        min-width: 0;
+        margin: 0;
+        transform: none;
+        cursor: ew-resize; /* the fader rule above sets ns-resize on every slider-mode input */
+    }
+
+
+
+
+
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-value {
+        margin: 0;
+        letter-spacing: inherit;
+        text-shadow: none;
+        grid-column: 3;
+        grid-row: 1;
+        font-size: var(--text-2xs);
+        white-space: nowrap;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .help-btn {
+        position: static;
+        grid-column: 4;
+        grid-row: 1;
+        width: 12px;
+        height: 12px;
+    }
+
+    body[data-controls="sliders"] .effects-rack .knob-container {
+        display: none;
+    }
+
+    /* Hint popover opens under the row, wide enough to read */
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group .control-hint {
+        top: calc(100% + 2px);
+        left: 0;
+        right: auto;
+        width: 260px;
+        max-width: 100%;
+    }
+
+    body[data-controls="sliders"] .effects-rack .controls-grid .control-group:last-child .control-hint {
+        left: auto;
+        right: 0;
+    }
+
+    /* ---- Knob mode: one 6-column grid for the whole rack. Every knob sits
+       on the same column (Master 1 · Reverb 2 · Delay 3 / Tone 2 · Chorus 2),
+       the two rows share the panel height, knob size follows the viewport. ---- */
+    body[data-controls="knobs"] .effects-rack {
+        display: grid;
+        flex: 1 1 auto;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        gap: var(--space-sm);
+        margin-top: 0;
+    }
+
+    /* Each set is its own box, like the instrument sets */
+    body[data-controls="knobs"] .effects-rack .control-set {
+        grid-column: span var(--cols, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: var(--space-xs);
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        padding: var(--space-xs) var(--space-xs) var(--space-sm);
+        border: 1px solid rgba(0, 240, 255, 0.12);
+        background: rgba(0, 240, 255, 0.02);
+    }
+
+    body[data-controls="knobs"] .effects-rack .control-set-title {
+        flex: 0 0 auto;
+        margin: 0;
+        font-size: var(--text-xs);
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid {
+        flex: 1 1 auto;
+        align-content: center;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+        column-gap: 4px;
+        justify-items: center;
+    }
+
+    /* Cell = small grid: readout and ? paired on top, knob, name */
+    body[data-controls="knobs"] .effects-rack .controls-grid .control-group {
+        --knob-size: var(--knob-desk);
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        padding: 0 0 2px;
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-areas: "value help" "knob knob" "label label";
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        column-gap: 3px;
+        row-gap: 1px;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid .control-value {
+        grid-area: value;
+        justify-self: end;
+        margin: 0;
+        font-size: var(--text-xs);
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid .help-btn {
+        grid-area: help;
+        position: static;
+        justify-self: start;
+        width: 14px;
+        height: 14px;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid .knob-container {
+        grid-area: knob;
+        display: block;
+    }
+
+    body[data-controls="knobs"] .effects-rack .controls-grid .control-label label {
+        grid-area: label;
+        margin: 0;
+        font-size: var(--text-2xs); /* DISTORTION must fit a 70px cell */
+    }
+}
+

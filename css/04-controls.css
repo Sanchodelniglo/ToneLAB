@@ -1,0 +1,424 @@
+/*@split 04-controls.css: Control sets and cells, hints, help buttons, slider skin, slider mode, knobs (split from styles.css, no rule changes) */
+
+/* Control sets: knobs grouped by meaning (Oscillator, Envelope, Filter...).
+   Sets pack side by side and wrap; cards inside a set wrap too. */
+.control-sets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* sets keep their own height */
+    gap: var(--space-md);
+    margin-top: clamp(1rem, 3vw, 2rem);
+}
+
+/* A set never shrinks: if it does not fit on the row it moves to the next one
+   whole. Only a set wider than the panel (narrow screens) wraps its cards. */
+.control-set {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    flex: 1 0 auto; /* exact cell width, then stretch to tile the row */
+    max-width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.control-set-title {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* --cols / --cells are set per set by controls.js (sizeControlSets) */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), var(--knob-cell));
+    gap: var(--space-sm);
+    align-items: start;
+}
+
+/* Knob cell (default mode): a bare hardware-style cell — knob on top, readout
+   inside the cap, name under it. No card chrome: the set box is the frame. */
+.control-set .control-group {
+    min-width: 0;
+}
+
+.control-set .control-group:has(.wave-select) {
+    grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+    .control-set {
+        width: 100%;
+    }
+
+    .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); /* four knobs per row on a phone */
+    }
+}
+
+.control-group {
+    --knob-size: 72px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2px 2px 4px;
+}
+
+.control-label {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin: 2px 0 0;
+    max-width: 100%;
+    font-size: var(--text-2xs);
+    line-height: 1.2;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-tight);
+    overflow-wrap: break-word;
+}
+
+/* Wave cells have no knob: name first, picker under it */
+.control-group:has(.wave-select) .control-label {
+    order: 0;
+    margin: 0 0 4px;
+}
+
+.control-value {
+    color: var(--accent-magenta);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+}
+
+/* Knob cells stack readout · knob · name. The label block is unwrapped
+   (display: contents) so its children take their own slot in the column. */
+.control-group:has(.knob-container) .control-label {
+    display: contents;
+}
+
+/* Beats the global `label` rule (text-sm, wide tracking) */
+.control-group .control-label label {
+    font-size: var(--text-xs);
+    color: var(--accent-cyan);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.2;
+}
+
+.control-group:has(.knob-container) label {
+    order: 2;
+    margin-top: 2px;
+    max-width: 100%;
+}
+
+.control-group:has(.knob-container) .control-value {
+    order: 0;
+    margin-bottom: 2px;
+    letter-spacing: 0;
+    text-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+}
+
+/* Hint = overlay popover on the card. Never affects layout: shown on hover /
+   focus of the ? button, or pinned by clicking it (touch). */
+.control-hint {
+    display: none;
+    position: absolute;
+    top: 22px;
+    left: 0;
+    width: 280px;
+    max-width: calc(100vw - 2 * var(--space-md));
+    z-index: 5;
+    margin: 0;
+    padding: 0.6rem 0.75rem;
+    background: rgba(21, 25, 55, 0.97);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    line-height: 1.45;
+    text-align: left;
+    pointer-events: none;
+}
+
+.control-hint:not([hidden]),
+.control-group:has(.help-btn:focus-visible) .control-hint {
+    display: block;
+}
+
+/* Hover preview only where hover exists: on touch the :hover state sticks to
+   the last tapped button and would keep a closed hint on screen. */
+@media (hover: hover) {
+    .control-group:has(.help-btn:hover) .control-hint {
+        display: block;
+    }
+}
+
+/* Cells at the right edge of a set open their hint to the left */
+.control-group:last-child:not(:first-child) .control-hint {
+    left: auto;
+    right: 0;
+}
+
+/* "?" help toggle, top-right of every control card */
+.help-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    opacity: 0.35;
+    padding: 0;
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: 1;
+    cursor: pointer;
+    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.control-group:hover .help-btn,
+.control-group:focus-within .help-btn,
+.help-btn:focus-visible,
+.help-btn[aria-expanded="true"] {
+    opacity: 1;
+}
+
+@media (pointer: coarse) {
+    .help-btn {
+        opacity: 1;
+    }
+}
+
+.help-btn:hover,
+.help-btn:focus-visible {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 240, 255, 0.6);
+}
+
+.help-btn[aria-expanded="true"] {
+    color: var(--bg-primary);
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+/* Knob mode (default): the range input is the hidden source of truth */
+input[type="range"] {
+    display: none;
+}
+
+/* ---- Slider skin ----
+   Styles every range input. Harmless in knob mode (the inputs are display: none
+   there); which inputs are shown is decided by the mode switch below and, on
+   desktop, by the effects rack (see LAYOUT A at the end of the file). */
+input[type="range"] {
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: transparent;
+    cursor: ew-resize; /* resize arrows like the knobs; faders flip to ns-resize */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]:focus-visible {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+}
+
+/* Track: cyan fill up to --fill-percent (set by updateSliderFill), dark remainder */
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: rgba(30, 39, 73, 0.9);
+}
+
+input[type="range"]::-moz-range-progress {
+    height: 4px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+/* Thumb: square fader cap, magenta like the knob indicator */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 18px;
+    margin-top: -7px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    transition: box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 18px;
+    border-radius: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-magenta);
+    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+}
+
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:active::-webkit-slider-thumb {
+    box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
+}
+
+/* ---- Slider mode (user toggle): vertical faders replace the knobs ----
+   Same cell stack as knobs (readout · fader · name). The range input keeps
+   its horizontal skin and is rotated, so its left→right fill reads bottom→top.
+   The desktop effects rack re-flattens them (see LAYOUT A). */
+body[data-controls="sliders"] .knob-container {
+    display: none;
+}
+
+body[data-controls="sliders"] .control-group {
+    --fader-len: 76px;
+    --fader-thick: 30px;
+}
+
+body[data-controls="sliders"] .control-group input[type="range"] {
+    display: block;
+    order: 1;
+    width: var(--fader-len);
+    height: var(--fader-thick);
+    margin: calc((var(--fader-len) - var(--fader-thick)) / 2) 0;
+    transform: rotate(-90deg);
+    cursor: ns-resize; /* the cursor does not rotate with the input */
+}
+
+/* Fader track: deep slot with a glowing fill */
+body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(8, 11, 30, 0.95) var(--fill-percent, 0%));
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-track {
+    height: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    background: rgba(8, 11, 30, 0.95);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-progress {
+    height: 10px;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* Fader cap: tall block with a magenta centre line */
+body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider-thumb {
+    width: 14px;
+    height: 28px;
+    margin-top: -10px;
+    background:
+        linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
+        linear-gradient(to bottom, #2a3270, #161b3d);
+    border: 1px solid rgba(255, 0, 170, 0.8);
+    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 28px;
+    background:
+        linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
+        linear-gradient(to bottom, #2a3270, #161b3d);
+    border: 1px solid rgba(255, 0, 170, 0.8);
+    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+body[data-controls="sliders"] .wave-select {
+    width: 100%;
+}
+
+.knob-container {
+    order: 1;
+    display: block;
+    position: relative;
+    width: var(--knob-size);
+    height: var(--knob-size);
+    animation: var(--glitch-knob, crt-chromatic-knob) 8s infinite;
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+    margin: 0;
+    outline: none;
+}
+
+.knob-container.is-dragging {
+    cursor: ns-resize;
+}
+
+.knob-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.knob-track {
+    fill: none;
+    stroke: rgba(0, 240, 255, 0.14);
+    stroke-width: 4;
+    stroke-linecap: butt;
+}
+
+.knob-fill {
+    fill: none;
+    stroke: var(--accent-cyan);
+    stroke-width: 4;
+    stroke-linecap: butt;
+    filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.55));
+}
+
+.knob-body {
+    fill: #161b3d;
+    stroke: rgba(0, 240, 255, 0.28);
+    stroke-width: 1;
+    transition: stroke var(--transition-fast), fill var(--transition-fast);
+}
+
+.knob-container:hover .knob-body,
+.knob-container.is-dragging .knob-body {
+    fill: #1c2350;
+    stroke: rgba(0, 240, 255, 0.7);
+    filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.25));
+}
+
+.knob-container:focus-visible .knob-body {
+    stroke: var(--accent-magenta);
+    stroke-width: 2;
+}
+
+.knob-indicator {
+    stroke: var(--accent-magenta);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px rgba(255, 0, 170, 0.6));
+}
+
+.knob-notch {
+    stroke: rgba(0, 240, 255, 0.3);
+    stroke-width: 1;
+}
+

@@ -1,0 +1,303 @@
+/*@split 06-responsive.css: Mobile-first breakpoints, sticky mobile keyboard, reduced motion (split from styles.css, no rule changes) */
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS - MOBILE FIRST
+   ============================================ */
+
+/* Small tablets and larger phones - 480px+ */
+@media (min-width: 480px) {
+    .panel-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .instrument-select {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .key {
+        width: 45px;
+        height: 180px;
+    }
+
+    .key.black {
+        width: 30px;
+        height: 110px;
+        margin: 0 -16px;
+    }
+}
+
+/* Tablets and desktop - 769px+ */
+@media (min-width: 769px) {
+
+    .keyboard {
+        overflow-x: visible;
+    }
+
+    .key {
+        width: 50px;
+        height: 200px;
+    }
+
+    .key.black {
+        width: 32px;
+        height: 120px;
+        margin: 0 -17px;
+    }
+}
+
+/* Large desktop - 1200px+ */
+@media (min-width: 1200px) {
+    .container {
+        padding: 2rem;
+    }
+
+    header {
+        margin-bottom: 3rem;
+    }
+}
+
+/* ============================================
+   MOBILE STICKY KEYBOARD LAYOUT
+   ============================================ */
+
+/* Mobile devices - sticky keyboard at bottom */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 0;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .keyboard-section {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        margin-bottom: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, #0d1428 50%, var(--bg-secondary) 100%);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+    }
+
+    .keyboard-panel .info-display {
+        display: none; /* no computer keyboard on a phone, and the sticky bar must stay short */
+    }
+
+    .keyboard-panel {
+        margin-bottom: 0;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        border-bottom: none;
+        padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0));
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .keyboard-panel .panel-header {
+        flex-direction: column;
+        gap: var(--space-sm);
+        padding: 0 var(--space-md) var(--space-sm) var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+
+    .keyboard-controls {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        width: 100%;
+        padding: 0 var(--space-md);
+    }
+
+    .keyboard-controls .instrument-select {
+        display: none;
+    }
+
+    .keyboard-controls .octave-controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: var(--space-sm);
+    }
+
+    .keyboard-controls .octave-btn {
+        flex: 0 1 auto;
+        padding: var(--space-sm) var(--space-sm);
+        font-size: var(--text-xs);
+        white-space: nowrap;
+        min-width: 44px;
+        min-height: 44px;
+        max-width: 100px;
+    }
+
+    .keyboard-controls .octave-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: var(--bg-tertiary);
+        color: var(--text-muted);
+        border-color: rgba(0, 240, 255, 0.2);
+        box-shadow: none;
+    }
+
+    .keyboard-controls .octave-display {
+        flex: 1;
+        font-size: var(--text-sm);
+        text-align: center;
+        min-width: 60px;
+    }
+
+    .keyboard {
+        overflow: hidden;
+        padding: var(--space-sm) 0;
+        margin: 0;
+        position: relative;
+        gap: 2px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .key {
+        flex: 0 0 auto;
+        width: 52px;
+        min-width: 52px;
+        height: 140px;
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
+        transition: transform 50ms var(--ease-out),
+                    background 50ms var(--ease-out),
+                    box-shadow 50ms var(--ease-out);
+    }
+
+    .key.black {
+        flex: 0 0 auto;
+        width: 36px;
+        min-width: 36px;
+        height: 100px;
+        margin: 0 -16px;
+        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+
+    .key.pressed {
+        transform: translateY(3px) scale(0.98);
+        transition: transform 20ms linear,
+                    background 20ms linear,
+                    box-shadow 20ms linear;
+    }
+
+    .key:active {
+        transition: transform 20ms linear,
+                    background 20ms linear,
+                    box-shadow 20ms linear;
+    }
+
+    .keyboard-key-label {
+        font-size: var(--text-xs);
+        padding: 2px 4px;
+    }
+
+    .keyboard-scroll-indicator {
+        display: none;
+    }
+
+    /* Info display adjustments */
+    .info-display {
+        margin-bottom: var(--space-md);
+    }
+}
+
+/* Desktop - normal layout (no sticky behavior) */
+@media (min-width: 769px) {
+    .keyboard-section {
+        position: static;
+    }
+
+    .keyboard-panel {
+        border-radius: var(--radius-xl);
+    }
+
+    .keyboard-controls {
+        display: flex;
+        flex-direction: row;
+        gap: var(--space-xl);
+        align-items: center;
+    }
+}
+
+/* Tablet portrait - larger keys (must come after mobile styles) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .key {
+        width: 56px;
+        min-width: 56px;
+        height: 160px;
+    }
+
+    .key.black {
+        width: 40px;
+        min-width: 40px;
+        height: 110px;
+        margin: 0 -18px;
+    }
+}
+
+/* Accessibility: Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    /* Disable all decorative animations */
+    h1 {
+        animation: none !important;
+    }
+
+    .synth-panel::before,
+    .synth-panel:hover::before {
+        transition: none !important;
+    }
+
+    .keyboard-scroll-indicator {
+        animation: none !important;
+    }
+
+    .keyboard-scroll-indicator svg {
+        animation: none !important;
+    }
+
+    .audio-overlay-icon {
+        animation: none !important;
+    }
+
+    /* Disable hover transforms */
+    .control-group:hover,
+    select:hover,
+    .wave-select:hover,
+    .octave-btn:hover,
+    button:hover,
+    .key:hover {
+        transform: none !important;
+    }
+
+    /* Preserve essential interactive feedback with faster timing */
+    .key,
+    .key.pressed,
+    button,
+    select,
+    .control-group,
+    input[type="range"]::-webkit-slider-thumb,
+    input[type="range"]::-moz-range-thumb {
+        transition-duration: 50ms !important;
+    }
+
+    .key.pressed {
+        transition: transform 50ms linear !important;
+    }
+
+    * {
+        scroll-behavior: auto !important;
+    }
+}
+

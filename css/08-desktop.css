@@ -1,0 +1,375 @@
+/*@split 08-desktop.css: Desktop workstation layout (1024px and up) (split from styles.css, no rule changes) */
+
+/* ============================================
+   LAYOUT A — "WORKSTATION" (desktop, ≥ 1024px)
+   One screen, no page scroll. Mobile keeps the stacked layout above.
+
+   ┌ ToneLAB [install] │ INSTRUMENT · Type ▾ · [Knobs][Sliders]   ┐ bar
+   ├ PRESETS ▢ ▢ ▢ ▢ · description                                 ┤ intro
+   ├ sets (scrolls internally)            │ SCOPE  [Wave][Spectrum] ┤
+   │                                      │ ~~~~~ fills height ~~~~ │
+   │                                      ├─────────────────────────┤
+   │                                      │ EFFECTS rack (sliders)  │
+   ├ KEYBOARD · Layout ▾ Notes ▾ · ◀ OCT 4 OCT ▶ · Playing: C4      ┤ kbd
+   └───────────────────────────────────────────────────────────────┘
+
+   The DOM is unchanged: wrappers that only matter on mobile (main, the
+   instrument panel, its header, .instrument-top) become display: contents
+   so the container grid places their children directly.
+   ============================================ */
+@media (min-width: 1024px) {
+    .container {
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        padding: var(--space-md) var(--space-lg);
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) clamp(480px, 42%, 640px); /* wider right column: room for 60px effect knobs */
+        /* Scope row is content-sized (canvas height is a viewport clamp);
+           the effects row takes whatever height is left. */
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            "brand brand brand"
+            "sets  sets  scope"
+            "sets  sets  fx"
+            "kbd   kbd   kbd";
+        gap: var(--space-xs) var(--space-md);
+    }
+
+    main {
+        display: contents;
+    }
+
+    /* ---- Top bar: brand · ◂ instrument ▸ ? · PRESET ◂ select ▸ · install,
+       with the description and the preset hint on a second line ---- */
+    header {
+        grid-area: brand;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "logo . install";
+        align-items: center;
+        column-gap: var(--space-md);
+        margin: 0;
+        padding-bottom: var(--space-xs);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+        text-align: left;
+    }
+
+    header h1 {
+        grid-area: logo;
+    }
+
+    .instrument-bar .type-stepper {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .instrument-bar .type-stepper label {
+        display: none;
+    }
+
+    .instrument-bar .type-stepper select {
+        min-width: 150px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
+    }
+
+    .instrument-bar .type-help {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+        border-color: rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-size: var(--text-xs);
+    }
+
+    .instrument-bar .type-hint {
+        top: calc(100% + 4px);
+        left: 0;
+        width: 360px;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .instrument-bar .type-hint:not([hidden]) {
+        display: block;
+    }
+
+    header .type-slot,
+    header .synth-description {
+        display: none;
+    }
+
+    /* Preset ? popover hangs under the preset row */
+    .preset-stepper-row {
+        position: relative;
+    }
+
+    .preset-help:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+
+    header #installBtn {
+        grid-area: install;
+    }
+
+    h1 {
+        font-size: var(--text-lg);
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .subtitle {
+        display: none;
+    }
+
+    header #installBtn {
+        margin-top: 0;
+        padding: var(--space-xs) var(--space-md);
+        font-size: var(--text-xs);
+    }
+
+    /* ---- Instrument box: title + Knobs/Sliders on the header line, sets scroll under it ---- */
+    .instrument-panel {
+        grid-area: sets;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .instrument-panel > .panel-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+        margin: 0;
+        padding: var(--space-sm) var(--space-md) var(--space-xs);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+    }
+
+    .instrument-panel .panel-title {
+        font-size: var(--text-sm);
+    }
+
+    .panel-tools {
+        flex-wrap: nowrap;
+    }
+
+    .preset-bar {
+        display: none;
+    }
+
+    /* ---- Instrument bar: ◂ type ▸ ? · PRESET ◂ select ▸ ?, under the box header ---- */
+    .instrument-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        padding: var(--space-xs) var(--space-md);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+    }
+
+    .instrument-bar .preset-stepper {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+    }
+
+    .preset-stepper-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .preset-label {
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+    }
+
+    .preset-stepper .step-btn,
+    .instrument-bar .type-stepper .step-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        cursor: pointer;
+    }
+
+    .preset-stepper .step-btn:hover,
+    .instrument-bar .type-stepper .step-btn:hover {
+        border-color: rgba(0, 240, 255, 0.6);
+    }
+
+    #presetSelect {
+        width: 190px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
+    }
+
+    /* ---- Left column: control sets, scrolls on their own ---- */
+    #controls {
+        flex: 1 1 auto;
+        min-height: 0;
+        margin: 0;
+        padding: var(--space-md);
+        align-content: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 240, 255, 0.35) rgba(10, 14, 39, 0.6);
+    }
+
+    /* Scope title matches the other box titles */
+    .scope-head .control-set-title {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: var(--weight-bold);
+        letter-spacing: var(--tracking-display);
+        color: var(--accent-cyan);
+    }
+
+    /* ---- Right column, top: scope strip, short so the effects get the room ---- */
+    .scope-block {
+        grid-area: scope;
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+        background: linear-gradient(135deg, rgba(21, 25, 55, 0.9), rgba(30, 39, 73, 0.9));
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .scope-canvas {
+        flex: 0 0 auto;
+        height: clamp(130px, 19vh, 230px); /* 152px at 800 tall, 205px at 1080 */
+        min-height: 0;
+    }
+
+    /* ---- Right column, bottom: effects as a compact slider rack ---- */
+    .effects-panel {
+        grid-area: fx;
+        margin: 0;
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .effects-panel .panel-header {
+        margin-bottom: var(--space-xs);
+        padding-bottom: var(--space-xs);
+    }
+
+    .effects-panel .panel-title {
+        font-size: var(--text-sm);
+    }
+
+    /* ---- Bottom row: keyboard, always visible ---- */
+    .keyboard-section {
+        grid-area: kbd;
+        min-width: 0;
+    }
+
+    .keyboard-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "head"
+            "keys";
+        align-items: center;
+        column-gap: var(--space-md);
+        margin: 0;
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+    }
+
+    .keyboard-panel .panel-header {
+        grid-area: head;
+        margin: 0;
+        padding: 0;
+        border-bottom: none;
+    }
+
+    .keyboard-panel .keyboard-controls {
+        flex-wrap: nowrap;
+        gap: var(--space-md);
+    }
+
+    /* The option text says it all ("C D E", "QWERTY"); the chips sit first */
+    .keyboard-panel .keyboard-controls .instrument-select label {
+        display: none;
+    }
+
+    .keyboard-panel .keyboard-controls select {
+        height: 30px;
+        padding: 0 8px;
+        font-size: var(--text-xs);
+    }
+
+    .keyboard-panel .octave-controls {
+        flex-wrap: nowrap;
+        gap: var(--space-sm);
+    }
+
+    .keyboard-panel .octave-display {
+        white-space: nowrap;
+    }
+
+    .keyboard-panel .octave-btn {
+        padding: var(--space-xs) var(--space-md);
+    }
+
+    .keyboard-panel .keyboard-wrapper {
+        grid-area: keys;
+        min-width: 0;
+    }
+
+    .keyboard-panel .info-display {
+        grid-area: info;
+        margin: 0;
+        padding: var(--space-xs) var(--space-sm);
+        white-space: nowrap;
+    }
+
+    /* Key caps already show the computer-keyboard mapping; keep only the readout */
+    .keyboard-panel .info-hint {
+        display: none;
+    }
+
+    .keyboard {
+        margin: var(--space-sm) 0 0;
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .key {
+        height: 100px;
+    }
+
+    .key.black {
+        height: 60px;
+    }
+}
+

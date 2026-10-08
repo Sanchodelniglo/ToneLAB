@@ -1,0 +1,813 @@
+/*@split 09-pocket.css: Pocket layout (below 1024px): tabs, pages, scope strip, landscape (split from styles.css, no rule changes) */
+
+/* ============================================
+   POCKET LAYOUT (< 1024px): 100dvh app, no page scroll
+   bar · scope strip · tabs · one page · keyboard. js/ui/mobile.js moves the
+   type stepper into the header, secondary controls into the settings sheet and the
+   effects rack into the pages carousel; CSS does the rest.
+   ============================================ */
+
+/* Desktop: the extra nodes stay out of the way */
+.pages { display: contents; }
+.xy-set, .arp-set, .tab-bar, .step-btn, .scope-preset, .type-help, .type-hint, .preset-stepper { display: none; }
+
+/* Key labels (settings sheet on mobile, keyboard bar on desktop): note name and
+   computer key are two independent toggles */
+body[data-note-labels="off"] .note-label {
+    display: none;
+}
+
+body[data-key-labels="off"] .keyboard-key-label {
+    display: none;
+}
+
+/* .chip = independent on/off toggle (the active fill says it is on) */
+
+@media (max-width: 1023px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .crt-screen {
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .container {
+        height: 100%;
+        max-width: none;
+        padding: 0;
+        display: grid;
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "scope" "tabs" "pages" "kbd";
+    }
+
+    main,
+    .instrument-panel,
+    .effects-panel {
+        display: contents;
+    }
+
+    /* Gone on a phone: the settings sheet keeps what matters */
+    .instrument-panel > .panel-header,
+    .effects-panel > .panel-header,
+    .instrument-bar,
+    .preset-stepper,
+    .scope-head,
+    header #installBtn,
+    .keyboard-panel .panel-title,
+    .keyboard-panel .info-display,
+    .skip-link {
+        display: none;
+    }
+
+    /* ---- top bar ---- */
+    header {
+        grid-area: bar;
+        display: flex;
+        flex-wrap: wrap; /* line 1: ToneLAB … gear · line 2: ◂ type ▸ */
+        align-items: center;
+        gap: var(--space-xs) var(--space-sm);
+        margin: 0;
+        padding: 6px var(--space-md) 6px var(--space-md);
+        padding-top: calc(6px + env(safe-area-inset-top, 0));
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        text-align: left;
+    }
+
+    header h1 {
+        font-size: var(--text-lg);
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .type-slot {
+        flex: 1 1 100%;
+        order: 3;
+        min-width: 0;
+        display: flex;
+    }
+
+    /* .instrument-select is a column below 480px; the stepper is always a row */
+    .type-stepper {
+        position: relative; /* anchors the description popover */
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--space-xs);
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* ? between the select and ▸: the synth description as a popover */
+    .type-help {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        opacity: 1;
+        border-color: rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-size: var(--text-sm);
+    }
+
+    .type-hint {
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        width: auto;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .type-hint:not([hidden]) {
+        display: block;
+    }
+
+    .type-stepper label {
+        display: none;
+    }
+
+    .type-stepper select {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
+        height: 44px;
+        padding: 6px 8px;
+        font-size: var(--text-sm);
+        text-align: center;
+    }
+
+    .step-btn,
+    .more-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        cursor: pointer;
+    }
+
+    .more-btn {
+        flex: 0 0 auto;
+        margin-left: auto;
+        font-size: var(--text-md);
+        line-height: 1;
+    }
+
+    .step-btn:active,
+    .more-btn:active {
+        background: rgba(0, 240, 255, 0.15);
+    }
+
+    /* ---- scope strip: swipe left / right = preset ---- */
+    .scope-block {
+        grid-area: scope;
+        position: relative;
+        height: 96px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        touch-action: pan-y;
+    }
+
+    .scope-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        border: none;
+    }
+
+    .scope-preset {
+        position: absolute;
+        inset: 0 0 auto 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 4px 0;
+        pointer-events: none;
+    }
+
+    .scope-preset .step-btn {
+        pointer-events: auto;
+        width: 44px;
+        height: 36px;
+        border-color: transparent;
+    }
+
+    .scope-preset .preset-help {
+        pointer-events: auto;
+        width: 36px;
+        height: 36px;
+        border-color: transparent;
+    }
+
+    .scope-preset .preset-help:disabled {
+        opacity: 0.3;
+    }
+
+    .scope-preset .type-hint {
+        top: calc(100% + 2px);
+        left: 8px;
+        right: 8px;
+        width: auto;
+        max-width: none;
+        z-index: 60;
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        line-height: 1.45;
+        pointer-events: auto;
+    }
+
+    .scope-preset .type-hint:not([hidden]) {
+        display: block;
+    }
+
+    .scope-preset span {
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        color: var(--accent-magenta);
+        text-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+    }
+
+    /* ---- tabs ---- */
+    .tab-bar {
+        grid-area: tabs;
+        display: flex;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        flex: 1 0 auto;
+        min-width: 56px;
+        height: 44px;
+        padding: 0 var(--space-sm);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .tab-btn[aria-selected="true"] {
+        color: var(--accent-cyan);
+        border-bottom-color: var(--accent-cyan);
+        text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+    }
+
+    /* ---- pages carousel ---- */
+    .pages {
+        grid-area: pages;
+        display: flex;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+    }
+
+    .pages::-webkit-scrollbar {
+        display: none;
+    }
+
+    #controls {
+        display: contents;
+    }
+
+    /* A drag on a fader or rack slider must not swipe the page */
+    .pages input[type="range"] {
+        touch-action: none;
+    }
+
+    .pages > .control-set,
+    .pages > #controls > .control-set,
+    .pages > .effect-controls {
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        overflow-y: auto;
+        margin: 0;
+        padding: var(--space-sm) var(--space-md);
+        border: none;
+        background: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    /* The tab already names the set */
+    .pages > #controls > .control-set > .control-set-title {
+        display: none;
+    }
+
+    .pages .controls-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        justify-items: center;
+        gap: var(--space-sm) 4px;
+    }
+
+    .pages .control-group {
+        --knob-size: 72px;   /* same as the FX page: one size per device */
+        --fader-len: 80px;
+        width: 100%;
+    }
+
+    /* The sliders-mode default (76px) outranks the line above: restate it so faders match the FX page */
+    body[data-controls="sliders"] .pages .control-group {
+        --fader-len: 80px;
+    }
+
+    /* Thumb-sized text and targets: readouts, names, ? and set titles.
+       The cell is a small grid so the readout and the ? share the top row
+       (a centered pair) instead of the ? floating over the readout. */
+    .pages .control-group:has(.knob-container),
+    body[data-controls="knobs"] .pages > .effect-controls .controls-grid .control-group {
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-template-areas: "value help" "knob knob" "label label";
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        column-gap: 4px;
+        row-gap: 2px;
+    }
+
+    .pages .control-group:has(.knob-container) .control-value {
+        grid-area: value;
+        justify-self: end;
+        margin: 0;
+    }
+
+    .pages .control-group:has(.knob-container) .help-btn {
+        grid-area: help;
+        position: static;
+        justify-self: start;
+        width: 22px;   /* repeated here to outrank the knob-rack 12px rule */
+        height: 22px;
+        font-size: var(--text-xs);
+    }
+
+    .pages .control-group:has(.knob-container) .knob-container,
+    .pages .control-group:has(.knob-container) input[type="range"] {
+        grid-area: knob;
+    }
+
+    .pages .control-group:has(.knob-container) label {
+        grid-area: label;
+        margin: 0;
+    }
+
+    .pages .control-value {
+        font-size: var(--text-sm);
+    }
+
+    .pages .control-group .control-label label {
+        font-size: var(--text-sm);
+    }
+
+    .pages .help-btn {
+        width: 22px;
+        height: 22px;
+        font-size: var(--text-xs);
+        opacity: 1;
+    }
+
+    .pages .control-set-title {
+        font-size: var(--text-xs);
+    }
+
+    .pages .control-hint {
+        font-size: var(--text-sm);
+        width: min(360px, calc(100vw - 32px)); /* near full width on a phone */
+    }
+
+    .pages .wave-picker-btn {
+        min-height: 44px;
+        font-size: var(--text-sm);
+    }
+
+    /* Wave pickers: one full-width row each, at the top of the page: name on the
+       left, picker on the right. Knobs then flow in clean rows underneath
+       instead of leaving holes beside a two-column picker. */
+    .pages .control-group:has(.wave-select) {
+        grid-column: 1 / -1;
+        order: -1;
+        display: grid;
+        grid-template-columns: minmax(84px, 30%) minmax(0, 1fr);
+        align-items: center;
+        column-gap: var(--space-sm);
+        padding: 0 var(--space-xs);
+    }
+
+    .pages .control-group:has(.wave-select) .control-label {
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .pages .control-group:has(.wave-select) .wave-picker {
+        grid-column: 2;
+    }
+
+    /* FX page: the five effect sets stacked, scrolls inside the page.
+       nowrap: .control-sets wraps by default and a column that wraps spills
+       into a second column off the right edge. */
+    .pages > .effect-controls {
+        flex-wrap: nowrap;
+        align-items: stretch;
+    }
+
+    .pages > .effect-controls .control-group {
+        --knob-size: 72px;
+        --fader-len: 80px;
+    }
+
+    .pages > .effect-controls .control-set {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+        padding: var(--space-xs) 0;
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        background: none;
+    }
+
+    .pages > .effect-controls .control-set:first-child {
+        border-top: none;
+    }
+
+    .pages > .effect-controls .control-set-title {
+        margin-bottom: 2px;
+    }
+
+    /* ---- XY page ---- */
+    .xy-set {
+        display: flex;
+    }
+
+    .xy-set[hidden] {
+        display: none;
+    }
+
+    .xy-targets {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .xy-targets label {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        color: var(--accent-cyan);
+    }
+
+    .xy-targets select {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 4px 6px;
+        font-size: var(--text-2xs);
+    }
+
+    .xy-pad {
+        --x: 0.5;
+        --y: 0.5;
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 120px;
+        touch-action: none;
+        user-select: none;
+        cursor: crosshair;
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        background:
+            repeating-linear-gradient(to right, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 12.5%),
+            repeating-linear-gradient(to bottom, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 25%),
+            radial-gradient(ellipse at center, rgba(0, 240, 255, 0.06), transparent 70%),
+            rgba(8, 11, 30, 0.9);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+
+    .xy-pad.is-active {
+        border-color: var(--accent-magenta);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 0, 170, 0.3);
+    }
+
+    .xy-cross-x,
+    .xy-cross-y {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(255, 0, 170, 0.45);
+    }
+
+    .xy-cross-x {
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        left: calc(var(--x) * 100%);
+    }
+
+    .xy-cross-y {
+        left: 0;
+        right: 0;
+        height: 1px;
+        top: calc(var(--y) * 100%);
+    }
+
+    .xy-dot {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: calc(var(--x) * 100%);
+        top: calc(var(--y) * 100%);
+        transform: translate(-50%, -50%);
+        border: 2px solid var(--accent-magenta);
+        background: rgba(255, 0, 170, 0.25);
+        box-shadow: 0 0 12px rgba(255, 0, 170, 0.7);
+        pointer-events: none;
+    }
+
+    .xy-read {
+        position: absolute;
+        top: 4px;
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        color: var(--accent-cyan);
+        pointer-events: none;
+        max-width: 48%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .xy-read-x { left: 6px; }
+    .xy-read-y { right: 6px; text-align: right; }
+
+    /* ---- keyboard dock ---- */
+    .keyboard-section {
+        grid-area: kbd;
+        position: static;
+        width: auto;
+        margin: 0;
+        padding: 0;
+        z-index: auto;
+        background: none;
+    }
+
+    .keyboard-panel {
+        margin: 0;
+        padding: 0 0 env(safe-area-inset-bottom, 0);
+        border: none;
+        border-top: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 0;
+        background: linear-gradient(180deg, rgba(10, 14, 39, 0.98), rgba(15, 18, 40, 1));
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+
+    .keyboard-panel .panel-header {
+        flex-direction: row;
+        margin: 0;
+        padding: 4px var(--space-md) 2px;
+    }
+
+    .keyboard-controls {
+        padding: 0;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .keyboard-controls .instrument-select {
+        display: none;
+    }
+
+    /* Two rows on a phone: ◂ OCT · 4 · OCT ▸ then HOLD · ARP full width */
+    .keyboard-controls .octave-controls {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .keyboard-controls .octave-display {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: center;
+        font-size: var(--text-sm);
+        white-space: nowrap;
+    }
+
+    .keyboard-controls .octave-btn {
+        padding: 0 var(--space-sm);
+        min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+        .keyboard-controls .hold-btn,
+        .keyboard-controls .arp-btn {
+            flex: 1 1 45%;
+            min-height: 40px;
+        }
+    }
+
+    .keyboard-controls .octave-btn {
+        min-height: 44px;
+        padding: 0 var(--space-md);
+        font-size: var(--text-sm);
+    }
+
+    .keyboard-controls .octave-display {
+        font-size: var(--text-md);
+    }
+
+    .keyboard {
+        margin: 0;
+        padding: 2px 0 6px;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: none;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    /* White keys share the width (7 per octave fit any phone, 14 in landscape);
+       black keys keep a fixed width and their negative margins */
+    .key {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        height: 140px;
+    }
+
+    .key.black {
+        flex: 0 0 36px;
+        width: 36px;
+        min-width: 36px;
+        height: 92px;
+    }
+
+    .keyboard {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    .keyboard-scroll-indicator {
+        display: none;
+    }
+
+    /* ---- settings sheet ---- */
+    .sheet-body {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: 85dvh;
+        overflow-y: auto;
+        padding: var(--space-md) var(--space-md) calc(var(--space-lg) + env(safe-area-inset-bottom, 0));
+        background: linear-gradient(135deg, rgba(21, 25, 55, 0.98), rgba(30, 39, 73, 0.98));
+        border-top: 1px solid rgba(0, 240, 255, 0.4);
+        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+    }
+}
+
+/* Phone on its side: scope left, tabs + page right, keys full width */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .container {
+        grid-template-columns: 2fr 3fr;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar bar" "scope tabs" "scope pages" "kbd kbd";
+    }
+
+    .scope-block {
+        height: auto;
+        border-right: 1px solid rgba(0, 240, 255, 0.15);
+    }
+
+    .key {
+        height: 94px;
+    }
+
+    .key.black {
+        height: 60px;
+    }
+
+    .keyboard-panel .panel-header {
+        padding: 2px var(--space-md) 0;
+    }
+
+    .pages .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    }
+
+    /* "0.05 Sec" plus the ? was 88px wide in a 72px cell and ran into the next cell:
+       smaller readout, smaller ?, slightly wider cells */
+    .pages .control-value {
+        font-size: var(--text-xs);
+    }
+
+    .pages .control-group:has(.knob-container) .help-btn {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Same knob and fader size as the FX page in landscape (64 / 72) */
+    .pages .control-group {
+        --knob-size: 64px;
+        --fader-len: 72px;
+    }
+
+    body[data-controls="sliders"] .pages .control-group {
+        --fader-len: 72px;
+    }
+
+    /* FX page: the five sets flow side by side (Master · Reverb · Delay, then
+       Tone · Chorus) instead of one under the other, so the short page shows
+       a whole row of cells before it scrolls. */
+    .pages > .effect-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: var(--space-xs) 12px; /* 1 + 2 + 3 cells of 72px + 2 gaps = 468px: one row at 844 wide */
+    }
+
+    .pages > .effect-controls .control-set {
+        width: auto;
+        max-width: 100%;
+        flex: 0 0 auto;
+        border-top: none;
+        padding: 0;
+    }
+
+    .pages > .effect-controls .controls-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .pages > .effect-controls .controls-grid .control-group {
+        --knob-size: 64px;
+        --fader-len: 72px;
+        width: 72px;
+        flex: 0 0 72px;
+    }
+
+    /* Type stepper shares the bar line with the logo and ⋯ */
+    .type-slot {
+        flex: 1 1 auto;
+        order: 0;
+        padding: 0 var(--space-md);
+    }
+
+    .type-stepper select {
+        max-width: 240px;
+    }
+
+    .tab-btn {
+        height: 36px;
+    }
+
+    .keyboard-controls .octave-btn {
+        min-height: 36px;
+    }
+}
+

@@ -1,0 +1,87 @@
+/*@split 01-tokens.css: Design tokens, reset and the page body (split from styles.css, no rule changes) */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Colors */
+    --bg-primary: #0a0e27;
+    --bg-secondary: #151937;
+    --bg-tertiary: #1e2749;
+    --accent-cyan: #00f0ff;
+    --accent-magenta: #ff00aa;
+    --accent-yellow: #ffeb3b;
+    --text-primary: #e8eeff;
+    --text-secondary: #a0b0d0;
+    --text-muted: #8899bb;
+    --text-muted-light: #99aacc;
+    --text-white: #ffffff;
+    --border-glow: rgba(0, 240, 255, 0.4);
+
+    /* Spacing Scale */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+
+    /* Typography Scale */
+    /* Type scale (fluid). Every font-size in the file maps to one of these. */
+    --text-2xs: clamp(0.6rem, 0.55rem + 0.25vw, 0.7rem);   /* hints, key labels */
+    --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.78rem);   /* control labels, presets, pickers, status */
+    --text-sm: clamp(0.8rem, 0.75rem + 0.3vw, 0.9rem);     /* buttons, selects, values, body copy */
+    --text-base: clamp(0.9rem, 0.85rem + 0.4vw, 1rem);     /* octave readout, overlay copy */
+    --text-lg: clamp(1rem, 0.9rem + 0.6vw, 1.25rem);       /* panel titles, current octave */
+    --text-xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+    --text-2xl: clamp(1.75rem, 1.25rem + 2.5vw, 3rem);     /* h1 */
+    --text-3xl: clamp(2.5rem, 2rem + 3vw, 4rem);           /* audio overlay title */
+    /* Tracking: tight for dense buttons, wide for uppercase mono labels, display for Orbitron titles */
+    --tracking-tight: 0.03rem;
+    --tracking-wide: 0.08rem;
+    --tracking-display: clamp(0.15rem, 0.6vw, 0.3rem);
+    /* Weights: 400 body/mono, 700 emphasis + titles, 900 hero only */
+    --weight-normal: 400;
+    --weight-bold: 700;
+    --knob-cell: 100px; /* fits HARMONICITY on one line */
+    --knob-desk: clamp(52px, 8vh, 80px); /* desktop knob size: instrument sets and effects rack alike */
+    --weight-black: 900;
+
+    /* Font Families */
+    --font-display: 'Orbitron', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+
+    /* Animation */
+    --transition-fast: 0.15s;
+    --transition-base: 0.3s;
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Border Radius */
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --radius-xl: 0;
+
+    /* Shadows & Glows */
+    --glow-cyan-soft: 0 0 20px rgba(0, 240, 255, 0.2);
+    --glow-cyan-medium: 0 0 40px rgba(0, 240, 255, 0.4);
+    --glow-cyan-strong: 0 0 60px rgba(0, 240, 255, 0.6);
+    --glow-magenta-soft: 0 0 20px rgba(255, 0, 170, 0.2);
+    --glow-magenta-medium: 0 0 40px rgba(255, 0, 170, 0.4);
+    --shadow-inset-panel: inset 0 0 60px rgba(0, 240, 255, 0.05);
+}
+
+body {
+    font-family: var(--font-mono);
+    background: #000;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+
+}
+

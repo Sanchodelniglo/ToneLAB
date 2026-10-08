@@ -72,7 +72,9 @@ ToneLAB/
                       keyboard.js (keys, octaves, touch), scope.js (oscilloscope / spectrum)
   js/crt.js           Static snow canvas
   js/pwa.js           Service worker registration, install prompt
-  styles.css          CRT effects, knob layout, responsive design
+  styles.css          entry point, @imports css/ in cascade order
+  css/                13 stylesheets (cascade order = import order) (tokens, CRT screen, panels, controls, keyboard,
+                      responsive, scope, desktop, pocket, effects rack, arp, extras, settings)
   manifest.json       PWA manifest
   service-worker.js   Offline caching (precache + stale-while-revalidate)
   fonts/              Self-hosted woff2 fonts + @font-face CSS

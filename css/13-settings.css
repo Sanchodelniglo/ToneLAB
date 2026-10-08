@@ -1,0 +1,191 @@
+/*@split 13-settings.css: Settings sheet and gear, CRT toggle chips (split from styles.css, no rule changes) */
+
+/* Four chips next to a hint do not fit a phone row: hint on top, chips under it in a 2 x 2 grid.
+   (The desktop popover stacks the row too, see the 1024px block, but keeps the chips on one line.) */
+@media (max-width: 1023px) {
+    .sheet-row:has(.crt-toggle) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+
+    .sheet-slots .view-toggle.crt-toggle {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-xs);
+    }
+
+    .sheet-slots .crt-toggle .chip {
+        min-height: 44px;
+    }
+}
+
+.sheet-slots .crt-toggle {
+    flex-wrap: wrap;
+}
+
+/* ---- Settings sheet (gear): bottom sheet on a phone, popover under the gear on desktop ---- */
+.sheet {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(5, 7, 20, 0.7);
+}
+
+.sheet[hidden] {
+    display: none;
+}
+
+.sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+
+.sheet-title {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-black);
+    letter-spacing: var(--tracking-display);
+    color: var(--accent-cyan);
+}
+
+.sheet-close {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+}
+
+.sheet-slots {
+    display: flex;
+    flex-direction: column;
+}
+
+.sheet-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid rgba(0, 240, 255, 0.1);
+}
+
+.sheet-row:first-child {
+    border-top: none;
+}
+
+/* Install only when the browser offers it (pwa.js flips the inline display) */
+.sheet-row:has(> #installBtn[style*="none"]) {
+    display: none;
+}
+
+.sheet-row-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sheet-row-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+}
+
+.sheet-row-hint {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.sheet-row > :last-child {
+    flex: 0 0 auto;
+}
+
+/* The row title replaces the select's own "Notes:" / "Layout:" label */
+.sheet-row .instrument-select label {
+    display: none;
+}
+
+.sheet-slots .view-toggle,
+.sheet-slots .scope-modes {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.sheet-slots .instrument-select {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* The sheet is a plain modal: shared box look, positioned per layout */
+.sheet-body {
+    background: linear-gradient(135deg, rgba(21, 25, 55, 0.98), rgba(30, 39, 73, 0.98));
+}
+
+/* Gear button: 44px on a phone (pocket block), 30px square in the desktop header */
+@media (min-width: 1024px) {
+    header {
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        grid-template-areas: "logo . install gear";
+    }
+
+    header .more-btn {
+        display: inline-flex;
+        grid-area: gear;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        background: transparent;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--accent-cyan);
+        cursor: pointer;
+    }
+
+    header .more-btn:hover,
+    header .more-btn[aria-expanded="true"] {
+        border-color: rgba(0, 240, 255, 0.6);
+    }
+
+    header .more-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sheet {
+        background: rgba(5, 7, 20, 0.35);
+    }
+
+    /* Narrow popover: the hint sits above the chips instead of squeezing them into a column */
+    .sheet-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+
+    .sheet-body {
+        position: absolute;
+        top: 56px;
+        right: var(--space-md);
+        width: min(420px, calc(100vw - 2 * var(--space-md)));
+        max-height: calc(100vh - 72px);
+        overflow-y: auto;
+        padding: var(--space-md);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    }
+}

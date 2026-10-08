@@ -19,7 +19,31 @@
     --text-muted: #8899bb;
     --text-muted-light: #99aacc;
     --text-white: #ffffff;
-    --border-glow: rgba(0, 240, 255, 0.4);
+    /* Colour channels: "R G B" so any alpha can be applied with rgb(var(--cyan-rgb) / 0.25).
+       The accent / panel / CRT colours that were repeated as rgba() literals all over the CSS. */
+    --cyan-rgb: 0 240 255;           /* = --accent-cyan */
+    --magenta-rgb: 255 0 170;        /* = --accent-magenta */
+    --black-rgb: 0 0 0;
+    --white-rgb: 255 255 255;
+    --glitch-blue-rgb: 0 30 255;     /* chromatic aberration: blue fringe */
+    --glitch-red-rgb: 255 0 80;      /* chromatic aberration: red fringe */
+    --panel-top-rgb: 21 25 55;       /* panel gradient, light end */
+    --panel-bottom-rgb: 30 39 73;
+    --bg-deep-rgb: 10 14 39;         /* the original --bg-primary, kept for translucent washes */
+    --bg-void-rgb: 8 11 30;
+    --overlay-rgb: 5 7 20;
+    --surface-rgb: 15 18 40;
+    --cyan-dim-rgb: 0 200 220;
+    --magenta-dark-rgb: 200 0 130;
+    --crt-dark-rgb: 18 16 16;        /* scanline / flicker tint */
+    /* Solid surfaces and neutrals used in gradients */
+    --surface-deep: #161b3d;
+    --surface-mid: #2a3270;
+    --bg-mid: #0d1428;               /* middle stop of the screen gradient */
+    --white: #fff;
+    --black: #000;
+
+    --border-glow: rgb(var(--cyan-rgb) / 0.4);
 
     /* Spacing Scale */
     --space-xs: 0.25rem;
@@ -67,17 +91,17 @@
     --radius-xl: 0;
 
     /* Shadows & Glows */
-    --glow-cyan-soft: 0 0 20px rgba(0, 240, 255, 0.2);
-    --glow-cyan-medium: 0 0 40px rgba(0, 240, 255, 0.4);
-    --glow-cyan-strong: 0 0 60px rgba(0, 240, 255, 0.6);
-    --glow-magenta-soft: 0 0 20px rgba(255, 0, 170, 0.2);
-    --glow-magenta-medium: 0 0 40px rgba(255, 0, 170, 0.4);
-    --shadow-inset-panel: inset 0 0 60px rgba(0, 240, 255, 0.05);
+    --glow-cyan-soft: 0 0 20px rgb(var(--cyan-rgb) / 0.2);
+    --glow-cyan-medium: 0 0 40px rgb(var(--cyan-rgb) / 0.4);
+    --glow-cyan-strong: 0 0 60px rgb(var(--cyan-rgb) / 0.6);
+    --glow-magenta-soft: 0 0 20px rgb(var(--magenta-rgb) / 0.2);
+    --glow-magenta-medium: 0 0 40px rgb(var(--magenta-rgb) / 0.4);
+    --shadow-inset-panel: inset 0 0 60px rgb(var(--cyan-rgb) / 0.05);
 }
 
 body {
     font-family: var(--font-mono);
-    background: #000;
+    background: var(--black);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;

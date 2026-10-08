@@ -29,7 +29,7 @@
         max-width: none;
         padding: var(--space-xs) 0;
         border: none;
-        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        border-top: 1px solid rgb(var(--cyan-rgb) / 0.08);
         background: none;
     }
 
@@ -170,8 +170,8 @@
         max-width: none;
         min-width: 0;
         padding: var(--space-xs) var(--space-xs) var(--space-sm);
-        border: 1px solid rgba(0, 240, 255, 0.12);
-        background: rgba(0, 240, 255, 0.02);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.12);
+        background: rgb(var(--cyan-rgb) / 0.02);
     }
 
     body[data-controls="knobs"] .effects-rack .control-set-title {

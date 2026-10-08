@@ -10,7 +10,7 @@
     flex-direction: column;
     gap: var(--space-xs);
     padding: var(--space-xs) var(--space-md);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+    border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.12);
 }
 
 .arp-strip[hidden] {
@@ -157,8 +157,8 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 .arp-step {
     height: 18px;
     padding: 0;
-    background: rgba(0, 240, 255, 0.35);
-    border: 1px solid rgba(0, 240, 255, 0.5);
+    background: rgb(var(--cyan-rgb) / 0.35);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.5);
     border-radius: 0;
     cursor: pointer;
     transition: background var(--transition-fast), box-shadow var(--transition-fast);
@@ -171,13 +171,13 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 
 .arp-step.off {
     background: transparent;
-    border-color: rgba(0, 240, 255, 0.2);
+    border-color: rgb(var(--cyan-rgb) / 0.2);
 }
 
 .arp-step.accent {
     background: var(--accent-magenta);
     border-color: var(--accent-magenta);
-    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+    box-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5);
 }
 
 .arp-step.beyond {
@@ -186,9 +186,9 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 }
 
 .arp-step.running {
-    background: #fff;
-    border-color: #fff;
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.9);
+    background: var(--white);
+    border-color: var(--white);
+    box-shadow: 0 0 12px rgb(var(--cyan-rgb) / 0.9);
 }
 
 /* ARP switch lit like HOLD, and the key the pattern is on */
@@ -197,15 +197,15 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     background: var(--accent-magenta);
     color: var(--bg-primary);
     border-color: var(--accent-magenta);
-    box-shadow: 0 0 25px rgba(255, 0, 170, 0.4);
+    box-shadow: 0 0 25px rgb(var(--magenta-rgb) / 0.4);
 }
 
 /* Cyan = you played it (pressed), magenta = the arp plays it, on every key */
 .key.arp-playing,
 .key.black.arp-playing {
-    background: linear-gradient(180deg, rgba(255, 0, 170, 0.7), rgba(200, 0, 130, 0.5));
+    background: linear-gradient(180deg, rgb(var(--magenta-rgb) / 0.7), rgb(var(--magenta-dark-rgb) / 0.5));
     border-color: var(--accent-magenta);
-    box-shadow: 0 0 18px rgba(255, 0, 170, 0.6);
+    box-shadow: 0 0 18px rgb(var(--magenta-rgb) / 0.6);
 }
 
 @media (min-width: 1024px) {
@@ -298,7 +298,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
         align-items: stretch;
         gap: 0;
         height: 44px;
-        border: 1px solid rgba(0, 240, 255, 0.3);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.3);
     }
 
     .arp-group .arp-label,
@@ -313,7 +313,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 
     .arp-group .chip {
         border: none;
-        border-left: 1px solid rgba(0, 240, 255, 0.2);
+        border-left: 1px solid rgb(var(--cyan-rgb) / 0.2);
         padding: 0;
         font-size: var(--text-sm);
     }
@@ -326,7 +326,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     .arp-bpm-readout {
         font-size: var(--text-md);
         color: var(--accent-magenta);
-        border-left: 1px solid rgba(0, 240, 255, 0.2);
+        border-left: 1px solid rgb(var(--cyan-rgb) / 0.2);
     }
 
     /* Gate / swing: label · slider · value on one line, the slider is the
@@ -367,9 +367,9 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 
     .arp-settings .arp-knob input[type="range"]::-webkit-slider-runnable-track {
         height: 10px;
-        border: 1px solid rgba(0, 240, 255, 0.3);
-        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(8, 11, 30, 0.95) var(--fill-percent, 0%));
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 240, 255, 0.25);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.3);
+        background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgb(var(--bg-void-rgb) / 0.95) var(--fill-percent, 0%));
+        box-shadow: inset 0 0 5px rgb(var(--black-rgb) / 0.7), 0 0 10px rgb(var(--cyan-rgb) / 0.25);
     }
 
     .arp-settings .arp-knob input[type="range"]::-webkit-slider-thumb {
@@ -379,9 +379,9 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
         margin-top: -10px;
         background:
             linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
-            linear-gradient(to bottom, #2a3270, #161b3d);
-        border: 1px solid rgba(255, 0, 170, 0.8);
-        box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+            linear-gradient(to bottom, var(--surface-mid), var(--surface-deep));
+        border: 1px solid rgb(var(--magenta-rgb) / 0.8);
+        box-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5), 0 2px 4px rgb(var(--black-rgb) / 0.6);
     }
 
     .arp-settings .arp-knob .control-hint {
@@ -402,7 +402,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     }
 
     .arp-step.accent {
-        box-shadow: 0 0 10px rgba(255, 0, 170, 0.6), inset 0 -5px 0 rgba(255, 255, 255, 0.35);
+        box-shadow: 0 0 10px rgb(var(--magenta-rgb) / 0.6), inset 0 -5px 0 rgb(var(--white-rgb) / 0.35);
     }
 
 }

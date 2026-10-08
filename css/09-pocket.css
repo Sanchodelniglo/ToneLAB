@@ -74,7 +74,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         margin: 0;
         padding: 6px var(--space-md) 6px var(--space-md);
         padding-top: calc(6px + env(safe-area-inset-top, 0));
-        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.15);
         text-align: left;
     }
 
@@ -113,7 +113,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         width: 44px;
         height: 44px;
         opacity: 1;
-        border-color: rgba(0, 240, 255, 0.25);
+        border-color: rgb(var(--cyan-rgb) / 0.25);
         color: var(--accent-cyan);
         font-size: var(--text-sm);
     }
@@ -158,7 +158,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         height: 44px;
         padding: 0;
         background: transparent;
-        border: 1px solid rgba(0, 240, 255, 0.25);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.25);
         color: var(--accent-cyan);
         font-family: var(--font-mono);
         font-size: var(--text-xs);
@@ -174,7 +174,7 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     .step-btn:active,
     .more-btn:active {
-        background: rgba(0, 240, 255, 0.15);
+        background: rgb(var(--cyan-rgb) / 0.15);
     }
 
     /* ---- scope strip: swipe left / right = preset ---- */
@@ -185,7 +185,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         padding: 0;
         margin: 0;
         border: none;
-        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.15);
         touch-action: pan-y;
     }
 
@@ -248,14 +248,14 @@ body[data-key-labels="off"] .keyboard-key-label {
         letter-spacing: var(--tracking-wide);
         text-transform: uppercase;
         color: var(--accent-magenta);
-        text-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+        text-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5);
     }
 
     /* ---- tabs ---- */
     .tab-bar {
         grid-area: tabs;
         display: flex;
-        border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+        border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.15);
         overflow-x: auto;
         scrollbar-width: none;
     }
@@ -283,7 +283,7 @@ body[data-key-labels="off"] .keyboard-key-label {
     .tab-btn[aria-selected="true"] {
         color: var(--accent-cyan);
         border-bottom-color: var(--accent-cyan);
-        text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        text-shadow: 0 0 8px rgb(var(--cyan-rgb) / 0.5);
     }
 
     /* ---- pages carousel ---- */
@@ -462,7 +462,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         max-width: 100%;
         padding: var(--space-xs) 0;
         border: none;
-        border-top: 1px solid rgba(0, 240, 255, 0.08);
+        border-top: 1px solid rgb(var(--cyan-rgb) / 0.08);
         background: none;
     }
 
@@ -515,26 +515,26 @@ body[data-key-labels="off"] .keyboard-key-label {
         touch-action: none;
         user-select: none;
         cursor: crosshair;
-        border: 1px solid rgba(0, 240, 255, 0.35);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.35);
         background:
-            repeating-linear-gradient(to right, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 12.5%),
-            repeating-linear-gradient(to bottom, rgba(0, 240, 255, 0.08) 0 1px, transparent 1px 25%),
-            radial-gradient(ellipse at center, rgba(0, 240, 255, 0.06), transparent 70%),
-            rgba(8, 11, 30, 0.9);
-        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+            repeating-linear-gradient(to right, rgb(var(--cyan-rgb) / 0.08) 0 1px, transparent 1px 12.5%),
+            repeating-linear-gradient(to bottom, rgb(var(--cyan-rgb) / 0.08) 0 1px, transparent 1px 25%),
+            radial-gradient(ellipse at center, rgb(var(--cyan-rgb) / 0.06), transparent 70%),
+            rgb(var(--bg-void-rgb) / 0.9);
+        box-shadow: inset 0 0 30px rgb(var(--black-rgb) / 0.6);
         overflow: hidden;
     }
 
     .xy-pad.is-active {
         border-color: var(--accent-magenta);
-        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 0, 170, 0.3);
+        box-shadow: inset 0 0 30px rgb(var(--black-rgb) / 0.6), 0 0 16px rgb(var(--magenta-rgb) / 0.3);
     }
 
     .xy-cross-x,
     .xy-cross-y {
         position: absolute;
         pointer-events: none;
-        background: rgba(255, 0, 170, 0.45);
+        background: rgb(var(--magenta-rgb) / 0.45);
     }
 
     .xy-cross-x {
@@ -559,8 +559,8 @@ body[data-key-labels="off"] .keyboard-key-label {
         top: calc(var(--y) * 100%);
         transform: translate(-50%, -50%);
         border: 2px solid var(--accent-magenta);
-        background: rgba(255, 0, 170, 0.25);
-        box-shadow: 0 0 12px rgba(255, 0, 170, 0.7);
+        background: rgb(var(--magenta-rgb) / 0.25);
+        box-shadow: 0 0 12px rgb(var(--magenta-rgb) / 0.7);
         pointer-events: none;
     }
 
@@ -595,9 +595,9 @@ body[data-key-labels="off"] .keyboard-key-label {
         margin: 0;
         padding: 0 0 env(safe-area-inset-bottom, 0);
         border: none;
-        border-top: 1px solid rgba(0, 240, 255, 0.2);
+        border-top: 1px solid rgb(var(--cyan-rgb) / 0.2);
         border-radius: 0;
-        background: linear-gradient(180deg, rgba(10, 14, 39, 0.98), rgba(15, 18, 40, 1));
+        background: linear-gradient(180deg, rgb(var(--bg-deep-rgb) / 0.98), rgb(var(--surface-rgb) / 1));
         backdrop-filter: none;
         box-shadow: none;
     }
@@ -704,9 +704,9 @@ body[data-key-labels="off"] .keyboard-key-label {
         max-height: 85dvh;
         overflow-y: auto;
         padding: var(--space-md) var(--space-md) calc(var(--space-lg) + env(safe-area-inset-bottom, 0));
-        background: linear-gradient(135deg, rgba(21, 25, 55, 0.98), rgba(30, 39, 73, 0.98));
-        border-top: 1px solid rgba(0, 240, 255, 0.4);
-        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+        background: linear-gradient(135deg, rgb(var(--panel-top-rgb) / 0.98), rgb(var(--panel-bottom-rgb) / 0.98));
+        border-top: 1px solid rgb(var(--cyan-rgb) / 0.4);
+        box-shadow: 0 -8px 40px rgb(var(--black-rgb) / 0.6);
     }
 }
 
@@ -720,7 +720,7 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     .scope-block {
         height: auto;
-        border-right: 1px solid rgba(0, 240, 255, 0.15);
+        border-right: 1px solid rgb(var(--cyan-rgb) / 0.15);
     }
 
     .key {

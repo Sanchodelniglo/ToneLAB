@@ -6,12 +6,12 @@
     gap: 2px;
     margin: clamp(0.75rem, 2vw, 1.5rem) 0;
     padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2.5vw, 1.5rem) clamp(1rem, 2.5vw, 1.5rem);
-    background: linear-gradient(180deg, rgba(10, 14, 39, 0.95), rgba(15, 18, 40, 0.98));
+    background: linear-gradient(180deg, rgb(var(--bg-deep-rgb) / 0.95), rgb(var(--surface-rgb) / 0.98));
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(0, 240, 255, 0.2);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.2);
     box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(0, 240, 255, 0.1);
+        0 8px 30px rgb(var(--black-rgb) / 0.4),
+        inset 0 1px 0 rgb(var(--cyan-rgb) / 0.1);
     position: relative;
     overflow-x: auto;
 }
@@ -26,13 +26,13 @@
     width: 40px;
     height: 160px;
     background: linear-gradient(180deg, rgba(55, 65, 110, 0.95), rgba(40, 48, 85, 0.98));
-    border: 1px solid rgba(0, 240, 255, 0.4);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.4);
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     cursor: pointer;
     transition: background var(--transition-fast) var(--ease-out), border-color var(--transition-fast) var(--ease-out), transform var(--transition-fast) var(--ease-out), box-shadow var(--transition-fast) var(--ease-out);
     box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.4),
-        inset 0 -20px 30px rgba(0, 240, 255, 0.05);
+        0 4px 12px rgb(var(--black-rgb) / 0.4),
+        inset 0 -20px 30px rgb(var(--cyan-rgb) / 0.05);
 }
 
 .key:hover {
@@ -40,17 +40,17 @@
     border-color: var(--accent-cyan);
     transform: translateY(-3px);
     box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.5),
-        0 0 20px rgba(0, 240, 255, 0.3);
+        0 8px 20px rgb(var(--black-rgb) / 0.5),
+        0 0 20px rgb(var(--cyan-rgb) / 0.3);
 }
 
 .key:active {
-    background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(0, 200, 220, 0.6));
+    background: linear-gradient(180deg, rgb(var(--cyan-rgb) / 0.7), rgb(var(--cyan-dim-rgb) / 0.6));
     border-color: var(--accent-cyan);
     transform: translateY(2px);
     box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(0, 240, 255, 0.4);
+        0 1px 4px rgb(var(--black-rgb) / 0.3),
+        0 0 25px rgb(var(--cyan-rgb) / 0.4);
 }
 
 .key:focus-visible {
@@ -66,27 +66,27 @@
     margin: 0 -15px;
     z-index: 10;
     border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    border-color: rgba(255, 0, 170, 0.4);
+    border-color: rgb(var(--magenta-rgb) / 0.4);
     box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.6),
-        inset 0 -15px 25px rgba(255, 0, 170, 0.05);
+        0 4px 12px rgb(var(--black-rgb) / 0.6),
+        inset 0 -15px 25px rgb(var(--magenta-rgb) / 0.05);
 }
 
 .key.black:hover {
     background: linear-gradient(180deg, rgba(25, 15, 40, 1), rgba(15, 8, 30, 1));
     border-color: var(--accent-magenta);
     box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.6),
-        0 0 15px rgba(255, 0, 170, 0.3);
+        0 8px 20px rgb(var(--black-rgb) / 0.6),
+        0 0 15px rgb(var(--magenta-rgb) / 0.3);
 }
 
 .key.black:active {
-    background: linear-gradient(180deg, rgba(255, 0, 170, 0.7), rgba(200, 0, 130, 0.5));
+    background: linear-gradient(180deg, rgb(var(--magenta-rgb) / 0.7), rgb(var(--magenta-dark-rgb) / 0.5));
     border-color: var(--accent-magenta);
     transform: translateY(2px);
     box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(255, 0, 170, 0.3);
+        0 1px 4px rgb(var(--black-rgb) / 0.3),
+        0 0 20px rgb(var(--magenta-rgb) / 0.3);
 }
 
 .note-label {
@@ -118,10 +118,10 @@
     font-size: var(--text-2xs);
     font-weight: var(--weight-normal);
     color: var(--accent-cyan);
-    background: rgba(0, 240, 255, 0.08);
+    background: rgb(var(--cyan-rgb) / 0.08);
     padding: 2px 5px;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(0, 240, 255, 0.35);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.35);
     text-transform: uppercase;
     letter-spacing: var(--tracking-tight);
     transition: color var(--transition-fast), border-color var(--transition-fast);
@@ -129,49 +129,49 @@
 
 .key:hover .keyboard-key-label {
     color: var(--text-white);
-    border-color: rgba(0, 240, 255, 0.7);
+    border-color: rgb(var(--cyan-rgb) / 0.7);
 }
 
 .key.black .keyboard-key-label {
     color: var(--accent-magenta);
-    background: rgba(255, 0, 170, 0.08);
-    border-color: rgba(255, 0, 170, 0.35);
+    background: rgb(var(--magenta-rgb) / 0.08);
+    border-color: rgb(var(--magenta-rgb) / 0.35);
 }
 
 .key.black:hover .keyboard-key-label {
     color: var(--text-white);
-    border-color: rgba(255, 0, 170, 0.7);
+    border-color: rgb(var(--magenta-rgb) / 0.7);
 }
 
 .key.pressed {
-    background: linear-gradient(180deg, rgba(0, 240, 255, 0.8), rgba(0, 200, 220, 0.6));
+    background: linear-gradient(180deg, rgb(var(--cyan-rgb) / 0.8), rgb(var(--cyan-dim-rgb) / 0.6));
     border-color: var(--accent-cyan);
     transform: translateY(2px);
     box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(0, 240, 255, 0.4);
+        0 1px 4px rgb(var(--black-rgb) / 0.3),
+        0 0 25px rgb(var(--cyan-rgb) / 0.4);
 }
 
 .key.pressed .keyboard-key-label {
     color: var(--bg-primary);
-    background: rgba(255, 255, 255, 0.15);
+    background: rgb(var(--white-rgb) / 0.15);
     border-color: transparent;
 }
 
 /* Black keys press the same cyan as white ones: one colour = "you played it" */
 .key.black.pressed {
-    background: linear-gradient(180deg, rgba(0, 240, 255, 0.8), rgba(0, 200, 220, 0.6));
+    background: linear-gradient(180deg, rgb(var(--cyan-rgb) / 0.8), rgb(var(--cyan-dim-rgb) / 0.6));
     border-color: var(--accent-cyan);
     box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(0, 240, 255, 0.4);
+        0 1px 4px rgb(var(--black-rgb) / 0.3),
+        0 0 25px rgb(var(--cyan-rgb) / 0.4);
 }
 
 
 button {
     background: var(--bg-tertiary);
     color: var(--text-primary);
-    border: 1px solid rgba(0, 240, 255, 0.3);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.3);
     padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
@@ -184,7 +184,7 @@ button {
 
 button:hover {
     border-color: var(--accent-cyan);
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 12px rgb(var(--cyan-rgb) / 0.2);
     transform: translateY(-1px);
 }
 
@@ -217,14 +217,14 @@ button:focus-visible {
 }
 
 .wave-select:hover {
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 30px rgb(var(--cyan-rgb) / 0.4);
     transform: translateY(-2px);
 }
 
 .wave-select:focus {
     outline: 2px solid var(--accent-magenta);
     outline-offset: 2px;
-    box-shadow: 0 0 40px rgba(0, 240, 255, 0.6);
+    box-shadow: 0 0 40px rgb(var(--cyan-rgb) / 0.6);
     border-color: var(--accent-magenta);
 }
 
@@ -256,7 +256,7 @@ button:focus-visible {
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
     color: var(--bg-primary);
     transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 25px rgb(var(--cyan-rgb) / 0.4);
 }
 
 .octave-btn:active {
@@ -268,7 +268,7 @@ button:focus-visible {
 .hold-btn[aria-pressed="true"]:hover {
     background: var(--accent-cyan);
     color: var(--bg-primary);
-    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 25px rgb(var(--cyan-rgb) / 0.4);
 }
 
 .octave-display {
@@ -288,10 +288,10 @@ button:focus-visible {
 .info-display {
     text-align: center;
     padding: clamp(0.5rem, 1.2vw, 0.7rem);
-    background: rgba(0, 240, 255, 0.03);
+    background: rgb(var(--cyan-rgb) / 0.03);
     border-radius: var(--radius-md);
     margin-top: clamp(0.75rem, 2vw, 1.25rem);
-    border: 1px solid rgba(0, 240, 255, 0.12);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.12);
 }
 
 .info-display p {

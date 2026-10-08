@@ -79,7 +79,7 @@
         z-index: 100;
         margin-bottom: 0;
         padding-bottom: env(safe-area-inset-bottom, 0);
-        background: linear-gradient(135deg, var(--bg-primary) 0%, #0d1428 50%, var(--bg-secondary) 100%);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-mid) 50%, var(--bg-secondary) 100%);
         width: 100vw;
         margin-left: calc(-50vw + 50%);
     }
@@ -140,7 +140,7 @@
         cursor: not-allowed;
         background: var(--bg-tertiary);
         color: var(--text-muted);
-        border-color: rgba(0, 240, 255, 0.2);
+        border-color: rgb(var(--cyan-rgb) / 0.2);
         box-shadow: none;
     }
 

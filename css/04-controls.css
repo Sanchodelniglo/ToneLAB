@@ -19,8 +19,8 @@
     flex: 1 0 auto; /* exact cell width, then stretch to tile the row */
     max-width: 100%;
     padding: var(--space-sm);
-    border: 1px solid rgba(0, 240, 255, 0.12);
-    background: rgba(0, 240, 255, 0.02);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.12);
+    background: rgb(var(--cyan-rgb) / 0.02);
 }
 
 .control-set-title {
@@ -124,7 +124,7 @@
     order: 0;
     margin-bottom: 2px;
     letter-spacing: 0;
-    text-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    text-shadow: 0 0 6px rgb(var(--magenta-rgb) / 0.5);
 }
 
 /* Hint = overlay popover on the card. Never affects layout: shown on hover /
@@ -139,9 +139,9 @@
     z-index: 5;
     margin: 0;
     padding: 0.6rem 0.75rem;
-    background: rgba(21, 25, 55, 0.97);
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+    background: rgb(var(--panel-top-rgb) / 0.97);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.4);
+    box-shadow: 0 0 16px rgb(var(--cyan-rgb) / 0.2);
     font-family: var(--font-body);
     font-size: var(--text-sm);
     color: var(--text-primary);
@@ -178,7 +178,7 @@
     height: 14px;
     opacity: 0.35;
     padding: 0;
-    border: 1px solid rgba(0, 240, 255, 0.25);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.25);
     border-radius: 0;
     background: transparent;
     color: var(--text-muted);
@@ -205,7 +205,7 @@
 .help-btn:hover,
 .help-btn:focus-visible {
     color: var(--accent-cyan);
-    border-color: rgba(0, 240, 255, 0.6);
+    border-color: rgb(var(--cyan-rgb) / 0.6);
 }
 
 .help-btn[aria-expanded="true"] {
@@ -241,19 +241,19 @@ input[type="range"]:focus-visible {
 /* Track: cyan fill up to --fill-percent (set by updateSliderFill), dark remainder */
 input[type="range"]::-webkit-slider-runnable-track {
     height: 4px;
-    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(30, 39, 73, 0.9) var(--fill-percent, 0%));
-    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgb(var(--panel-bottom-rgb) / 0.9) var(--fill-percent, 0%));
+    box-shadow: 0 0 6px rgb(var(--cyan-rgb) / 0.25);
 }
 
 input[type="range"]::-moz-range-track {
     height: 4px;
-    background: rgba(30, 39, 73, 0.9);
+    background: rgb(var(--panel-bottom-rgb) / 0.9);
 }
 
 input[type="range"]::-moz-range-progress {
     height: 4px;
     background: var(--accent-cyan);
-    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+    box-shadow: 0 0 6px rgb(var(--cyan-rgb) / 0.25);
 }
 
 /* Thumb: square fader cap, magenta like the knob indicator */
@@ -265,7 +265,7 @@ input[type="range"]::-webkit-slider-thumb {
     margin-top: -7px;
     background: var(--bg-tertiary);
     border: 1px solid var(--accent-magenta);
-    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    box-shadow: 0 0 6px rgb(var(--magenta-rgb) / 0.5);
     transition: box-shadow var(--transition-fast);
 }
 
@@ -275,12 +275,12 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 0;
     background: var(--bg-tertiary);
     border: 1px solid var(--accent-magenta);
-    box-shadow: 0 0 6px rgba(255, 0, 170, 0.5);
+    box-shadow: 0 0 6px rgb(var(--magenta-rgb) / 0.5);
 }
 
 input[type="range"]:hover::-webkit-slider-thumb,
 input[type="range"]:active::-webkit-slider-thumb {
-    box-shadow: 0 0 12px rgba(255, 0, 170, 0.8);
+    box-shadow: 0 0 12px rgb(var(--magenta-rgb) / 0.8);
 }
 
 /* ---- Slider mode (user toggle): vertical faders replace the knobs ----
@@ -309,22 +309,22 @@ body[data-controls="sliders"] .control-group input[type="range"] {
 /* Fader track: deep slot with a glowing fill */
 body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider-runnable-track {
     height: 10px;
-    border: 1px solid rgba(0, 240, 255, 0.3);
-    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgba(8, 11, 30, 0.95) var(--fill-percent, 0%));
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 240, 255, 0.25);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.3);
+    background: linear-gradient(to right, var(--accent-cyan) var(--fill-percent, 0%), rgb(var(--bg-void-rgb) / 0.95) var(--fill-percent, 0%));
+    box-shadow: inset 0 0 5px rgb(var(--black-rgb) / 0.7), 0 0 10px rgb(var(--cyan-rgb) / 0.25);
 }
 
 body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-track {
     height: 10px;
-    border: 1px solid rgba(0, 240, 255, 0.3);
-    background: rgba(8, 11, 30, 0.95);
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.3);
+    background: rgb(var(--bg-void-rgb) / 0.95);
+    box-shadow: inset 0 0 5px rgb(var(--black-rgb) / 0.7);
 }
 
 body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-progress {
     height: 10px;
     background: var(--accent-cyan);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 10px rgb(var(--cyan-rgb) / 0.4);
 }
 
 /* Fader cap: tall block with a magenta centre line */
@@ -334,9 +334,9 @@ body[data-controls="sliders"] .control-group input[type="range"]::-webkit-slider
     margin-top: -10px;
     background:
         linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
-        linear-gradient(to bottom, #2a3270, #161b3d);
-    border: 1px solid rgba(255, 0, 170, 0.8);
-    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+        linear-gradient(to bottom, var(--surface-mid), var(--surface-deep));
+    border: 1px solid rgb(var(--magenta-rgb) / 0.8);
+    box-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5), 0 2px 4px rgb(var(--black-rgb) / 0.6);
 }
 
 body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-thumb {
@@ -344,9 +344,9 @@ body[data-controls="sliders"] .control-group input[type="range"]::-moz-range-thu
     height: 28px;
     background:
         linear-gradient(to right, transparent 43%, var(--accent-magenta) 43%, var(--accent-magenta) 57%, transparent 57%),
-        linear-gradient(to bottom, #2a3270, #161b3d);
-    border: 1px solid rgba(255, 0, 170, 0.8);
-    box-shadow: 0 0 8px rgba(255, 0, 170, 0.5), 0 2px 4px rgba(0, 0, 0, 0.6);
+        linear-gradient(to bottom, var(--surface-mid), var(--surface-deep));
+    border: 1px solid rgb(var(--magenta-rgb) / 0.8);
+    box-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5), 0 2px 4px rgb(var(--black-rgb) / 0.6);
 }
 
 body[data-controls="sliders"] .wave-select {
@@ -378,7 +378,7 @@ body[data-controls="sliders"] .wave-select {
 
 .knob-track {
     fill: none;
-    stroke: rgba(0, 240, 255, 0.14);
+    stroke: rgb(var(--cyan-rgb) / 0.14);
     stroke-width: 4;
     stroke-linecap: butt;
 }
@@ -388,12 +388,12 @@ body[data-controls="sliders"] .wave-select {
     stroke: var(--accent-cyan);
     stroke-width: 4;
     stroke-linecap: butt;
-    filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.55));
+    filter: drop-shadow(0 0 3px rgb(var(--cyan-rgb) / 0.55));
 }
 
 .knob-body {
-    fill: #161b3d;
-    stroke: rgba(0, 240, 255, 0.28);
+    fill: var(--surface-deep);
+    stroke: rgb(var(--cyan-rgb) / 0.28);
     stroke-width: 1;
     transition: stroke var(--transition-fast), fill var(--transition-fast);
 }
@@ -401,8 +401,8 @@ body[data-controls="sliders"] .wave-select {
 .knob-container:hover .knob-body,
 .knob-container.is-dragging .knob-body {
     fill: #1c2350;
-    stroke: rgba(0, 240, 255, 0.7);
-    filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.25));
+    stroke: rgb(var(--cyan-rgb) / 0.7);
+    filter: drop-shadow(0 0 6px rgb(var(--cyan-rgb) / 0.25));
 }
 
 .knob-container:focus-visible .knob-body {
@@ -414,11 +414,11 @@ body[data-controls="sliders"] .wave-select {
     stroke: var(--accent-magenta);
     stroke-width: 2.5;
     stroke-linecap: round;
-    filter: drop-shadow(0 0 4px rgba(255, 0, 170, 0.6));
+    filter: drop-shadow(0 0 4px rgb(var(--magenta-rgb) / 0.6));
 }
 
 .knob-notch {
-    stroke: rgba(0, 240, 255, 0.3);
+    stroke: rgb(var(--cyan-rgb) / 0.3);
     stroke-width: 1;
 }
 

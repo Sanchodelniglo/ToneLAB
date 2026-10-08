@@ -45,6 +45,7 @@
     --weight-normal: 400;
     --weight-bold: 700;
     --knob-cell: 100px; /* fits HARMONICITY on one line */
+    --knob-desk: clamp(52px, 8vh, 80px); /* desktop knob size: instrument sets and effects rack alike */
     --weight-black: 900;
 
     /* Font Families */
@@ -2458,9 +2459,14 @@ body[data-key-labels="off"] .keyboard-key-label {
     }
 
     .pages .control-group {
-        --knob-size: 84px;
-        --fader-len: 92px;
+        --knob-size: 72px;   /* same as the FX page: one size per device */
+        --fader-len: 80px;
         width: 100%;
+    }
+
+    /* The sliders-mode default (76px) outranks the line above: restate it so faders match the FX page */
+    body[data-controls="sliders"] .pages .control-group {
+        --fader-len: 80px;
     }
 
     /* Thumb-sized text and targets: readouts, names, ? and set titles.
@@ -2952,7 +2958,28 @@ body[data-key-labels="off"] .keyboard-key-label {
     }
 
     .pages .controls-grid {
-        grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    }
+
+    /* "0.05 Sec" plus the ? was 88px wide in a 72px cell and ran into the next cell:
+       smaller readout, smaller ?, slightly wider cells */
+    .pages .control-value {
+        font-size: var(--text-xs);
+    }
+
+    .pages .control-group:has(.knob-container) .help-btn {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Same knob and fader size as the FX page in landscape (64 / 72) */
+    .pages .control-group {
+        --knob-size: 64px;
+        --fader-len: 72px;
+    }
+
+    body[data-controls="sliders"] .pages .control-group {
+        --fader-len: 72px;
     }
 
     /* FX page: the five sets flow side by side (Master · Reverb · Delay, then
@@ -3200,7 +3227,7 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     /* Cell = small grid: readout and ? paired on top, knob, name */
     body[data-controls="knobs"] .effects-rack .controls-grid .control-group {
-        --knob-size: clamp(52px, 8vh, 80px);
+        --knob-size: var(--knob-desk);
         width: 100%;
         max-width: none;
         min-width: 0;
@@ -3706,6 +3733,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 .env-preview {
     position: relative;
     width: 100%;
+    flex-shrink: 0; /* never let a short flex column squash it */
     height: 64px;
     margin: 2px 0 6px;
     overflow: hidden;
@@ -3790,6 +3818,63 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     .env-preview { height: 84px; }
 }
 
+/* Short landscape: the page is only ~150px tall and the knobs fill it, so a stacked
+   preview was squeezed to 2px. Wide enough: preview beside the knobs. Too narrow: no preview. */
 @media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
-    .env-preview { height: 44px; margin-bottom: 2px; }
+    .env-preview { display: none; }
+}
+
+@media (min-width: 800px) and (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+    .pages > #controls > .control-set:has(> .env-preview) {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 14px; /* room between the curve and the first knob */
+    }
+
+    .pages > #controls > .control-set > .env-preview {
+        display: block;
+        flex: 1 1 100px;
+        min-width: 100px;
+        height: auto;
+        margin: 0;
+    }
+
+    /* 78px cells and 6px gaps, wider than the 4px of the other pages, so the knobs
+       breathe next to the curve. The width is exact so the grid keeps its columns. */
+    .pages > #controls > .control-set:has(> .env-preview) > .controls-grid {
+        flex: 0 0 auto;
+        column-gap: 6px;
+        width: calc(var(--cols, 4) * 78px + (var(--cols, 4) - 1) * 6px);
+    }
+}
+
+/* Wide desktop: the envelope preview sits to the right of the knobs / faders, title on top.
+   Under 1200px the controls column is too narrow for four knobs plus a preview, so it
+   stays stacked above them. */
+@media (min-width: 1200px) {
+    .control-set:has(> .env-preview) {
+        display: grid;
+        grid-template-columns: auto minmax(120px, 1fr);
+        grid-template-areas:
+            "title title"
+            "grid  env";
+        column-gap: var(--space-md);
+    }
+
+    .control-set:has(> .env-preview) > .control-set-title { grid-area: title; }
+    .control-set:has(> .env-preview) > .controls-grid { grid-area: grid; }
+
+    .control-set > .env-preview {
+        grid-area: env;
+        height: auto;
+        min-height: 64px;
+        margin: 0;
+    }
+}
+
+/* Desktop: instrument knobs match the effects rack (same --knob-desk) */
+@media (min-width: 1024px) {
+    #controls .control-group {
+        --knob-size: var(--knob-desk);
+    }
 }

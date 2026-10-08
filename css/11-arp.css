@@ -191,14 +191,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     box-shadow: 0 0 12px rgb(var(--cyan-rgb) / 0.9);
 }
 
-/* ARP switch lit like HOLD, and the key the pattern is on */
-.arp-btn[aria-pressed="true"],
-.arp-btn[aria-pressed="true"]:hover {
-    background: var(--accent-magenta);
-    color: var(--bg-primary);
-    border-color: var(--accent-magenta);
-    box-shadow: 0 0 25px rgb(var(--magenta-rgb) / 0.4);
-}
+/* The ARP switch lights like an active chip (css/05-keyboard.css); below: the key the pattern is on */
 
 /* Cyan = you played it (pressed), magenta = the arp plays it, on every key */
 .key.arp-playing,

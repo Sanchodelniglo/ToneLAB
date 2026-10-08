@@ -652,7 +652,6 @@ body[data-key-labels="off"] .keyboard-key-label {
     .keyboard-controls .octave-btn {
         min-height: 44px;
         padding: 0 var(--space-md);
-        font-size: var(--text-sm);
     }
 
     .keyboard-controls .octave-display {

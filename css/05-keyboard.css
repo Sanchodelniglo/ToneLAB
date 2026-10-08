@@ -242,33 +242,41 @@ button:focus-visible {
 }
 
 .octave-btn {
-    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem);
-    font-size: var(--text-sm);
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 2px solid var(--accent-cyan);
+    /* Same skin as every chip (.preset-btn): flat, outlined, mono caps; sizes come from the layout rules */
+    padding: clamp(0.4rem, 1.2vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.15);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-tight);
+    white-space: nowrap;
     cursor: pointer;
-    transition: background var(--transition-base), color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
-    box-shadow: var(--glow-cyan-soft);
+    transition: all var(--transition-fast) var(--ease-out);
 }
 
 .octave-btn:hover {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-    color: var(--bg-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px rgb(var(--cyan-rgb) / 0.4);
+    border-color: rgb(var(--cyan-rgb) / 0.5);
+    color: var(--cyan-text);
+    background: rgb(var(--cyan-rgb) / 0.05);
 }
 
-.octave-btn:active {
-    transform: translateY(0);
+.octave-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
-/* HOLD (latch): engaged = lit solid cyan with dark text, like a hardware switch */
+/* HOLD / ARP switches: engaged = the same lit look as an active chip (.preset-btn.active) */
 .hold-btn[aria-pressed="true"],
-.hold-btn[aria-pressed="true"]:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
-    box-shadow: 0 0 25px rgb(var(--cyan-rgb) / 0.4);
+.hold-btn[aria-pressed="true"]:hover,
+.arp-btn[aria-pressed="true"],
+.arp-btn[aria-pressed="true"]:hover {
+    background: rgb(var(--cyan-rgb) / 0.1);
+    border-color: var(--accent-cyan);
+    color: var(--cyan-text);
+    box-shadow: 0 0 10px rgb(var(--cyan-rgb) / 0.2);
 }
 
 .octave-display {

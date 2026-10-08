@@ -136,12 +136,9 @@
     }
 
     .keyboard-controls .octave-btn:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        background: var(--bg-tertiary);
+        background: transparent;
         color: var(--text-muted);
-        border-color: rgb(var(--cyan-rgb) / 0.2);
-        box-shadow: none;
+        border-color: rgb(var(--cyan-rgb) / 0.15);
     }
 
     .keyboard-controls .octave-display {

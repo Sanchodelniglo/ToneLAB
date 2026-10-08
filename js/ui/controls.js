@@ -112,7 +112,7 @@ document.addEventListener('dblclick', (e) => {
 // named set, with a few per-synth overrides where the same id means something
 // else (MetalSynth's harmonicity is tone colour, not an operator ratio).
 const GROUP_BY_ID = {
-    oscType: 'Oscillator', volume: 'Oscillator',
+    oscType: 'Oscillator', spread: 'Oscillator', volume: 'Oscillator',
     attack: 'Envelope', decay: 'Envelope', sustain: 'Envelope', release: 'Envelope',
     harmonicity: 'Operators', modulationIndex: 'Operators', modType: 'Operators',
     modAttack: 'Mod Envelope', modRelease: 'Mod Envelope',
@@ -131,7 +131,7 @@ const GROUP_OVERRIDES = {
     MembraneSynth: { oscType: 'Pitch' },
     MetalSynth: { harmonicity: 'Tone', modulationIndex: 'Tone', octaves: 'Tone' },
     PluckSynth: { resonance: 'String' },
-    DuoSynth: { harmonicity: 'Voices' }
+    DuoSynth: { harmonicity: 'Voices', spread: 'Voices' }
 };
 function groupFor(type, id) {
     return GROUP_OVERRIDES[type]?.[id] || GROUP_BY_ID[id] || 'Controls';
@@ -201,10 +201,14 @@ function updateControls(type) {
                                 'square3', 'square5', 'square7',
                                 'triangle3', 'triangle5', 'triangle7',
                                 'sawtooth2', 'sawtooth3', 'sawtooth4', 'sawtooth5', 'sawtooth6', 'sawtooth7', 'sawtooth8'];
+    // "fat<shape>" = 3 detuned copies (unison) for supersaw leads and pads; the Spread knob sets the detune.
+    // Only on the plain-oscillator synths, where a thick voice is the point.
+    const fatWaveforms = [...extendedWaveforms, 'fatsine', 'fattriangle', 'fatsquare', 'fatsawtooth'];
 
     // Human-readable descriptions for each parameter
     const descs = {
-        oscType: 'Wave shape \u2014 sine is pure, triangle soft, square hollow, sawtooth bright; numbered ones keep only those harmonics, so fewer = softer.',
+        oscType: 'Wave shape \u2014 sine is pure, triangle soft, square hollow, sawtooth bright; numbered ones keep only those harmonics, so fewer = softer; fat ones stack 3 detuned copies.',
+        spread: 'Detune between the 3 copies of a fat wave, in cents \u2014 only works on fat waves; try 20-30 for a lush supersaw, 60+ for a sour swarm.',
         attack: 'Fade-in time \u2014 low hits instantly, high swells in; try 0.01s for stabs and drums, 1s+ for slow pads.',
         decay: 'Time to fall from the peak to the sustain level \u2014 try 0.1s for snappy plucks, 1s+ for ringing keys.',
         sustain: 'Level held while the key is down \u2014 0 makes a pluck that dies away, 0.8+ gives a steady organ-like note.',
@@ -236,7 +240,8 @@ function updateControls(type) {
 
     const controlSets = {
         'Synth': [
-            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
+            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: fatWaveforms, default: 'sine' },
+            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
@@ -286,7 +291,8 @@ function updateControls(type) {
             { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 0.2, suffix: ' Sec' }
         ],
         'MonoSynth': [
-            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'square' },
+            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: fatWaveforms, default: 'square' },
+            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
             { name: 'Filter Q', id: 'filterQ', min: 0, max: 20, step: 0.1, default: 6 },
             { name: 'Filter Cutoff', id: 'filterCutoff', min: 20, max: 20000, step: 10, default: 1000, suffix: ' Hz' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
@@ -311,7 +317,8 @@ function updateControls(type) {
             { name: 'Resonance', id: 'resonance', min: 0, max: 1, step: 0.01, default: 0.7 }
         ],
         'PolySynth': [
-            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
+            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: fatWaveforms, default: 'sine' },
+            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
@@ -321,8 +328,9 @@ function updateControls(type) {
             { name: 'Vibrato Amount', id: 'vibratoAmount', min: 0, max: 1, step: 0.01, default: 0.5 },
             { name: 'Vibrato Rate', id: 'vibratoRate', min: 0, max: 20, step: 0.1, default: 5, suffix: ' Hz' },
             { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.01, default: 1.5 },
-            { name: 'Voice 0 Osc', id: 'voice0Type', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Voice 1 Osc', id: 'voice1Type', type: 'wave', values: extendedWaveforms, default: 'sine' },
+            { name: 'Voice 0 Osc', id: 'voice0Type', type: 'wave', values: fatWaveforms, default: 'sine' },
+            { name: 'Voice 1 Osc', id: 'voice1Type', type: 'wave', values: fatWaveforms, default: 'sine' },
+            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },

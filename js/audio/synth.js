@@ -28,6 +28,7 @@ function initSynth(type) {
     }
 
     const synthConfig = getSynthConfig(type);
+    state.oscSpread = 20; // the Spread knob is rebuilt at its default with the controls
 
     switch(type) {
         case 'Synth':
@@ -142,6 +143,9 @@ function getSynthConfig(type) {
     return configs[type] || configs['Synth'];
 }
 
+// fatsine / fatsquare / fattriangle / fatsawtooth: 3 detuned copies (Tone FatOscillator)
+const isFat = (type) => typeof type === 'string' && type.startsWith('fat');
+
 // AM/FM synths expose harmonicity and modulationIndex as Signals (.value),
 // MetalSynth exposes them as plain numbers. Write whichever the synth has.
 function setParam(target, prop, value) {
@@ -161,8 +165,22 @@ function updateSynthParameter(param, value) {
             case 'oscType':
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ oscillator: { type: value } });
+                    if (isFat(value)) state.synth.set({ oscillator: { spread: state.oscSpread } });
                 } else {
                     state.synth.oscillator.type = value;
+                    if (isFat(value)) state.synth.oscillator.spread = state.oscSpread;
+                }
+                break;
+            case 'spread':
+                // Tone ignores spread on non-fat waves, so keep it and apply it when the wave turns fat
+                state.oscSpread = value;
+                if (state.currentInstrumentType === 'PolySynth') {
+                    state.synth.set({ oscillator: { spread: value } });
+                } else if (state.synth.voice0) {
+                    state.synth.voice0.oscillator.spread = value;
+                    state.synth.voice1.oscillator.spread = value;
+                } else if (state.synth.oscillator) {
+                    state.synth.oscillator.spread = value;
                 }
                 break;
             case 'modType':
@@ -172,10 +190,16 @@ function updateSynthParameter(param, value) {
                 if (state.synth.noise) state.synth.noise.type = value;
                 break;
             case 'voice0Type':
-                if (state.synth.voice0) state.synth.voice0.oscillator.type = value;
+                if (state.synth.voice0) {
+                    state.synth.voice0.oscillator.type = value;
+                    if (isFat(value)) state.synth.voice0.oscillator.spread = state.oscSpread;
+                }
                 break;
             case 'voice1Type':
-                if (state.synth.voice1) state.synth.voice1.oscillator.type = value;
+                if (state.synth.voice1) {
+                    state.synth.voice1.oscillator.type = value;
+                    if (isFat(value)) state.synth.voice1.oscillator.spread = state.oscSpread;
+                }
                 break;
             case 'attack':
                 if (state.currentInstrumentType === 'PolySynth') {

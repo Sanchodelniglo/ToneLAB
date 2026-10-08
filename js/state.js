@@ -21,6 +21,7 @@ export const state = {
     arpDown: new Set(),       // notes physically down while the arp runs (HOLD off): feed the pattern, drop on release
     userLayout: 'qwerty',
     noteNotation: localStorage.getItem('noteNotation') || 'english',
+    oscSpread: 20,            // detune in cents for fat waves; re-applied whenever the wave becomes fat
     audioInitialized: false
 };
 

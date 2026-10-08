@@ -58,7 +58,19 @@ function noiseSamples(type, count) {
     return out;
 }
 
+// Fat waves: three copies detuned (exaggerated so the drift shows within 2 periods)
+const FAT_DETUNE = [0.92, 1, 1.08];
+
 function periodicSamples(type, count, periods) {
+    if (type.startsWith('fat')) {
+        const base = type.slice(3);
+        const out = new Array(count);
+        for (let i = 0; i < count; i++) {
+            const t = (i / count) * periods;
+            out[i] = FAT_DETUNE.reduce((v, f) => v + exact(base, (t * f) % 1), 0) / FAT_DETUNE.length;
+        }
+        return out;
+    }
     const m = type.match(/^(sine|square|triangle|sawtooth)(\d+)$/);
     const base = m ? m[1] : type;
     const partials = m ? parseInt(m[2], 10) : 0;
@@ -97,6 +109,7 @@ export function wavePath(type, w = 64, h = 20, count = 96) {
 // Tone's "square5" keeps partials 1..5 but square only has odd ones (1, 3, 5)
 // → "square 3". Sawtooth has every partial → "sawtooth 5". Base types unchanged.
 export function waveLabel(type) {
+    if (type.startsWith('fat')) return `fat ${type.slice(3)}`;
     const m = type.match(/^(sine|square|triangle|sawtooth)(\d+)$/);
     if (!m) return type;
     const base = m[1];

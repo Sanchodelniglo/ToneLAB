@@ -29,6 +29,7 @@ const synthPresets = {
         { name: 'Toy Piano', octave: 5, effects: { reverb: 0.2, reverbSize: 1.2, delayTime: 0.25, delayFeedback: 0, delayMix: 0, distortion: 0, filterFreq: 7000, chorusRate: 1.5, chorusMix: 0 }, params: { oscType: 'square3', attack: 0.001, decay: 0.6, sustain: 0, release: 0.4, volume: -14 } },
         { name: 'Tape Pad', octave: 3, effects: { reverb: 0.5, reverbSize: 6, delayTime: 0.5, delayFeedback: 0.4, delayMix: 0.2, distortion: 0.04, filterFreq: 1800, chorusRate: 0.3, chorusMix: 0.7 }, params: { oscType: 'sawtooth3', attack: 1.5, decay: 0.8, sustain: 0.7, release: 3.5, volume: -18 } },
         { name: 'Reese Bass', octave: 2, effects: { reverb: 0.08, reverbSize: 1, delayTime: 0.25, delayFeedback: 0, delayMix: 0, distortion: 0.2, filterFreq: 900, chorusRate: 0.4, chorusMix: 0.6 }, params: { oscType: 'sawtooth', attack: 0.01, decay: 0.3, sustain: 0.9, release: 0.3, volume: -12 } },
+        { name: 'Super Saw', octave: 4, effects: { reverb: 0.3, reverbSize: 2.5, delayTime: 0.375, delayFeedback: 0.35, delayMix: 0.22, distortion: 0.05, filterFreq: 6500, chorusRate: 0.5, chorusMix: 0.1 }, params: { oscType: 'fatsawtooth', spread: 28, attack: 0.02, decay: 0.2, sustain: 0.8, release: 0.5, volume: -16 } },
     ],
     'AMSynth': [
         { name: 'Bell Tone', octave: 5, effects: { reverb: 0.45, reverbSize: 4, delayTime: 0.375, delayFeedback: 0.3, delayMix: 0.2, distortion: 0, filterFreq: 9000, chorusRate: 0.5, chorusMix: 0.1 }, params: { harmonicity: 3.5, oscType: 'sine', modType: 'sine', attack: 0.001, decay: 1.8, sustain: 0, release: 2.5, modAttack: 0, modRelease: 1.5 } },
@@ -79,6 +80,7 @@ const synthPresets = {
         { name: 'Scream Lead', octave: 4, effects: { reverb: 0.3, reverbSize: 3, delayTime: 0.375, delayFeedback: 0.4, delayMix: 0.25, distortion: 0.45, filterFreq: 6500, chorusRate: 0.6, chorusMix: 0.15 }, params: { oscType: 'sawtooth', filterQ: 6, filterCutoff: 800, attack: 0.01, decay: 0.4, sustain: 0.9, release: 0.4, filterAttack: 0.2, filterDecay: 0.6, filterSustain: 0.7, filterRelease: 0.6 } },
         { name: 'Slow Sweep', octave: 2, effects: { reverb: 0.5, reverbSize: 6, delayTime: 0.5, delayFeedback: 0.5, delayMix: 0.25, distortion: 0, filterFreq: 4000, chorusRate: 0.3, chorusMix: 0.5 }, params: { oscType: 'pwm', filterQ: 12, filterCutoff: 100, attack: 1.2, decay: 1, sustain: 0.9, release: 3, filterAttack: 2, filterDecay: 2, filterSustain: 0.4, filterRelease: 4 } },
         { name: 'Pew Zap', octave: 5, effects: { reverb: 0.2, reverbSize: 1.5, delayTime: 0.2, delayFeedback: 0.4, delayMix: 0.25, distortion: 0, filterFreq: 8000, chorusRate: 1.5, chorusMix: 0 }, params: { oscType: 'square', filterQ: 18, filterCutoff: 200, attack: 0.001, decay: 0.3, sustain: 0, release: 0.1, filterAttack: 0.001, filterDecay: 0.08, filterSustain: 0, filterRelease: 0.1 } },
+        { name: 'Unison Bass', octave: 2, effects: { reverb: 0.05, reverbSize: 0.8, delayTime: 0.25, delayFeedback: 0, delayMix: 0, distortion: 0.12, filterFreq: 3000, chorusRate: 1.5, chorusMix: 0 }, params: { oscType: 'fatsawtooth', spread: 12, filterQ: 3, filterCutoff: 500, attack: 0.005, decay: 0.25, sustain: 0.7, release: 0.15, filterAttack: 0.001, filterDecay: 0.2, filterSustain: 0.4, filterRelease: 0.2 } },
     ],
     'NoiseSynth': [
         { name: 'Snare Hit', octave: 4, effects: { reverb: 0.2, reverbSize: 0.9, delayTime: 0, delayFeedback: 0, delayMix: 0, distortion: 0.1, filterFreq: 8000, chorusRate: 1.5, chorusMix: 0 }, params: { noiseType: 'white', attack: 0.001, decay: 0.18, sustain: 0, release: 0.1 } },
@@ -109,6 +111,8 @@ const synthPresets = {
         { name: 'Neon Stab', octave: 3, effects: { reverb: 0.3, reverbSize: 2.5, delayTime: 0.375, delayFeedback: 0.35, delayMix: 0.25, distortion: 0.05, filterFreq: 4500, chorusRate: 1, chorusMix: 0.25 }, params: { oscType: 'sawtooth', attack: 0.001, decay: 0.18, sustain: 0, release: 0.15 } },
         { name: 'Vapor Keys', octave: 3, effects: { reverb: 0.55, reverbSize: 7, delayTime: 0.5, delayFeedback: 0.4, delayMix: 0.25, distortion: 0, filterFreq: 1800, chorusRate: 0.3, chorusMix: 0.6 }, params: { oscType: 'triangle3', attack: 0.01, decay: 1.2, sustain: 0.3, release: 1.5 } },
         { name: 'Arcade Chords', octave: 4, effects: { reverb: 0.1, reverbSize: 1, delayTime: 0.16, delayFeedback: 0.3, delayMix: 0.2, distortion: 0, filterFreq: 8000, chorusRate: 1.5, chorusMix: 0 }, params: { oscType: 'pulse', attack: 0, decay: 0.1, sustain: 0.6, release: 0.05 } },
+        { name: 'Supersaw Pad', octave: 3, effects: { reverb: 0.5, reverbSize: 6, delayTime: 0.45, delayFeedback: 0.3, delayMix: 0.15, distortion: 0, filterFreq: 3500, chorusRate: 0.4, chorusMix: 0.3 }, params: { oscType: 'fatsawtooth', spread: 35, attack: 0.8, decay: 0.5, sustain: 0.85, release: 3 } },
+        { name: 'Trance Chords', octave: 3, effects: { reverb: 0.3, reverbSize: 2.5, delayTime: 0.375, delayFeedback: 0.45, delayMix: 0.3, distortion: 0.03, filterFreq: 5000, chorusRate: 1, chorusMix: 0.1 }, params: { oscType: 'fatsawtooth', spread: 30, attack: 0.005, decay: 0.3, sustain: 0.2, release: 0.3 } },
     ],
     'DuoSynth': [
         { name: 'Detune Lead', octave: 4, effects: { reverb: 0.2, reverbSize: 2, delayTime: 0.3, delayFeedback: 0.35, delayMix: 0.22, distortion: 0.1, filterFreq: 6500, chorusRate: 0.5, chorusMix: 0.15 }, params: { vibratoAmount: 0.1, vibratoRate: 5.5, harmonicity: 1.01, voice0Type: 'sawtooth', voice1Type: 'sawtooth', attack: 0.02, decay: 0.15, sustain: 0.8, release: 0.4 } },
@@ -119,6 +123,7 @@ const synthPresets = {
         { name: 'Theremin', octave: 4, effects: { reverb: 0.45, reverbSize: 4, delayTime: 0.35, delayFeedback: 0.3, delayMix: 0.15, distortion: 0, filterFreq: 5000, chorusRate: 0.5, chorusMix: 0.1 }, params: { vibratoAmount: 0.4, vibratoRate: 6.5, harmonicity: 2, voice0Type: 'sine', voice1Type: 'sine', attack: 0.25, decay: 0.2, sustain: 0.9, release: 0.8 } },
         { name: 'Tape Keys', octave: 3, effects: { reverb: 0.4, reverbSize: 4, delayTime: 0.4, delayFeedback: 0.3, delayMix: 0.15, distortion: 0, filterFreq: 3000, chorusRate: 0.3, chorusMix: 0.5 }, params: { vibratoAmount: 0.2, vibratoRate: 0.8, harmonicity: 2.01, voice0Type: 'triangle', voice1Type: 'sine', attack: 0.005, decay: 1.4, sustain: 0.2, release: 1.5 } },
         { name: 'Star Pluck', octave: 4, effects: { reverb: 0.35, reverbSize: 3, delayTime: 0.375, delayFeedback: 0.45, delayMix: 0.3, distortion: 0, filterFreq: 7000, chorusRate: 0.8, chorusMix: 0.2 }, params: { vibratoAmount: 0, vibratoRate: 5, harmonicity: 3, voice0Type: 'sawtooth', voice1Type: 'sine', attack: 0.001, decay: 0.3, sustain: 0, release: 0.25 } },
+        { name: 'Hyper Lead', octave: 4, effects: { reverb: 0.25, reverbSize: 2.5, delayTime: 0.3, delayFeedback: 0.35, delayMix: 0.2, distortion: 0.1, filterFreq: 6500, chorusRate: 0.6, chorusMix: 0.1 }, params: { vibratoAmount: 0.08, vibratoRate: 5, harmonicity: 2, voice0Type: 'fatsawtooth', voice1Type: 'fatsquare', spread: 25, attack: 0.02, decay: 0.2, sustain: 0.8, release: 0.5 } },
     ]
 };
 
@@ -133,6 +138,7 @@ const presetHints = {
     "Synth/Toy Piano": "A small metal tine, like a toy piano. The square 2 wave has only two overtones. The fast decay keeps it short.",
     "Synth/Tape Pad": "A soft chord bed, like an old cassette. The slow attack swells in. The dark filter and the slow chorus make it wobble.",
     "Synth/Reese Bass": "A thick, moving bass. The chorus adds a slightly out of tune copy of the sawtooth. The two copies beat against each other.",
+    "Synth/Super Saw": "The trance lead. The fat sawtooth stacks three copies, 28 cents apart. They drift against each other, and the sound gets wide.",
     "AMSynth/Bell Tone": "A bell. Harmonicity 3.5 adds a tone that is not in tune with the note. The long decay and zero sustain let it ring.",
     "AMSynth/Reed Organ": "A reed organ hum. Harmonicity 2 adds an octave. Sustain is full, so the note holds. The fast chorus adds the shimmer.",
     "AMSynth/Growl Bass": "A growling bass. Harmonicity 0.5 adds a tone below the note. The modulation fades in slowly, and the distortion adds grit.",
@@ -173,6 +179,7 @@ const presetHints = {
     "MonoSynth/Scream Lead": "A screaming lead. The filter opens slowly with high Q, then heavy distortion makes it scream.",
     "MonoSynth/Slow Sweep": "A slow filter sweep. The filter has very high Q and opens over two seconds. The pwm wave adds movement.",
     "MonoSynth/Pew Zap": "A laser chirp. The filter Q is near maximum. The filter snaps shut in 80 ms, so each note goes pew.",
+    "MonoSynth/Unison Bass": "A thick bass. Three sawtooths only 12 cents apart stay in tune but move. The low filter keeps the weight.",
     "NoiseSynth/Snare Hit": "A snare body. A burst of white noise with a short decay. A small reverb adds a little room.",
     "NoiseSynth/Hand Clap": "A hand clap. The delay repeats the noise after 11 ms, so it sounds like several hands.",
     "NoiseSynth/Wind Gust": "Wind. Pink noise fades in slowly. The dark filter and the wide chorus make it blow.",
@@ -197,6 +204,8 @@ const presetHints = {
     "PolySynth/Neon Stab": "Punchy chord stabs. Sawtooth chords that stop at once. The delay repeats them in time.",
     "PolySynth/Vapor Keys": "Washed-out vaporwave keys. Soft keys with a dark filter. The slow chorus and the huge reverb blur them.",
     "PolySynth/Arcade Chords": "8-bit console chords. Thin pulse chords with an organ-like envelope.",
+    "PolySynth/Supersaw Pad": "A wide chord bed. Each note is three detuned sawtooths, so a three-note chord has nine voices. The slow attack and the big reverb make it float.",
+    "PolySynth/Trance Chords": "Pumping trance chords. Fat sawtooth stabs with a short sustain. The dotted-eighth delay fills the gaps.",
     "DuoSynth/Detune Lead": "The classic detuned lead. Two sawtooth voices 1 % apart beat against each other. Light vibrato adds life.",
     "DuoSynth/Lush Pad": "A lush chord bed. A sawtooth and a triangle an octave apart. The slow attack and the big reverb make it wide.",
     "DuoSynth/Power Fifths": "Power chords from one key. The second voice plays a fifth above. Distortion makes it heavy.",
@@ -204,7 +213,8 @@ const presetHints = {
     "DuoSynth/Octave Bass": "A thick bass. The second voice plays an octave below the sawtooth. Distortion adds grit.",
     "DuoSynth/Theremin": "A theremin. Two pure sines an octave apart. The slow attack and the wide vibrato make it sing.",
     "DuoSynth/Tape Keys": "Keys from a stretched tape. The second voice is slightly out of tune. The slow vibrato makes the pitch wobble.",
-    "DuoSynth/Star Pluck": "A bright, bell-like pluck. The second voice plays an octave and a fifth above. The delay repeats each note."
+    "DuoSynth/Star Pluck": "A bright, bell-like pluck. The second voice plays an octave and a fifth above. The delay repeats each note.",
+    "DuoSynth/Hyper Lead": "A huge lead. Both voices are fat waves, so six oscillators play on each key. The second voice sits an octave above.",
 };
 
 function presetHint(type, name) {

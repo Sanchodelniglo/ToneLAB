@@ -294,4 +294,6 @@ export function refreshWavePreview(select) {
     parts.btn.querySelector('.wave-preview path').setAttribute('d', wavePath(select.value));
     parts.name.textContent = waveLabel(select.value);
     parts.options.forEach(li => li.setAttribute('aria-selected', String(li.dataset.value === select.value)));
+    // Lets other controls react to the wave (Spread only works on fat waves) without importing us
+    select.dispatchEvent(new CustomEvent('wavesync', { bubbles: true }));
 }

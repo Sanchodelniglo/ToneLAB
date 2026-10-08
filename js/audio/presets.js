@@ -274,6 +274,15 @@ function applyPreset(type, presetIndex) {
     setPresetHintText(presetHint(type, preset.name));
 }
 
+// Shows a name that is not one of the 8 presets (e.g. "Random"): nothing active, no hint.
+function showCustomPreset(name) {
+    document.querySelectorAll('#presetBar .preset-btn').forEach(btn => btn.classList.remove('active'));
+    const select = document.getElementById('presetSelect');
+    if (select) select.value = '';
+    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = name; });
+    setPresetHintText('');
+}
+
 // Fills every preset-hint slot; the ? buttons are disabled while there is
 // nothing to show (no preset picked yet, or a preset without a line).
 function setPresetHintText(text) {
@@ -325,4 +334,4 @@ function updatePresetBar(type) {
     setPresetHintText('');
 }
 
-export { synthDescriptions, synthPresets, presetHints, applyPreset, updatePresetBar };
+export { synthDescriptions, synthPresets, presetHints, applyPreset, updatePresetBar, showCustomPreset };

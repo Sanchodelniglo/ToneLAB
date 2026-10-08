@@ -132,6 +132,7 @@ function attachKnobToSlider(slider) {
     syncKnobAria(knob, slider);
 
     function setValue(raw) {
+        if (slider.disabled) return;
         const snapped = Math.round(raw / step) * step;
         const next = Math.max(min, Math.min(max, parseFloat(snapped.toFixed(decimals))));
         if (next === parseFloat(slider.value)) return;
@@ -148,6 +149,7 @@ function attachKnobToSlider(slider) {
     let startValue = 0;
 
     function onPointerDown(e) {
+        if (slider.disabled) return;
         if (e.button !== undefined && e.button !== 0) return;
         startY = e.clientY;
         startValue = parseFloat(slider.value);

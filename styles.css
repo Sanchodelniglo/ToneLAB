@@ -2532,6 +2532,28 @@ body[data-key-labels="off"] .keyboard-key-label {
         font-size: var(--text-sm);
     }
 
+    /* Wave pickers: one full-width row each, at the top of the page: name on the
+       left, picker on the right. Knobs then flow in clean rows underneath
+       instead of leaving holes beside a two-column picker. */
+    .pages .control-group:has(.wave-select) {
+        grid-column: 1 / -1;
+        order: -1;
+        display: grid;
+        grid-template-columns: minmax(84px, 30%) minmax(0, 1fr);
+        align-items: center;
+        column-gap: var(--space-sm);
+        padding: 0 var(--space-xs);
+    }
+
+    .pages .control-group:has(.wave-select) .control-label {
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .pages .control-group:has(.wave-select) .wave-picker {
+        grid-column: 2;
+    }
+
     /* FX page: the five effect sets stacked, scrolls inside the page.
        nowrap: .control-sets wraps by default and a column that wraps spills
        into a second column off the right edge. */
@@ -3662,4 +3684,19 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
         height: 36px;
     }
 }
+}
+
+/* RND button: three letters, so it outgrows the 30px square of the arrow steppers */
+.preset-stepper .step-btn.rnd-btn {
+    width: auto;
+    min-width: 38px;
+    padding: 0 6px;
+    letter-spacing: var(--tracking-wide);
+}
+
+/* Spread (and any control that does not apply right now): dimmed and untouchable, ? stays clickable */
+.control-group.is-disabled .knob-container,
+.control-group.is-disabled input[type="range"] {
+    opacity: 0.3;
+    pointer-events: none;
 }

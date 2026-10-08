@@ -1,5 +1,5 @@
 // Bump on every release so installed clients pick up new assets on activate.
-const CACHE_NAME = 'tonelab-synth-v11';
+const CACHE_NAME = 'tonelab-synth-v12';
 
 // App shell key. Cloudflare Pages redirects /index.html -> /, so we keep both
 // entries precached and try both on fallback.
@@ -23,6 +23,7 @@ const PRECACHE_URLS = [
   './js/ui/scope.js',
   './js/ui/wavePreview.js',
   './js/ui/mobile.js',
+  './js/ui/randomize.js',
   './js/ui/xypad.js',
   './js/ui/arp.js',
   './manifest.json',

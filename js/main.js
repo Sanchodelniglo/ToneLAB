@@ -10,6 +10,7 @@ import { createKeyboard } from './ui/keyboard.js';
 import { scope } from './ui/scope.js';
 import './pwa.js';
 import './ui/mobile.js';
+import './ui/randomize.js';
 import { initArp, setArp } from './ui/arp.js';
 
 // Initialize

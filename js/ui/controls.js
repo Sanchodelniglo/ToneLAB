@@ -422,10 +422,27 @@ function updateControls(type) {
         }
     });
     sizeControlSets(controlsDiv);
+    syncSpread();
 }
 
 // Static effects sets (index.html) get their column count once
 sizeControlSets(document);
+
+// Spread only does something on a fat wave: grey the control out (slider, knob and
+// keyboard) while no wave in the set is fat. Waves announce changes via 'wavesync'.
+function syncSpread() {
+    const slider = document.querySelector('#controls [data-control="spread"]');
+    if (!slider) return;
+    const anyFat = [...document.querySelectorAll('#controls select[data-control]')].some(sel => sel.value.startsWith('fat'));
+    slider.disabled = !anyFat;
+    slider.closest('.control-group')?.classList.toggle('is-disabled', !anyFat);
+    const knob = slider.parentElement.querySelector('.knob-container');
+    if (knob) {
+        knob.setAttribute('aria-disabled', String(!anyFat));
+        knob.setAttribute('tabindex', anyFat ? '0' : '-1');
+    }
+}
+document.addEventListener('wavesync', syncSpread);
 
 // Instrument selector
 document.getElementById('instrumentType').addEventListener('change', (e) => {

@@ -552,7 +552,7 @@ if (keyboardEl) {
 }
 
 // Key labels: the note name and the computer key are two independent
-// toggles (chips in the keyboard bar, rows in the ⋯ sheet). Computer keys
+// toggles (chips in the keyboard bar, rows in the settings sheet). Computer keys
 // default to off on touch devices, where there is no keyboard to map.
 const KEY_LABEL_STORE = { note: 'noteLabels', key: 'keyLabels' };
 const KEY_LABEL_DATA = { note: 'noteLabels', key: 'keyLabels' };

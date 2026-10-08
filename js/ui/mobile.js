@@ -2,7 +2,7 @@
 // scrolling page. Top bar · scope strip (swipe = preset) · tabs · one control
 // set per page · keyboard. The DOM stays shared with the desktop layout:
 // entering pocket mode moves a few nodes into mobile slots (type stepper into
-// the header, secondary controls into the ⋯ sheet, effects into the pages
+// the header, secondary controls into the settings sheet, effects into the pages
 // carousel) and leaving puts them back exactly where they were.
 
 import { synthPresets, applyPreset } from '../audio/presets.js';
@@ -151,7 +151,7 @@ function stepType(step) {
     select.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-/* ---------- ⋯ sheet ---------- */
+/* ---------- settings sheet (gear) ---------- */
 
 function openSheet(open) {
     const sheet = $('#moreSheet');
@@ -169,15 +169,16 @@ function enter() {
 
     moveTo($('.type-stepper'), $('#typeSlot'));
     // Each secondary control gets a row with a title and a one-line hint
+    // The CRT row is static in the sheet (it is also the desktop settings): pocket rows go above it
     const slots = $('#sheetSlots');
-    slots.innerHTML = '';
     SHEET_ROWS.forEach(({ sel, title, hint }) => {
         const el = $(sel);
         if (!el) return;
         const row = document.createElement('div');
         row.className = 'sheet-row';
+        row.dataset.pocket = '';
         row.innerHTML = `<div class="sheet-row-text"><span class="sheet-row-title">${title}</span><span class="sheet-row-hint">${hint}</span></div>`;
-        slots.appendChild(row);
+        slots.insertBefore(row, $('#crtRow'));
         moveTo(el, row);
     });
     moveTo($('.effect-controls'), $('#pages'), $('#arpSet'));
@@ -231,7 +232,7 @@ function leave() {
     presetObserver?.disconnect();
     openSheet(false);
     restoreAll();
-    $('#sheetSlots').innerHTML = ''; // drop the empty rows
+    document.querySelectorAll('#sheetSlots > [data-pocket]').forEach(row => row.remove()); // drop the empty rows
 }
 
 /* ---------- wiring (listeners live on static nodes, so they are bound once) ---------- */
@@ -254,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scope.addEventListener('pointercancel', () => { swipeX = null; });
 
     // Instrument description popover: text mirrors #synthDescription (which
-    // lives in the ⋯ sheet in pocket mode). The global help-btn handler in
+    // lives in the settings sheet in pocket mode). The global help-btn handler in
     // controls.js does the open / close; this fills the text and closes it on
     // outside taps and instrument changes.
     const typeHelp = $('#typeHelp');

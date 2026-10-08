@@ -1,9 +1,46 @@
-// CRT static snow overlay for the #crtStatic canvas. Side-effect module, no exports.
+// CRT screen effects: the on/off toggles and the static snow canvas. Side-effect module, no exports.
 //
 // Perf: filling 512×512 random pixels every frame cost ~1.6 ms of main-thread
 // time per frame (measured). Instead, a handful of noise tiles are generated
 // once and each frame just blits one of them at a random offset through a
 // repeating pattern — ~0.03 ms per frame, visually indistinguishable.
+// CRT toggles: scanlines, vignette, flicker (flicker overlay + static snow) and glitch
+// (colour-split text, boxes and knobs). Each is a data attribute on <body> that the CSS
+// reads: data-crt-scan / -vignette / -flicker / -glitch = "on" | "off". Saved in localStorage.
+// With no saved choice everything is on, except flicker and glitch when the system asks
+// for reduced motion.
+const CRT_STORE = 'crt';
+const CRT_KEYS = ['scan', 'vignette', 'flicker', 'glitch'];
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let crtSaved = {};
+try { crtSaved = JSON.parse(localStorage.getItem(CRT_STORE)) || {}; } catch (_) { /* private mode or bad JSON */ }
+
+function setCrt(key, on, { save = true } = {}) {
+    document.body.dataset['crt' + key[0].toUpperCase() + key.slice(1)] = on ? 'on' : 'off';
+    document.querySelectorAll(`[data-crt="${key}"]`).forEach(btn => {
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', String(on));
+    });
+    if (save) {
+        crtSaved[key] = on;
+        try { localStorage.setItem(CRT_STORE, JSON.stringify(crtSaved)); } catch (_) { /* private mode */ }
+    }
+    document.dispatchEvent(new CustomEvent('crt-change', { detail: { key, on } }));
+}
+
+CRT_KEYS.forEach(key => {
+    const fallback = !(reducedMotion && (key === 'flicker' || key === 'glitch'));
+    setCrt(key, typeof crtSaved[key] === 'boolean' ? crtSaved[key] : fallback, { save: false });
+});
+
+document.querySelectorAll('[data-crt]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        setCrt(btn.dataset.crt, btn.getAttribute('aria-pressed') !== 'true');
+        btn.blur(); // keep the computer keyboard playing notes
+    });
+});
+
 (function() {
     const canvas = document.getElementById('crtStatic');
     if (!canvas) return;
@@ -32,6 +69,7 @@
     }
 
     let rafId = null;
+    let snowOn = true; // follows the Flicker toggle
 
     function renderStatic() {
         // Random tile + random sub-tile offset: the eye never sees the repeat.
@@ -45,14 +83,28 @@
         rafId = requestAnimationFrame(renderStatic);
     }
 
+    function stopSnow() {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+
+    function startSnow() {
+        if (!rafId && snowOn && !document.hidden) renderStatic();
+    }
+
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        } else if (!rafId) {
-            renderStatic();
-        }
+        if (document.hidden) stopSnow();
+        else startSnow();
     });
 
-    renderStatic();
+    // Flicker switch: the noise stops drawing instead of just being hidden, so it costs nothing
+    document.addEventListener('crt-change', (e) => {
+        if (e.detail.key !== 'flicker') return;
+        snowOn = e.detail.on;
+        if (snowOn) startSnow(); else stopSnow();
+    });
+
+    // Settings were applied before this ran (see the toggles below): honour them
+    snowOn = document.body.dataset.crtFlicker !== 'off';
+    startSnow();
 })();

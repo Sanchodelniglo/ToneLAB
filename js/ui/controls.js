@@ -75,7 +75,7 @@ function setControlStyle(style) {
     style = style === 'sliders' ? 'sliders' : 'knobs';
     document.body.dataset.controls = style;
     try { localStorage.setItem(CONTROL_STYLE_KEY, style); } catch (e) { /* private mode */ }
-    // Only the Knobs / Sliders pair: .view-btn is a shared skin (the ⋯ sheet
+    // Only the Knobs / Sliders pair: .view-btn is a shared skin (the settings sheet
     // reuses it for other toggles)
     document.querySelectorAll('.view-btn[data-controls]').forEach(btn => {
         const active = btn.dataset.controls === style;

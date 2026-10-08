@@ -219,7 +219,11 @@ function syncArpTab(e) {
     if (on && e?.detail?.on) {
         const pages = $('#pages');
         const idx = pageList().indexOf(set);
-        if (idx >= 0) { markTab(idx); slideTo(pages, idx * pages.clientWidth); }
+        if (idx >= 0) {
+            // Tablet layout hides the tab bar and stacks every set: scroll to the strip instead of sliding
+            if (getComputedStyle($('#tabBar')).display === 'none') set.scrollIntoView({ block: 'nearest' });
+            else { markTab(idx); slideTo(pages, idx * pages.clientWidth); }
+        }
     }
 }
 

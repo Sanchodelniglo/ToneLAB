@@ -236,6 +236,11 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
         flex-direction: column;
     }
 
+    /* Beats the rule above (same specificity, later): a hidden ARP page must not take a carousel slot */
+    .arp-set.control-set[hidden] {
+        display: none;
+    }
+
     /* The strip is one grid: mode row, lights, then the rest. .arp-live and
        .arp-settings are display: contents so their children place themselves. */
     .arp-set .arp-strip {

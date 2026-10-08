@@ -1,0 +1,185 @@
+/*@split 14-tablet.css: Tablet layout (768px to 1023px wide, at least 600px tall): no tabs, every set visible in a wrapping flow */
+
+/* ============================================
+   TABLET LAYOUT (768–1023px wide, >= 600px tall)
+   The pocket shell (header · scope · pages · keyboard) stays, but the tab carousel
+   is replaced by one scrolling area that shows every set at once: the instrument sets
+   wrap two or more per row, then the effects rack, then the ARP strip when it runs.
+   Phones in landscape (short) keep the pocket landscape layout; phones in portrait are
+   narrower than 768px.
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1023px) and (min-height: 600px) {
+    .tab-bar {
+        display: none;
+    }
+
+    .container {
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "scope" "pages" "kbd";
+    }
+
+    /* Tall screens give the scope more room */
+    .scope-block {
+        height: clamp(96px, 14vh, 170px);
+    }
+
+    .pages {
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-snap-type: none;
+    }
+
+    /* Each set is exactly as wide as its cells (78px columns, 4px gaps, padding, border) and the
+       sets flow left to right, wrapping: no empty columns in a two-knob set */
+    .pages > .control-set,
+    .pages > #controls > .control-set {
+        flex: 1 1 auto; /* grow: the sets of a row share its whole width, no ragged right edge */
+        width: calc(var(--cols, 4) * 78px + (var(--cols, 4) - 1) * 4px + 2 * var(--space-sm) + 2px);
+        max-width: 100%;
+        padding: var(--space-sm);
+        overflow: visible;
+        scroll-snap-align: none;
+        scroll-snap-stop: normal;
+        border: 1px solid rgb(var(--cyan-rgb) / 0.12);
+        background: rgb(var(--cyan-rgb) / 0.02);
+    }
+
+    .pages > #controls > .control-set > .controls-grid {
+        grid-template-columns: repeat(var(--cols, 4), 78px);
+        justify-content: space-evenly;
+    }
+
+    .env-preview {
+        height: 56px;
+    }
+
+    /* One header line: logo, instrument stepper, gear (the phone layout needs a second line) */
+    header {
+        flex-wrap: nowrap;
+    }
+
+    .type-slot {
+        flex: 1 1 auto;
+        order: 2;
+    }
+
+    .more-btn {
+        order: 3;
+    }
+
+    /* No tab names the sets any more: bring the titles back */
+    .pages > #controls > .control-set > .control-set-title {
+        display: block;
+    }
+
+    /* Narrower columns than a phone page: value and ? must fit side by side (same fix as phone landscape) */
+    .pages .control-value {
+        font-size: var(--text-xs);
+    }
+
+    .pages .control-group:has(.knob-container) .help-btn {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* ---- effects rack: one full-width row of five sets ---- */
+    .pages > .effect-controls {
+        flex: 1 1 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--space-xs) var(--space-sm);
+        padding: var(--space-sm);
+        overflow: visible;
+        scroll-snap-align: none;
+        border: 1px solid rgb(var(--cyan-rgb) / 0.12);
+        background: rgb(var(--cyan-rgb) / 0.02);
+    }
+
+    .pages > .effect-controls .control-set {
+        flex: 1 1 auto;
+        width: auto;
+        padding: 0;
+        border: none;
+    }
+
+    .pages > .effect-controls .controls-grid {
+        grid-template-columns: repeat(var(--cols, 1), 78px);
+        justify-content: space-evenly;
+        gap: var(--space-sm) 4px;
+    }
+
+    /* ---- ARP strip (only while the arp runs) ---- */
+    .pages > .arp-set {
+        flex: 1 1 100%;
+    }
+}
+
+/* Narrow tablet portrait (768-899px): ten effect cells do not fit one row, so the rack is a
+   6-column grid of two even rows: Master 1 + Reverb 2 + Delay 3, then Tone 3 + Chorus 3 */
+@media (min-width: 768px) and (max-width: 899px) and (min-height: 600px) {
+    .pages > .effect-controls {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: var(--space-sm);
+    }
+
+    .pages > .effect-controls .control-set {
+        width: auto;
+        min-width: 0;
+    }
+
+    .pages > .effect-controls .control-set:nth-child(1) { grid-column: span 1; }
+    .pages > .effect-controls .control-set:nth-child(2) { grid-column: span 2; }
+    .pages > .effect-controls .control-set:nth-child(3) { grid-column: span 3; }
+    .pages > .effect-controls .control-set:nth-child(4),
+    .pages > .effect-controls .control-set:nth-child(5) { grid-column: span 3; }
+
+    .pages > .effect-controls .controls-grid {
+        grid-template-columns: repeat(var(--cols, 1), minmax(0, 78px));
+    }
+}
+
+/* Settings sheet: a 736px-wide bottom sheet is far too wide for four chips and a few rows.
+   Tablets get the desktop popover under the gear (css/13-settings.css) */
+@media (min-width: 768px) and (max-width: 1023px) and (min-height: 600px) {
+    .sheet {
+        background: rgb(var(--overlay-rgb) / 0.35);
+    }
+
+    .sheet-body {
+        top: calc(57px + 4px);
+        right: var(--space-md);
+        bottom: auto;
+        left: auto;
+        width: min(420px, calc(100vw - 2 * var(--space-md)));
+        max-height: calc(100dvh - 72px);
+        overflow-y: auto;
+        padding: var(--space-md);
+        border: 1px solid rgb(var(--cyan-rgb) / 0.4);
+        box-shadow: 0 8px 40px rgb(var(--black-rgb) / 0.6);
+    }
+
+    .sheet-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+
+    .sheet-row:has(.crt-toggle) {
+        align-items: flex-start;
+    }
+
+    .sheet-slots .view-toggle.crt-toggle {
+        display: flex;
+    }
+
+    .sheet-slots .crt-toggle .chip {
+        min-height: 0;
+    }
+}

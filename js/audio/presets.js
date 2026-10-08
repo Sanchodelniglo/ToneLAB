@@ -264,6 +264,8 @@ function applyPreset(type, presetIndex) {
         setEffect(key, fx[key]);
     }
 
+    document.dispatchEvent(new Event('presetapplied')); // previews that mirror the knobs (envelope curves) redraw
+
     // Update active preset button, the desktop select and every name / hint slot
     document.querySelectorAll('#presetBar .preset-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.querySelector(`#presetBar .preset-btn[data-preset="${presetIndex}"]`);

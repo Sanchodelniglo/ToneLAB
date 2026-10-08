@@ -4,6 +4,7 @@ import { initSynth, updateSynthParameter } from '../audio/synth.js';
 import { synthDescriptions, updatePresetBar } from '../audio/presets.js';
 import { updateSliderFill, attachKnobToSlider } from './knobs.js';
 import { buildWavePicker, refreshWavePreview, waveLabel } from './wavePreview.js';
+import { attachEnvelopePreviews } from './envelope.js';
 
 // Hints are collapsed behind a "?" button so the grid stays compact.
 function helpButton(id, name, desc) {
@@ -421,6 +422,7 @@ function updateControls(type) {
             attachKnobToSlider(slider);
         }
     });
+    attachEnvelopePreviews(controlsDiv);
     sizeControlSets(controlsDiv);
     syncSpread();
 }

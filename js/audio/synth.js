@@ -355,8 +355,38 @@ function stopNote(note) {
     }
 }
 
+// Arpeggiator step: scheduled ahead on the Transport clock, attack + release
+// in one call. Keeps the live trigger clock behind it so a key pressed by hand
+// never lands before a scheduled step.
+function triggerArpStep(note, duration, time, velocity = 1) {
+    if (!state.synth) return;
+    lastTriggerTime = Math.max(lastTriggerTime, time);
+    try {
+        const type = state.currentInstrumentType;
+        if (type === 'NoiseSynth') {
+            state.synth.triggerAttackRelease(duration, time, velocity);
+        } else if (type === 'MetalSynth') {
+            state.synth.triggerAttackRelease(state.synth.frequency.value, duration, time, velocity);
+        } else {
+            state.synth.triggerAttackRelease(note, duration, time, velocity);
+        }
+    } catch (error) {
+        console.log('Arp step error:', error);
+    }
+}
+
+// Silence every voice now (arp start / stop, so held keys do not stay on)
+function releaseAllVoices() {
+    if (!state.synth) return;
+    try {
+        if (typeof state.synth.releaseAll === 'function') state.synth.releaseAll();
+        else state.synth.triggerRelease();
+    } catch (_) { /* nothing sounding */ }
+    setNoteReadout('\u2014');
+}
+
 // Debug accessors for the trigger clock (window.ToneLAB smoke-test surface).
 function getLastTriggerTime() { return lastTriggerTime; }
 function bumpLastTriggerTime(seconds) { lastTriggerTime += seconds; }
 
-export { getSynthConfig, initSynth, updateSynthParameter, nextTriggerTime, playNote, stopNote, getLastTriggerTime, bumpLastTriggerTime };
+export { getSynthConfig, initSynth, updateSynthParameter, nextTriggerTime, playNote, stopNote, triggerArpStep, releaseAllVoices, getLastTriggerTime, bumpLastTriggerTime };

@@ -104,6 +104,7 @@
                 <nav class="tab-bar" id="tabBar" role="tablist" aria-label="Control pages"></nav>
                 <div class="pages" id="pages">
                     <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
+                    <section class="control-set arp-set" id="arpSet" role="group" aria-label="Arpeggiator settings" hidden></section>
                     <section class="control-set xy-set" id="xySet" role="group" aria-label="XY pad">
                         <div class="xy-targets">
                             <label>X <select id="xyTargetX" aria-label="X axis parameter"></select></label>
@@ -291,7 +292,65 @@
                                 <span class="octave-display">Octave: <span id="currentOctave" aria-live="polite">4</span></span>
                                 <button id="octaveUp" class="octave-btn" aria-label="Increase octave">OCT &#9654;</button>
                                 <button type="button" class="octave-btn hold-btn" id="holdBtn" aria-pressed="false" title="Latch: notes keep ringing after you let go. Tap a lit key to release it.">HOLD</button>
+                                <button type="button" class="octave-btn arp-btn" id="arpBtn" aria-pressed="false" title="Arpeggiator: held notes become a running pattern. Tap the step lights to shape the rhythm.">ARP</button>
                             </div>
+                        </div>
+                    </div>
+                    <!-- Arpeggiator strip: shown while ARP is on -->
+                    <!-- Arpeggiator. Desktop: one strip under the title line. Pocket: the
+                         live part (chips + lights) stays in the keyboard box, the settings
+                         rows move to an ARP tab (js/ui/mobile.js). -->
+                    <div class="arp-strip" id="arpStrip" hidden>
+                        <div class="arp-live" id="arpLive">
+                            <div class="arp-chips" role="group" aria-label="Arp quick controls">
+                                <button type="button" class="preset-btn arp-chip" data-arp-cycle="mode" title="Pattern: tap to change">&#8599; Up</button>
+                                <button type="button" class="preset-btn arp-chip" data-arp-cycle="rate" title="Rate: tap to change">1/16</button>
+                                <button type="button" class="preset-btn arp-chip arp-chip-bpm" data-arp-cycle="bpm" title="BPM: tap for +5, long press for -5">120</button>
+                            </div>
+                        <div class="arp-steps" role="group" aria-label="Steps: tap to mute, double tap to accent" title="Steps: tap a light to mute it, double tap to accent it"><button type="button" class="arp-step" data-arp-step="0" aria-label="Step 1" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="1" aria-label="Step 2" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="2" aria-label="Step 3" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="3" aria-label="Step 4" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="4" aria-label="Step 5" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="5" aria-label="Step 6" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="6" aria-label="Step 7" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="7" aria-label="Step 8" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="8" aria-label="Step 9" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="9" aria-label="Step 10" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="10" aria-label="Step 11" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="11" aria-label="Step 12" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="12" aria-label="Step 13" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="13" aria-label="Step 14" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="14" aria-label="Step 15" aria-pressed="true"></button><button type="button" class="arp-step" data-arp-step="15" aria-label="Step 16" aria-pressed="true"></button></div>
+                        </div>
+                        <div class="arp-settings" id="arpSettings">
+                        <div class="arp-row">
+                            <div class="arp-help">
+                                <button type="button" class="help-btn arp-help-btn" aria-label="How the arpeggiator works" aria-expanded="false" aria-controls="arpHint">?</button>
+                                <p class="control-hint" id="arpHint" hidden>Hold one or more keys. The arp plays them one after the other, in time. Turn HOLD on to lift your fingers and keep the pattern going. Tap a step light to mute that step. Double tap a light to make it louder.</p>
+                            </div>
+                            <select id="arpMode" aria-label="Arp pattern" title="Pattern: the order the held notes play in"></select>
+                            <select id="arpRate" aria-label="Arp rate" title="Rate: how many steps per beat. 1/16 is fast, 1/4 is slow, 1/8T is a triplet feel"></select>
+                            <div class="arp-group" role="group" aria-label="Octaves" title="Octaves: the pattern repeats one or two octaves higher before it comes back">
+                                <span class="arp-label">OCT</span>
+                                <button type="button" class="preset-btn view-btn chip active" data-arp-oct="1" aria-label="1 octave">1</button>
+                                <button type="button" class="preset-btn view-btn chip" data-arp-oct="2" aria-label="2 octaves">2</button>
+                                <button type="button" class="preset-btn view-btn chip" data-arp-oct="3" aria-label="3 octaves">3</button>
+                            </div>
+                            <div class="arp-group" role="group" aria-label="Pattern length" title="Length: how many steps before the lights start again. 8 is a tight loop, 12 feels odd">
+                                <span class="arp-label">LEN</span>
+                                <button type="button" class="preset-btn view-btn chip" data-length="8">8</button>
+                                <button type="button" class="preset-btn view-btn chip" data-length="12">12</button>
+                                <button type="button" class="preset-btn view-btn chip active" data-length="16">16</button>
+                            </div>
+                            <div class="arp-knob control-group">
+                                <div class="control-label"><label for="arpBpm">BPM</label><span class="control-value" id="arpBpmValue">120</span><button type="button" class="help-btn" aria-label="What does BPM do?" aria-expanded="false" aria-controls="arpBpmHint">?</button></div>
+                                <p class="control-hint" id="arpBpmHint" hidden>Speed of the beat. 90 is slow and heavy, 120 is pop, 140 and more is fast. TAP: tap four times on the beat and the knob follows.</p>
+                                <input type="range" id="arpBpm" min="60" max="180" step="1" value="120" data-default-value="120">
+                            </div>
+                            <div class="arp-group arp-bpm-stepper" role="group" aria-label="Tempo">
+                                <button type="button" class="preset-btn view-btn chip" data-bpm-step="-1" aria-label="Slower">&minus;</button>
+                                <span class="arp-bpm-readout" id="arpBpmReadout">120</span>
+                                <button type="button" class="preset-btn view-btn chip" data-bpm-step="1" aria-label="Faster">+</button>
+                            </div>
+                            <button type="button" class="preset-btn arp-tap" id="arpTap" title="Tap four times on the beat to set the BPM">TAP</button>
+                            <div class="arp-knob control-group">
+                                <div class="control-label"><label for="arpGate">Gate</label><span class="control-value" id="arpGateValue">60%</span><button type="button" class="help-btn" aria-label="What does Gate do?" aria-expanded="false" aria-controls="arpGateHint">?</button></div>
+                                <p class="control-hint" id="arpGateHint" hidden>How long each step sounds. 20% is short and dry. 90% is almost legato. Accented steps get a bit more.</p>
+                                <input type="range" id="arpGate" min="0.1" max="1" step="0.05" value="0.6" data-default-value="0.6">
+                            </div>
+                            <div class="arp-knob control-group">
+                                <div class="control-label"><label for="arpSwing">Swing</label><span class="control-value" id="arpSwingValue">0%</span><button type="button" class="help-btn" aria-label="What does Swing do?" aria-expanded="false" aria-controls="arpSwingHint">?</button></div>
+                                <p class="control-hint" id="arpSwingHint" hidden>Shuffle. Every second step comes a little late. 0% is straight. 30% is a bounce. 60% is a strong shuffle.</p>
+                                <input type="range" id="arpSwing" min="0" max="0.6" step="0.05" value="0" data-default-value="0">
+                            </div>
+                        </div>
                         </div>
                     </div>
                     <div class="keyboard-wrapper">
@@ -336,6 +395,7 @@
     <link rel="modulepreload" href="js/ui/wavePreview.js">
     <link rel="modulepreload" href="js/ui/mobile.js">
     <link rel="modulepreload" href="js/ui/xypad.js">
+    <link rel="modulepreload" href="js/ui/arp.js">
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

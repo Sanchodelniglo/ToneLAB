@@ -10,6 +10,7 @@ import { createKeyboard } from './ui/keyboard.js';
 import { scope } from './ui/scope.js';
 import './pwa.js';
 import './ui/mobile.js';
+import { initArp, setArp } from './ui/arp.js';
 
 // Initialize
 let audioInitStarted = false;
@@ -30,6 +31,7 @@ async function init() {
         document.getElementById('keyboardLayout').value = state.userLayout;
 
         createKeyboard();
+        initArp();
         state.audioInitialized = true;
 
 
@@ -75,6 +77,7 @@ window.ToneLAB = {
     setEffect,
     updateControls,
     applyPreset,
+    setArp,
     // Same contract as the old initSynth, which rebuilt the control panel itself.
     initSynth: (type) => { initSynth(type); updateControls(type); },
     nextTriggerTime: () => nextTriggerTime(),

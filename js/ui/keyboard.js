@@ -17,6 +17,22 @@ function keysForNote(note) {
 // it instead and returns false, so the caller must not track that press.
 // Mono instruments have a single voice: a new note takes over any latched one.
 function noteOn(note, el) {
+    // Arp running: keys only edit the note set, the arp does the playing.
+    // HOLD on = latch (tap again to drop), HOLD off = only while pressed.
+    if (state.arp?.on) {
+        if (state.hold) {
+            if (state.heldNotes.has(note)) {
+                state.heldNotes.delete(note);
+                keysForNote(note).forEach(k => k.classList.remove('pressed'));
+                return false;
+            }
+            state.heldNotes.add(note);
+        } else {
+            state.arpDown.add(note);
+        }
+        el.classList.add('pressed');
+        return true;
+    }
     if (state.hold && state.heldNotes.has(note)) {
         unlatch(note);
         return false;
@@ -36,6 +52,11 @@ function noteOff(note, el) {
         state.heldNotes.add(note);
         return;
     }
+    if (state.arp?.on) {
+        state.arpDown.delete(note);
+        el.classList.remove('pressed');
+        return;
+    }
     el.classList.remove('pressed');
     stopNote(note);
 }
@@ -43,6 +64,7 @@ function noteOff(note, el) {
 function unlatch(note) {
     state.heldNotes.delete(note);
     keysForNote(note).forEach(k => k.classList.remove('pressed'));
+    if (state.arp?.on) return; // the arp owns the voice
     stopNote(note);
     // stopNote blanks the readout when nothing is physically pressed; if other
     // notes are still latched, show the most recent one instead.
@@ -72,6 +94,7 @@ function setHold(on) {
         btn.classList.toggle('active', on);
     }
     if (!on) releaseHeld();
+    document.dispatchEvent(new CustomEvent('hold-change', { detail: { on } }));
 }
 
 // Haptic tick. Only meaningful inside a touch handler (Android needs the user
@@ -201,7 +224,9 @@ document.getElementById('holdBtn')?.addEventListener('click', () => {
 
 // Switching instrument rebuilds the synth (controls.js): drop the latched notes with it.
 // controls.js registers first (module order), so by now the old voice has been released.
-document.getElementById('instrumentType')?.addEventListener('change', () => releaseHeld());
+// Instrument switch releases latched notes, unless the arp is playing them
+// on the new sound
+document.getElementById('instrumentType')?.addEventListener('change', () => { if (!state.arp?.on) releaseHeld(); });
 
 // Octave controls
 document.getElementById('octaveUp').addEventListener('click', () => {

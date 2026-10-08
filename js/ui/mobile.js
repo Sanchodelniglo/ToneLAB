@@ -53,13 +53,14 @@ let active = false;
 
 function pageList() {
     const pages = $('#pages');
-    const pageSel = ':scope > #controls > .control-set, :scope > .effect-controls' + (XY_PAD ? ', :scope > .xy-set' : '');
+    const pageSel = ':scope > #controls > .control-set, :scope > .effect-controls, :scope > .arp-set:not([hidden])' + (XY_PAD ? ', :scope > .xy-set' : '');
     return [...pages.querySelectorAll(pageSel)];
 }
 
 function tabName(page) {
     if (page.classList.contains('effect-controls')) return 'FX';
     if (page.classList.contains('xy-set')) return 'XY';
+    if (page.classList.contains('arp-set')) return '\u25CF ARP';
     const title = page.querySelector('.control-set-title')?.textContent.trim() || '';
     return TAB_NAMES[title] || title.slice(0, 5).toUpperCase();
 }
@@ -179,7 +180,10 @@ function enter() {
         slots.appendChild(row);
         moveTo(el, row);
     });
-    moveTo($('.effect-controls'), $('#pages'), $('#xySet'));
+    moveTo($('.effect-controls'), $('#pages'), $('#arpSet'));
+    // The whole arp strip becomes the ARP page (lights included); the keyboard box keeps only the ARP switch
+    moveTo($('#arpStrip'), $('#arpSet'));
+    syncArpTab();
 
     $('#xySet').hidden = !XY_PAD;
     if (XY_PAD) {
@@ -195,14 +199,33 @@ function enter() {
     });
     pagesObserver.observe($('#controls'), { childList: true });
 
+    document.addEventListener('arp-change', syncArpTab);
     presetObserver = new MutationObserver(syncPresetName);
     presetObserver.observe($('#presetBar'), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     syncPresetName();
 }
 
+// The ARP tab exists only while the arp runs; rebuilt on toggle
+function syncArpTab(e) {
+    if (!active) return;
+    const set = $('#arpSet');
+    const on = Boolean(window.ToneLAB?.state?.arp?.on);
+    if (set.hidden !== !on) {
+        set.hidden = !on;
+        buildTabs();
+    }
+    // Starting the arp lands you on its page
+    if (on && e?.detail?.on) {
+        const pages = $('#pages');
+        const idx = pageList().indexOf(set);
+        if (idx >= 0) { markTab(idx); slideTo(pages, idx * pages.clientWidth); }
+    }
+}
+
 function leave() {
     if (!active) return;
     active = false;
+    document.removeEventListener('arp-change', syncArpTab);
     document.body.classList.remove('pocket');
     pagesObserver?.disconnect();
     presetObserver?.disconnect();

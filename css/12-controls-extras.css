@@ -177,3 +177,8 @@ body[data-crt-glitch="off"] {
     --glitch-knob: none;
 }
 
+/* A hint that would run under the keyboard (or out of its scroll area) opens above its cell (js/ui/controls.js fitHint) */
+.control-group > .control-hint.hint-up {
+    top: auto;
+    bottom: calc(100% + 2px);
+}

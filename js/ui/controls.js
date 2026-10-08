@@ -27,17 +27,60 @@ function closeAllHints(except) {
     document.querySelectorAll('.help-btn[aria-expanded="true"]').forEach(btn => { if (btn !== except) closeHint(btn); });
 }
 
-// Keep the popover inside the viewport: cells at the edge of a page would
-// otherwise push it off screen (it is absolute inside the cell).
+// Keep the popover on screen. Horizontally: cells at the edge of a page would push it
+// off screen (it is absolute inside the cell). Vertically: a control near the bottom
+// would open its hint under the keyboard or out of its scroll area, so it opens upward there.
 function fitHint(hint) {
     hint.style.transform = '';
+    hint.classList.remove('hint-up');
+    // A hover preview is still display: none here; measure it without showing it
+    const forced = getComputedStyle(hint).display === 'none';
+    if (forced) { hint.style.display = 'block'; hint.style.visibility = 'hidden'; }
     const r = hint.getBoundingClientRect();
     const margin = 8;
+    const group = hint.closest('.control-group');
+    let dy = 0;
+    // Limits: the screen, narrowed to the nearest scrolling box (it clips the hint, and in
+    // phone landscape the scope sits right next to it, so a hint pushed left disappears)
+    let left = margin;
+    let right = window.innerWidth - margin;
+    let top = margin;
+    let bottom = window.innerHeight - margin;
+    if (group) {
+        const gr = group.getBoundingClientRect();
+        const keys = document.querySelector('.keyboard-panel');
+        if (keys && keys.getBoundingClientRect().top > gr.top) bottom = Math.min(bottom, keys.getBoundingClientRect().top - 4);
+        for (let el = group.parentElement; el && el !== document.body; el = el.parentElement) {
+            if (/(auto|scroll|hidden|clip)/.test(getComputedStyle(el).overflowY)) {
+                const cr = el.getBoundingClientRect();
+                left = Math.max(left, cr.left + 4);
+                right = Math.min(right, cr.right - 4);
+                top = Math.max(top, cr.top + 4);
+                bottom = Math.min(bottom, cr.bottom - 4);
+                break;
+            }
+        }
+        if (r.bottom > bottom) {
+            if (gr.top - r.height - 2 >= top) hint.classList.add('hint-up');
+            else dy = Math.max(bottom - r.bottom, top - r.top); // no room either way (short landscape page): slide it inside the area
+        }
+    }
     let dx = 0;
-    if (r.right > window.innerWidth - margin) dx = window.innerWidth - margin - r.right;
-    if (r.left + dx < margin) dx = margin - r.left;
-    if (dx) hint.style.transform = `translateX(${dx}px)`;
+    if (r.right > right) dx = right - r.right;
+    if (r.left + dx < left) dx = left - r.left;
+    if (dx || dy) hint.style.transform = `translate(${dx}px, ${dy}px)`;
+    if (forced) { hint.style.display = ''; hint.style.visibility = ''; }
 }
+
+// Hover preview (mouse): place the hint before it shows, once per cell
+let fittedGroup = null;
+document.addEventListener('pointerover', (e) => {
+    const group = e.target.closest?.('.control-group');
+    if (!group || group === fittedGroup) return;
+    fittedGroup = group;
+    const hint = group.querySelector(':scope > .control-hint');
+    if (hint) fitHint(hint);
+}, { passive: true });
 
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.help-btn');

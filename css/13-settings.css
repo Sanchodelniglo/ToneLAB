@@ -49,7 +49,7 @@
     font-size: var(--text-md);
     font-weight: var(--weight-black);
     letter-spacing: var(--tracking-display);
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
 }
 
 .sheet-close {
@@ -99,7 +99,7 @@
     font-size: var(--text-xs);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
 }
 
 .sheet-row-hint {
@@ -152,7 +152,7 @@
         padding: 0;
         background: transparent;
         border: 1px solid rgb(var(--cyan-rgb) / 0.25);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
         cursor: pointer;
     }
 

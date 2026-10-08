@@ -81,7 +81,7 @@
     max-width: 100%;
     font-size: var(--text-2xs);
     line-height: 1.2;
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     text-transform: uppercase;
     letter-spacing: var(--tracking-tight);
     overflow-wrap: break-word;
@@ -94,7 +94,7 @@
 }
 
 .control-value {
-    color: var(--accent-magenta);
+    color: var(--magenta-text);
     font-weight: var(--weight-bold);
     font-size: var(--text-2xs);
     white-space: nowrap;
@@ -109,7 +109,7 @@
 /* Beats the global `label` rule (text-sm, wide tracking) */
 .control-group .control-label label {
     font-size: var(--text-xs);
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     letter-spacing: var(--tracking-tight);
     line-height: 1.2;
 }
@@ -204,7 +204,7 @@
 
 .help-btn:hover,
 .help-btn:focus-visible {
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     border-color: rgb(var(--cyan-rgb) / 0.6);
 }
 

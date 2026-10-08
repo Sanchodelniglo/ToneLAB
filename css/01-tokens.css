@@ -8,17 +8,21 @@
 
 :root {
     /* Colors */
-    --bg-primary: #0a0e27;
+    --bg-primary: #0d122f; /* lifted from #0a0e27: near-black (luminance < 0.006) makes light text halate */
     --bg-secondary: #151937;
     --bg-tertiary: #1e2749;
     --accent-cyan: #00f0ff;
     --accent-magenta: #ff00aa;
     --accent-yellow: #ffeb3b;
-    --text-primary: #e8eeff;
+    /* Accents as TEXT. --accent-cyan / --accent-magenta stay full-strength for borders, fills and glows;
+       text uses these lifted tints (cyan 10.5:1, magenta 7:1 on the background, magenta >= 5.5 on every panel) */
+    --cyan-text: #0cdae9;
+    --magenta-text: #ff66cc;
+    --text-primary: #beccf4; /* was #e8eeff (16:1 on the background = glare); now ~11.5:1 */
     --text-secondary: #a0b0d0;
-    --text-muted: #8899bb;
+    --text-muted: #94a5c8;
     --text-muted-light: #99aacc;
-    --text-white: #ffffff;
+    --text-white: #beccf4; /* same as --text-primary: pure white was 19:1 */
     /* Colour channels: "R G B" so any alpha can be applied with rgb(var(--cyan-rgb) / 0.25).
        The accent / panel / CRT colours that were repeated as rgba() literals all over the CSS. */
     --cyan-rgb: 0 240 255;           /* = --accent-cyan */

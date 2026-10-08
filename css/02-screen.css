@@ -225,7 +225,7 @@ body::after {
 }
 
 .audio-overlay-icon {
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     animation: pulse-overlay 2s ease-in-out infinite;
 }
 

@@ -87,7 +87,7 @@
 
 .wave-picker-btn::after {
     content: '\25BE';
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     font-size: 0.8em;
 }
 
@@ -164,13 +164,13 @@
 
 .wave-picker-option:hover,
 .wave-picker-option:focus {
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     border-color: rgb(var(--cyan-rgb) / 0.5);
     background: rgb(var(--cyan-rgb) / 0.06);
 }
 
 .wave-picker-option[aria-selected="true"] {
-    color: var(--accent-magenta);
+    color: var(--magenta-text);
     border-color: rgb(var(--magenta-rgb) / 0.5);
 }
 
@@ -179,7 +179,7 @@
 }
 
 #currentNote {
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     font-weight: var(--weight-bold);
 }
 

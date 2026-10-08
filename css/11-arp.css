@@ -325,7 +325,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
 
     .arp-bpm-readout {
         font-size: var(--text-md);
-        color: var(--accent-magenta);
+        color: var(--magenta-text);
         border-left: 1px solid rgb(var(--cyan-rgb) / 0.2);
     }
 

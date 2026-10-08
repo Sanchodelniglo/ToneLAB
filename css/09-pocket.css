@@ -114,7 +114,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         height: 44px;
         opacity: 1;
         border-color: rgb(var(--cyan-rgb) / 0.25);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
         font-size: var(--text-sm);
     }
 
@@ -159,7 +159,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         padding: 0;
         background: transparent;
         border: 1px solid rgb(var(--cyan-rgb) / 0.25);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
         font-family: var(--font-mono);
         font-size: var(--text-xs);
         cursor: pointer;
@@ -247,7 +247,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         font-size: var(--text-xs);
         letter-spacing: var(--tracking-wide);
         text-transform: uppercase;
-        color: var(--accent-magenta);
+        color: var(--magenta-text);
         text-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5);
     }
 
@@ -281,7 +281,7 @@ body[data-key-labels="off"] .keyboard-key-label {
     }
 
     .tab-btn[aria-selected="true"] {
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
         border-bottom-color: var(--accent-cyan);
         text-shadow: 0 0 8px rgb(var(--cyan-rgb) / 0.5);
     }
@@ -496,7 +496,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         gap: 4px;
         font-family: var(--font-mono);
         font-size: var(--text-2xs);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
     }
 
     .xy-targets select {
@@ -569,7 +569,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         top: 4px;
         font-family: var(--font-mono);
         font-size: var(--text-2xs);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
         pointer-events: none;
         max-width: 48%;
         overflow: hidden;

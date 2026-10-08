@@ -90,7 +90,7 @@
         white-space: nowrap;
         font-size: var(--text-2xs);
         letter-spacing: var(--tracking-tight);
-        color: var(--accent-cyan);
+        color: var(--cyan-text);
     }
 
     body[data-controls="sliders"] .effects-rack .controls-grid .control-group input[type="range"] {

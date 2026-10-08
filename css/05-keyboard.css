@@ -117,7 +117,7 @@
     font-family: var(--font-mono);
     font-size: var(--text-2xs);
     font-weight: var(--weight-normal);
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     background: rgb(var(--cyan-rgb) / 0.08);
     padding: 2px 5px;
     border-radius: var(--radius-sm);
@@ -128,18 +128,18 @@
 }
 
 .key:hover .keyboard-key-label {
-    color: var(--text-white);
+    color: var(--text-primary);
     border-color: rgb(var(--cyan-rgb) / 0.7);
 }
 
 .key.black .keyboard-key-label {
-    color: var(--accent-magenta);
+    color: var(--magenta-text);
     background: rgb(var(--magenta-rgb) / 0.08);
     border-color: rgb(var(--magenta-rgb) / 0.35);
 }
 
 .key.black:hover .keyboard-key-label {
-    color: var(--text-white);
+    color: var(--text-primary);
     border-color: rgb(var(--magenta-rgb) / 0.7);
 }
 
@@ -279,7 +279,7 @@ button:focus-visible {
 }
 
 .octave-display #currentOctave {
-    color: var(--accent-cyan);
+    color: var(--cyan-text);
     font-size: var(--text-lg);
     font-weight: var(--weight-bold);
     margin-left: var(--space-sm);

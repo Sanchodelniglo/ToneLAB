@@ -1,0 +1,60 @@
+/*@split 15-theme-sodium.css: "Sodium" colour theme (Blade Runner: amber, teal, warm grey on smoggy blue-black), selected by html[data-theme="sodium"] */
+
+/* ============================================
+   THEME: SODIUM
+   Same token names as the default theme, new values. In every theme "cyan" is the PRIMARY accent
+   (here amber) and "magenta" the SECONDARY accent (here teal), so no rule needs to change.
+   Contrast (measured, see the README "Colours"): body text ~12:1, amber text ~10:1, teal text ~10:1,
+   secondary ~8:1, muted ~7:1 against the background, all >= 5.5:1 on the lightest panel.
+   ============================================ */
+
+:root[data-theme="sodium"] {
+    /* Solid colours */
+    --bg-primary: #0e1317;
+    --bg-secondary: #141c21;
+    --bg-tertiary: #1c272d;
+    --accent-cyan: #ff9a2e;
+    --accent-magenta: #2dd4cf;
+    --accent-yellow: #f3d27a;
+    --text-primary: #d6d0c4;
+    --text-secondary: #b1a898;
+    --text-muted: #a8a092;
+    --text-muted-light: #aaa294;
+    --cyan-text: #ffab3d;
+    --magenta-text: #42d7d7;
+    --surface-deep: #12191d;
+    --surface-mid: #26343a;
+    --bg-mid: #0b1014;
+    --knob-fill: #19232a;
+
+    /* Colour channels */
+    --cyan-rgb: 255 154 46;
+    --magenta-rgb: 45 212 207;
+    --cyan-dim-rgb: 214 120 30;
+    --magenta-dark-rgb: 20 150 148;
+    --glitch-blue-rgb: 0 150 160;     /* chromatic fringe 1: teal */
+    --glitch-red-rgb: 255 90 20;      /* chromatic fringe 2: orange */
+    --panel-top-rgb: 20 28 33;
+    --panel-bottom-rgb: 28 39 45;
+    --bg-deep-rgb: 14 19 23;
+    --bg-void-rgb: 9 13 16;
+    --overlay-rgb: 6 9 11;
+    --surface-rgb: 17 24 28;
+    --crt-dark-rgb: 16 18 18;
+    --screen-deep-rgb: 6 10 14;
+
+    /* Keys: warm grey-teal caps, near-black ebony */
+    --key-top-rgb: 62 72 78;
+    --key-bottom-rgb: 44 52 58;
+    --key-hover-top-rgb: 52 62 68;
+    --key-hover-bottom-rgb: 38 46 52;
+    --key-black-top-rgb: 22 27 31;
+    --key-black-bottom-rgb: 12 15 18;
+    --key-black-hover-top-rgb: 36 24 22;
+    --key-black-hover-bottom-rgb: 22 14 12;
+}
+
+/* The dropdown arrow is an SVG data URI, so it cannot read a token: same shape, amber fill */
+:root[data-theme="sodium"] .wave-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff9a2e' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}

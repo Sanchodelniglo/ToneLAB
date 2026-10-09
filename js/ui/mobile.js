@@ -169,7 +169,7 @@ function enter() {
 
     moveTo($('.type-stepper'), $('#typeSlot'));
     // Each secondary control gets a row with a title and a one-line hint
-    // The CRT row is static in the sheet (it is also the desktop settings): pocket rows go above it
+    // The theme and CRT rows are static in the sheet (they are also the desktop settings): pocket rows go above them
     const slots = $('#sheetSlots');
     SHEET_ROWS.forEach(({ sel, title, hint }) => {
         const el = $(sel);
@@ -178,7 +178,7 @@ function enter() {
         row.className = 'sheet-row';
         row.dataset.pocket = '';
         row.innerHTML = `<div class="sheet-row-text"><span class="sheet-row-title">${title}</span><span class="sheet-row-hint">${hint}</span></div>`;
-        slots.insertBefore(row, $('#crtRow'));
+        slots.insertBefore(row, $('#themeRow'));
         moveTo(el, row);
     });
     moveTo($('.effect-controls'), $('#pages'), $('#arpSet'));

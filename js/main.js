@@ -1,5 +1,6 @@
 // Entry point: pulls in every module (load-time listeners run on import), starts audio
 // on the first click via init(), and exposes a small window.ToneLAB debug surface.
+import './theme.js';
 import './crt.js';
 import { state, detectKeyboardLayout } from './state.js';
 import { initEffects, initMasterVolume, setEffect } from './audio/effects.js';

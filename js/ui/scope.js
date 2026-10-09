@@ -13,12 +13,25 @@ export const scope = (() => {
     const FFT_SIZE = 1024;    // bins — bin width ~21.5 Hz, log axis from ~21 Hz to Nyquist
     const MIN_DB = -100;
     const MAX_DB = -10;
-    const TRACE = '#00f0ff';
-    const TRACE_GLOW = 'rgba(0, 240, 255, 0.55)';
-    const GRID = 'rgba(0, 240, 255, 0.08)';
-    const GRID_STRONG = 'rgba(0, 240, 255, 0.2)';
-    const LABEL = 'rgba(160, 176, 208, 0.7)';
-    const PERSISTENCE = 'rgba(10, 14, 39, 0.4)'; // bg-primary at low alpha = phosphor afterglow
+    // Canvas colours come from the theme tokens (re-read on 'theme-change')
+    let TRACE, TRACE_GLOW, GRID, GRID_STRONG, LABEL, PERSISTENCE, BACKGROUND, FILL_TOP, FILL_BOTTOM;
+    function readColors() {
+        const cs = getComputedStyle(document.documentElement);
+        const ch = (name) => cs.getPropertyValue(name).trim().replace(/\s+/g, ' ');
+        const accent = ch('--cyan-rgb');
+        const hex = cs.getPropertyValue('--text-secondary').trim();
+        const label = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(' ');
+        TRACE = `rgb(${accent})`;
+        TRACE_GLOW = `rgb(${accent} / 0.55)`;
+        GRID = `rgb(${accent} / 0.08)`;
+        GRID_STRONG = `rgb(${accent} / 0.2)`;
+        LABEL = `rgb(${label} / 0.7)`;
+        BACKGROUND = `rgb(${ch('--bg-deep-rgb')})`;
+        PERSISTENCE = `rgb(${ch('--bg-deep-rgb')} / 0.4)`; // bg-primary at low alpha = phosphor afterglow
+        FILL_TOP = `rgb(${accent} / 0.35)`;
+        FILL_BOTTOM = `rgb(${accent} / 0.02)`;
+    }
+    readColors();
 
     const labels = {
         wave: 'Oscilloscope showing the output waveform',
@@ -43,7 +56,7 @@ export const scope = (() => {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.fillStyle = '#0a0e27';
+        ctx.fillStyle = BACKGROUND;
         ctx.fillRect(0, 0, width, height);
     }
 
@@ -145,8 +158,8 @@ export const scope = (() => {
         lastMaxDb = maxDb;
 
         const fill = ctx.createLinearGradient(0, 0, 0, height);
-        fill.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
-        fill.addColorStop(1, 'rgba(0, 240, 255, 0.02)');
+        fill.addColorStop(0, FILL_TOP);
+        fill.addColorStop(1, FILL_BOTTOM);
         ctx.fillStyle = fill;
         ctx.fill();
         strokeTrace();
@@ -243,6 +256,7 @@ export const scope = (() => {
     }
 
     setMode(mode);
+    document.addEventListener('theme-change', () => { readColors(); resize(); });
     resize();
     drawGrid();
 

@@ -171,15 +171,18 @@
         gap: var(--space-xs);
     }
 
-    .sheet-row:has(.crt-toggle) {
+    .sheet-row:has(.crt-toggle),
+    .sheet-row:has(.theme-toggle) {
         align-items: flex-start;
     }
 
-    .sheet-slots .view-toggle.crt-toggle {
+    .sheet-slots .view-toggle.crt-toggle,
+    .sheet-slots .view-toggle.theme-toggle {
         display: flex;
     }
 
-    .sheet-slots .crt-toggle .chip {
+    .sheet-slots .crt-toggle .chip,
+    .sheet-slots .theme-toggle .chip {
         min-height: 0;
     }
 }

@@ -19,6 +19,7 @@
     <!-- Stylesheets (fonts self-hosted so offline mode keeps the typography) -->
     <link rel="preload" href="fonts/share-tech-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/orbitron-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script>try{var t=localStorage.getItem('theme');if(t&&t!=='cyber')document.documentElement.dataset.theme=t}catch(e){}</script>
     <link rel="stylesheet" href="fonts/fonts.css">
     <link rel="stylesheet" href="styles.css"><!-- imports css/*.css in cascade order -->
 
@@ -378,6 +379,14 @@
                 <button type="button" class="sheet-close" id="sheetClose" aria-label="Close">&#10005;</button>
             </div>
             <div class="sheet-slots" id="sheetSlots">
+                <div class="sheet-row" id="themeRow">
+                    <div class="sheet-row-text"><span class="sheet-row-title">Theme</span></div>
+                    <div class="view-toggle theme-toggle" role="group" aria-label="Colour theme">
+                        <button type="button" class="preset-btn view-btn chip active" data-theme-choice="cyber" aria-pressed="true">Cyber</button>
+                        <button type="button" class="preset-btn view-btn chip" data-theme-choice="sodium" aria-pressed="false">Sodium</button>
+                        <button type="button" class="preset-btn view-btn chip" data-theme-choice="replicant" aria-pressed="false">Replicant</button>
+                    </div>
+                </div>
                 <div class="sheet-row" id="crtRow">
                     <div class="sheet-row-text"><span class="sheet-row-title">CRT screen</span><span class="sheet-row-hint">Scanlines, vignette, flicker (with the noise) and the colour glitch. Turn off what bothers you or slows the device.</span></div>
                     <div class="view-toggle crt-toggle" role="group" aria-label="CRT effects">
@@ -396,6 +405,7 @@
          import waterfall: all 12 modules fetch in parallel instead of 4 rounds. -->
     <link rel="modulepreload" href="js/main.js">
     <link rel="modulepreload" href="js/state.js">
+    <link rel="modulepreload" href="js/theme.js">
     <link rel="modulepreload" href="js/crt.js">
     <link rel="modulepreload" href="js/pwa.js">
     <link rel="modulepreload" href="js/audio/effects.js">

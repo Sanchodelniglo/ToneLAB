@@ -49,7 +49,7 @@ function build(set, grid) {
     // Unique gradient id per svg: a gradient defined inside a hidden tab page would not resolve
     const gid = `envFill${uid++}`;
     svg.innerHTML = `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#00f0ff" stop-opacity="0.45"/><stop offset="1" stop-color="#00f0ff" stop-opacity="0.02"/></linearGradient></defs>`;
+        <stop offset="0" style="stop-color: rgb(var(--cyan-rgb)); stop-opacity: 0.45"/><stop offset="1" style="stop-color: rgb(var(--cyan-rgb)); stop-opacity: 0.02"/></linearGradient></defs>`;
     const mk = (cls, extra = {}) => {
         const path = document.createElementNS(NS, 'path');
         path.setAttribute('class', cls);

@@ -1,0 +1,62 @@
+/*@split 16-theme-replicant.css: "Replicant" colour theme, the palette of the "Replicant Runner" VS Code theme (deep green-black, teal, rose), selected by html[data-theme="replicant"] */
+
+/* ============================================
+   THEME: REPLICANT
+   Colours are taken from the VS Code theme "Replicant Runner" (sanchodelniglo.replicant-theme):
+     background #0d1a18, panels #132321 / #1c322e, text #beb6b9, UI green #63a385,
+     teal #45c9a0 (cyan / focus), rose #ef5f77 (buttons, tab border, cursor family), pink #dd6b93, lilac #ba9af4.
+   In every theme "cyan" is the PRIMARY accent (here teal) and "magenta" the SECONDARY accent (here rose).
+   Two text colours are lifted a little from the editor theme so they pass 5.5:1 on the lightest panel:
+   muted #63a385 -> #82b59d (same hue), rose text #ef5f77 -> #f38295.
+   ============================================ */
+
+:root[data-theme="replicant"] {
+    /* Solid colours */
+    --bg-primary: #0d1a18;
+    --bg-secondary: #132321;
+    --bg-tertiary: #1c322e;
+    --accent-cyan: #45c9a0;
+    --accent-magenta: #ef5f77;
+    --accent-yellow: #dd6b93;
+    --text-primary: #beb6b9;
+    --text-secondary: #b1a3a8;
+    --text-muted: #82b59d;
+    --text-muted-light: #93c0aa;
+    --cyan-text: #55cea7;
+    --magenta-text: #f38295;
+    --surface-deep: #10201e;
+    --surface-mid: #24413b;
+    --bg-mid: #0a1513;
+    --knob-fill: #152824;
+
+    /* Colour channels */
+    --cyan-rgb: 69 201 160;
+    --magenta-rgb: 239 95 119;
+    --cyan-dim-rgb: 55 160 128;
+    --magenta-dark-rgb: 179 20 55;       /* the theme's selection red #b31437 */
+    --glitch-blue-rgb: 163 113 247;      /* chromatic fringe 1: the theme's purple #a371f7 */
+    --glitch-red-rgb: 242 109 132;       /* chromatic fringe 2: rose #f26d84 */
+    --panel-top-rgb: 19 35 33;
+    --panel-bottom-rgb: 28 50 46;
+    --bg-deep-rgb: 13 26 24;
+    --bg-void-rgb: 8 17 16;
+    --overlay-rgb: 5 12 11;
+    --surface-rgb: 16 30 28;
+    --crt-dark-rgb: 14 20 18;
+    --screen-deep-rgb: 6 14 13;
+
+    /* Keys: muted green caps, near-black ebony with a rose tint when pressed */
+    --key-top-rgb: 56 76 71;
+    --key-bottom-rgb: 38 54 50;
+    --key-hover-top-rgb: 48 68 63;
+    --key-hover-bottom-rgb: 34 48 44;
+    --key-black-top-rgb: 17 30 28;
+    --key-black-bottom-rgb: 9 18 16;
+    --key-black-hover-top-rgb: 40 22 28;
+    --key-black-hover-bottom-rgb: 24 12 16;
+}
+
+/* The dropdown arrow is an SVG data URI, so it cannot read a token: same shape, teal fill */
+:root[data-theme="replicant"] .wave-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2345c9a0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}

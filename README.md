@@ -29,7 +29,7 @@ It runs in the browser, works offline, and installs as an app.
 - **CRT look**: scanlines, RGB phosphors, vignette, flicker, static, and a colour glitch. The **gear** button opens Settings, where each of Scanlines, Vignette, Flicker and Glitch can be turned off. They start off for Flicker and Glitch when the system asks for reduced motion
 - **Three layouts**: a one-screen workstation on desktop (1024px and wider), a tablet layout (768 to 1023px wide) that shows every set at once, and a phone layout with tabs, a preset strip on the scope, and a landscape split
 - **PWA**: install it as an app, works fully offline (no CDN at runtime)
-- Text colours are tuned for contrast (see "Colours" below)
+- **Three colour themes** in Settings (gear): **Cyber** (cyan and magenta, the default), **Sodium** (amber and teal on smoggy blue-black, like a rainy city at night) and **Replicant** (deep green, teal and rose: the palette of the Replicant Runner VS Code theme). The choice is saved. Text colours are tuned for contrast in all of them (see "Colours" below)
 
 ## Controls
 
@@ -50,7 +50,7 @@ Pick a preset with the arrows or the list. Examples: Acid Bass, Electric Piano, 
 
 - **Tone.js 14.8.49** -- Web Audio synthesis (vendored in `vendor/`)
 - **Vanilla JS** -- native ES modules, no framework, no build step
-- **CSS3** -- custom properties, 14 imported stylesheets (see structure)
+- **CSS3** -- custom properties, 16 imported stylesheets (see structure)
 - **PWA** -- service worker, fully offline, installable
 - **Fonts** -- Orbitron (logo), Share Tech Mono (UI), Inter (descriptions), self-hosted in `fonts/`
 
@@ -79,7 +79,7 @@ Reference: [Alec Lownes - CRT Display](https://aleclownes.com/2017/02/01/crt-dis
 
 ## Colours
 
-All colours are tokens in `css/01-tokens.css`. Solid colours are plain variables (`--accent-cyan`, `--text-primary`). Translucent colours are channel triplets, used as `rgb(var(--cyan-rgb) / 0.25)`. Text uses lifted tints (`--cyan-text`, `--magenta-text`) so it stays readable: body text about 11:1 and magenta at least 5.5:1 against the panels.
+All colours are tokens in `css/01-tokens.css`. A theme is a block that gives the same tokens new values (`css/15-theme-sodium.css` and `css/16-theme-replicant.css`, selected by `html[data-theme="..."]`). In every theme `cyan` is the primary accent and `magenta` the secondary accent. Solid colours are plain variables (`--accent-cyan`, `--text-primary`). Translucent colours are channel triplets, used as `rgb(var(--cyan-rgb) / 0.25)`. Text uses lifted tints (`--cyan-text`, `--magenta-text`) so it stays readable: body text about 11-12:1 and the secondary accent at least 5.5:1 against the panels.
 
 ## Project Structure
 
@@ -88,6 +88,7 @@ ToneLAB/
   index.html          Main HTML with CRT overlays and the settings sheet
   js/main.js          Entry: audio init, wiring (native ES modules, no build)
   js/state.js         Shared mutable state + keyboard layouts / note labels
+  js/theme.js         Colour theme switch (saved, applied before first paint)
   js/crt.js           CRT toggles (saved) and the static snow canvas
   js/pwa.js           Service worker registration, install prompt
   js/audio/           effects.js (rack, limiter), synth.js (engine, note triggers), presets.js
@@ -97,7 +98,7 @@ ToneLAB/
   styles.css          entry point: @imports css/ in cascade order (the order is the cascade)
   css/                01 tokens · 02 screen (CRT) · 03 panels · 04 controls · 05 keyboard · 06 responsive ·
                       07 scope · 08 desktop · 09 pocket (phone) · 10 effects rack · 11 arp · 12 extras ·
-                      13 settings · 14 tablet
+                      13 settings · 14 tablet · 15 Sodium theme · 16 Replicant theme
   manifest.json       PWA manifest
   service-worker.js   Offline caching (precache + stale-while-revalidate)
   fonts/              Self-hosted woff2 fonts + @font-face CSS

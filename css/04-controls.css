@@ -170,6 +170,13 @@
 }
 
 /* "?" help toggle, top-right of every control card */
+/* The ? looks small but its hit area is 24px or more (WCAG 2.2 target size): the ::after reaches 5px past each edge */
+.control-group .help-btn::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+}
+
 .help-btn {
     position: absolute;
     top: 0;

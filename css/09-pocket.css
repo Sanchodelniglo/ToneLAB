@@ -375,7 +375,7 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     .pages .control-group:has(.knob-container) .help-btn {
         grid-area: help;
-        position: static;
+        position: relative; /* anchors the hit-area ::after */
         justify-self: start;
         width: 22px;   /* repeated here to outrank the knob-rack 12px rule */
         height: 22px;

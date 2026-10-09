@@ -6,12 +6,7 @@
 // carousel) and leaving puts them back exactly where they were.
 
 import { synthPresets, applyPreset } from '../audio/presets.js';
-import { initXYPad } from './xypad.js';
 import { state } from '../state.js';
-
-// XY pad page: built and working (js/ui/xypad.js), parked until the rest of
-// the pocket shell has settled. Flip to true to get the XY tab back.
-const XY_PAD = false;
 
 const mq = window.matchMedia('(max-width: 1023px)');
 const moved = [];
@@ -45,7 +40,6 @@ const TAB_NAMES = {
 };
 
 const $ = (sel) => document.querySelector(sel);
-let xy = null;
 let pagesObserver = null;
 let presetObserver = null;
 let active = false;
@@ -54,13 +48,12 @@ let active = false;
 
 function pageList() {
     const pages = $('#pages');
-    const pageSel = ':scope > #controls > .control-set, :scope > .effect-controls, :scope > .arp-set:not([hidden])' + (XY_PAD ? ', :scope > .xy-set' : '');
+    const pageSel = ':scope > #controls > .control-set, :scope > .effect-controls, :scope > .arp-set:not([hidden])';
     return [...pages.querySelectorAll(pageSel)];
 }
 
 function tabName(page) {
     if (page.classList.contains('effect-controls')) return 'FX';
-    if (page.classList.contains('xy-set')) return 'XY';
     if (page.classList.contains('arp-set')) return '\u25CF ARP';
     const title = page.querySelector('.control-set-title')?.textContent.trim() || '';
     return TAB_NAMES[title] || title.slice(0, 5).toUpperCase();
@@ -187,17 +180,11 @@ function enter() {
     moveTo($('#arpStrip'), $('#arpSet'));
     syncArpTab();
 
-    $('#xySet').hidden = !XY_PAD;
-    if (XY_PAD) {
-        if (!xy) xy = initXYPad($('#xySet'));
-        xy.refresh($('#instrumentType').value);
-    }
     buildTabs();
 
     pagesObserver = new MutationObserver(() => {
         if (!active) return;
         buildTabs();
-        xy?.refresh($('#instrumentType').value);
     });
     pagesObserver.observe($('#controls'), { childList: true });
 

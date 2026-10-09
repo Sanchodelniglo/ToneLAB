@@ -86,10 +86,10 @@ function tick(time) {
     const notes = pattern();
     const cfg = a.steps[step];
     let note = null;
-    if (notes.length && cfg.on) {
+    if (cfg.on && notes.length) {
         note = a.mode === 'random' ? notes[Math.floor(Math.random() * notes.length)] : notes[patternIndex % notes.length];
+        patternIndex++;
     }
-    if (notes.length && cfg.on) patternIndex++;
     if (note) {
         const dur = Math.max(0.02, stepSeconds() * (cfg.accent ? Math.min(1, a.gate + 0.25) : a.gate));
         triggerArpStep(note, dur, time, cfg.accent ? 1 : 0.75);

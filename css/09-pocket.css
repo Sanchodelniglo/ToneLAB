@@ -9,7 +9,7 @@
 
 /* Desktop: the extra nodes stay out of the way */
 .pages { display: contents; }
-.xy-set, .arp-set, .tab-bar, .step-btn, .scope-preset, .type-help, .type-hint, .preset-stepper { display: none; }
+.arp-set, .tab-bar, .step-btn, .scope-preset, .type-help, .type-hint, .preset-stepper { display: none; }
 
 /* Key labels (settings sheet on mobile, keyboard bar on desktop): note name and
    computer key are two independent toggles */
@@ -473,112 +473,6 @@ body[data-key-labels="off"] .keyboard-key-label {
     .pages > .effect-controls .control-set-title {
         margin-bottom: 2px;
     }
-
-    /* ---- XY page ---- */
-    .xy-set {
-        display: flex;
-    }
-
-    .xy-set[hidden] {
-        display: none;
-    }
-
-    .xy-targets {
-        display: flex;
-        gap: var(--space-sm);
-    }
-
-    .xy-targets label {
-        flex: 1 1 0;
-        min-width: 0;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-family: var(--font-mono);
-        font-size: var(--text-2xs);
-        color: var(--cyan-text);
-    }
-
-    .xy-targets select {
-        flex: 1 1 auto;
-        min-width: 0;
-        padding: 4px 6px;
-        font-size: var(--text-2xs);
-    }
-
-    .xy-pad {
-        --x: 0.5;
-        --y: 0.5;
-        position: relative;
-        flex: 1 1 auto;
-        min-height: 120px;
-        touch-action: none;
-        user-select: none;
-        cursor: crosshair;
-        border: 1px solid rgb(var(--cyan-rgb) / 0.35);
-        background:
-            repeating-linear-gradient(to right, rgb(var(--cyan-rgb) / 0.08) 0 1px, transparent 1px 12.5%),
-            repeating-linear-gradient(to bottom, rgb(var(--cyan-rgb) / 0.08) 0 1px, transparent 1px 25%),
-            radial-gradient(ellipse at center, rgb(var(--cyan-rgb) / 0.06), transparent 70%),
-            rgb(var(--bg-void-rgb) / 0.9);
-        box-shadow: inset 0 0 30px rgb(var(--black-rgb) / 0.6);
-        overflow: hidden;
-    }
-
-    .xy-pad.is-active {
-        border-color: var(--accent-magenta);
-        box-shadow: inset 0 0 30px rgb(var(--black-rgb) / 0.6), 0 0 16px rgb(var(--magenta-rgb) / 0.3);
-    }
-
-    .xy-cross-x,
-    .xy-cross-y {
-        position: absolute;
-        pointer-events: none;
-        background: rgb(var(--magenta-rgb) / 0.45);
-    }
-
-    .xy-cross-x {
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        left: calc(var(--x) * 100%);
-    }
-
-    .xy-cross-y {
-        left: 0;
-        right: 0;
-        height: 1px;
-        top: calc(var(--y) * 100%);
-    }
-
-    .xy-dot {
-        position: absolute;
-        width: 18px;
-        height: 18px;
-        left: calc(var(--x) * 100%);
-        top: calc(var(--y) * 100%);
-        transform: translate(-50%, -50%);
-        border: 2px solid var(--accent-magenta);
-        background: rgb(var(--magenta-rgb) / 0.25);
-        box-shadow: 0 0 12px rgb(var(--magenta-rgb) / 0.7);
-        pointer-events: none;
-    }
-
-    .xy-read {
-        position: absolute;
-        top: 4px;
-        font-family: var(--font-mono);
-        font-size: var(--text-2xs);
-        color: var(--cyan-text);
-        pointer-events: none;
-        max-width: 48%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .xy-read-x { left: 6px; }
-    .xy-read-y { right: 6px; text-align: right; }
 
     /* ---- keyboard dock ---- */
     .keyboard-section {

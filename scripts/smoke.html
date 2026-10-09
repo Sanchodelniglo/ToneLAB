@@ -34,6 +34,8 @@ setTimeout(async () => {
     knob.focus(); const oct = S.currentOctave;
     knob.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     check('arrow key on a knob leaves the octave alone', S.currentOctave === oct);
+
+    T.setArp(false);
   } catch (e) { out.push('FAIL exception ' + e.message); }
   fetch('/__result?' + encodeURIComponent(out.join('\n')));
 }, 1500);

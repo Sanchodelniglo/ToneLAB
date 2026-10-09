@@ -15,7 +15,7 @@ It runs in the browser, works offline, and installs as an app.
 ### Playing
 - **2-octave keyboard** with QWERTY, AZERTY (with dead keys), QWERTZ and Dvorak layouts. Octave buttons shift the range
 - **HOLD**: latches notes so they keep ringing. Tap a lit key to release it
-- **Arpeggiator (ARP)**: held notes become a running pattern. Modes up, down, up-down, random, as-played. 1 to 3 octaves, rate, gate, swing, BPM knob and tap tempo. 16 step lights: tap one to mute it, double-tap to accent it
+- **Arpeggiator (ARP)**: held notes become a running pattern. Modes up, down, up-down, random, as-played. 1 to 3 octaves, rate, gate, swing, BPM knob and tap tempo. 16 step lights (LEN 8, 12 or 16): tap one to mute it, double-tap to accent it
 - **Touch**: glide across keys, haptic tick on note start (where the browser allows it)
 - **Note names** as A B C or Do Re Mi, and a switch for the labels printed on the keys
 
@@ -94,7 +94,7 @@ ToneLAB/
   js/audio/           effects.js (rack, limiter), synth.js (engine, note triggers), presets.js
   js/ui/              controls.js (knob grid, hints), knobs.js (SVG knobs), keyboard.js (keys, HOLD, touch),
                       scope.js (oscilloscope / spectrum), wavePreview.js (wave picker), envelope.js (ADSR preview),
-                      randomize.js (RND), arp.js (arpeggiator), mobile.js (phone shell, settings sheet), xypad.js
+                      randomize.js (RND), arp.js (arpeggiator), mobile.js (phone shell, settings sheet)
   styles.css          entry point: @imports css/ in cascade order (the order is the cascade)
   css/                01 tokens · 02 screen (CRT) · 03 panels · 04 controls · 05 keyboard · 06 responsive ·
                       07 scope · 08 desktop · 09 pocket (phone) · 10 effects rack · 11 arp · 12 extras ·

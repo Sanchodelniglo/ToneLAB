@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Browser smoke test, run by scripts/smoke.sh. Loads the app in an iframe (index.html#debug) and checks
+     instruments, key handling, focus loss, knob arrows and bad saved arp data. -->
+<body style="margin:0"><iframe id="f" style="width:1200px;height:800px;border:0"></iframe>
+<script>
+// Bad saved arp data must not break the arpeggiator (same origin, so the iframe reads it)
+localStorage.setItem('arp', JSON.stringify({ length: 0, steps: [null] }));
+const out = [];
+const check = (name, ok, extra = '') => out.push(`${ok ? 'PASS' : 'FAIL'} ${name} ${extra}`);
+const f = document.getElementById('f');
+f.src = '../index.html#debug';
+setTimeout(async () => {
+  try {
+    const w = f.contentWindow, d = f.contentDocument, errors = [];
+    w.addEventListener('error', e => errors.push(e.message));
+    d.getElementById('audioOverlay')?.click();
+    await new Promise(r => setTimeout(r, 1000));
+    const T = w.ToneLAB, S = T.state;
+    check('bad saved arp data repaired', S.arp.length === 16 && S.arp.steps.every(s => s && typeof s === 'object'));
+    for (const type of ['Synth','AMSynth','FMSynth','MembraneSynth','MetalSynth','MonoSynth','NoiseSynth','PluckSynth','PolySynth','DuoSynth']) {
+      T.initSynth(type); await new Promise(r => setTimeout(r, 150));
+      T.playNote('C4'); T.stopNote('C4');
+    }
+    check('all 10 instruments build and play without errors', errors.length === 0, errors.join(' | '));
+    const key = (type, init) => d.dispatchEvent(new w.KeyboardEvent(type, { key: 't', bubbles: true, cancelable: true, ...init }));
+    S.activeKeys.clear();
+    key('keydown', { metaKey: true });
+    check('Cmd+T does not play a note', !S.activeKeys.has('t'));
+    key('keydown', {});
+    check('plain key plays', S.activeKeys.has('t'));
+    w.dispatchEvent(new w.Event('blur'));
+    check('focus loss releases held keys', S.activeKeys.size === 0 && d.querySelectorAll('.key.pressed').length === 0);
+    const knob = d.querySelector('#controls .control-group:not(.is-disabled) .knob-container');
+    knob.focus(); const oct = S.currentOctave;
+    knob.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+    check('arrow key on a knob leaves the octave alone', S.currentOctave === oct);
+  } catch (e) { out.push('FAIL exception ' + e.message); }
+  fetch('/__result?' + encodeURIComponent(out.join('\n')));
+}, 1500);
+</script>

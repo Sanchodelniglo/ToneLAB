@@ -1,4 +1,5 @@
 // Oscilloscope / spectrum analyser drawn on the CRT canvas, tapping the signal after the limiter.
+import { store } from '../state.js';
 
 /* ============================================
    SCOPE — oscilloscope / spectrum on the CRT
@@ -43,7 +44,7 @@ export const scope = (() => {
     let rafId = null;
     let width = 0;
     let height = 0;
-    let mode = localStorage.getItem('scopeMode') === 'spectrum' ? 'spectrum' : 'wave';
+    let mode = store.get('scopeMode') === 'spectrum' ? 'spectrum' : 'wave';
     let sampleRate = 44100;
     let lastPeak = 0; // peak of the last drawn waveform frame, 0..1
     let lastMaxDb = -Infinity; // loudest bin of the last drawn spectrum frame
@@ -217,7 +218,7 @@ export const scope = (() => {
 
     function setMode(next) {
         mode = next === 'spectrum' ? 'spectrum' : 'wave';
-        localStorage.setItem('scopeMode', mode);
+        store.set('scopeMode', mode);
         canvas.setAttribute('aria-label', labels[mode]);
         document.querySelectorAll('.scope-btn').forEach(btn => {
             const active = btn.dataset.scopeMode === mode;

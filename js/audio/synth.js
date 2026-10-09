@@ -24,7 +24,7 @@ function initSynth(type) {
             if (typeof old.releaseAll === 'function') old.releaseAll();
             else if (typeof old.triggerRelease === 'function') old.triggerRelease();
         } catch (e) { /* some synths have nothing to release */ }
-        setTimeout(() => old.dispose(), 2000);
+        setTimeout(() => old.dispose(), 6000); // longest preset release is 4 s
     }
 
     const synthConfig = getSynthConfig(type);

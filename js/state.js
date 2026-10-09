@@ -1,6 +1,12 @@
 // Shared mutable state (former top-level lets of script.js) plus the keyboard layout,
 // dead-key and note-label tables every module reads.
 
+// localStorage throws where site storage is blocked: never let that kill the app
+export const store = {
+    get(key) { try { return localStorage.getItem(key); } catch (_) { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* storage blocked */ } }
+};
+
 // Initialize audio context
 export const state = {
     synth: null,
@@ -20,7 +26,7 @@ export const state = {
     heldNotes: new Set(),     // notes latched by HOLD, e.g. 'C4'; they ring until unlatched
     arpDown: new Set(),       // notes physically down while the arp runs (HOLD off): feed the pattern, drop on release
     userLayout: 'qwerty',
-    noteNotation: localStorage.getItem('noteNotation') || 'english',
+    noteNotation: store.get('noteNotation') || 'english',
     oscSpread: 20,            // detune in cents for fat waves; re-applied whenever the wave becomes fat
     audioInitialized: false
 };
@@ -52,7 +58,7 @@ export function getDisplayLabel(noteLabel) {
 
 // Detect user's keyboard layout
 export function detectKeyboardLayout() {
-    const savedLayout = localStorage.getItem('keyboardLayout');
+    const savedLayout = store.get('keyboardLayout');
     if (savedLayout && keyboardLayouts[savedLayout]) {
         return savedLayout;
     }

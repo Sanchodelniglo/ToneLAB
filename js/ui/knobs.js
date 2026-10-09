@@ -203,6 +203,7 @@ function attachKnobToSlider(slider) {
             default: return;
         }
         e.preventDefault();
+        e.stopPropagation(); // the page-level handler would also read Left/Right as octave keys
     });
 
     knob.addEventListener('dblclick', () => {

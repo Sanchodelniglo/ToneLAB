@@ -7,6 +7,7 @@
 
 import { synthPresets, applyPreset } from '../audio/presets.js';
 import { initXYPad } from './xypad.js';
+import { state } from '../state.js';
 
 // XY pad page: built and working (js/ui/xypad.js), parked until the rest of
 // the pocket shell has settled. Flip to true to get the XY tab back.
@@ -210,7 +211,7 @@ function enter() {
 function syncArpTab(e) {
     if (!active) return;
     const set = $('#arpSet');
-    const on = Boolean(window.ToneLAB?.state?.arp?.on);
+    const on = Boolean(state.arp?.on);
     if (set.hidden !== !on) {
         set.hidden = !on;
         buildTabs();

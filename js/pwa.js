@@ -25,20 +25,7 @@ if ('serviceWorker' in navigator && !isLocalDev) {
 
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
-            .then(registration => {
-                // Listen for updates
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            newWorker.postMessage('SKIP_WAITING');
-                        }
-                    });
-                });
-            })
-            .catch(error => {
-                console.log('Service Worker registration failed:', error);
-            });
+            .catch(error => console.log('Service Worker registration failed:', error));
     });
 }
 

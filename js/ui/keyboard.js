@@ -1,7 +1,7 @@
 // On-screen keyboard: key rendering, octave/layout/notation controls, computer-keyboard
 // input, and the mobile multi-touch handling.
-import { state, keyboardLayouts, deadKeyCodeMap, getDisplayLabel } from '../state.js';
-import { playNote, stopNote } from '../audio/synth.js';
+import { state, store, keyboardLayouts, deadKeyCodeMap, getDisplayLabel } from '../state.js';
+import { playNote, stopNote, releaseAllVoices } from '../audio/synth.js';
 
 /* ============================================
    NOTE ON/OFF WITH HOLD (LATCH)
@@ -255,7 +255,7 @@ document.getElementById('octaveDown').addEventListener('click', () => {
 
 // Keyboard shortcuts for octave changes — only when no form control is focused
 document.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return; // browser shortcuts (Cmd+T...) must not play notes
 
     let key = e.key.toLowerCase();
     // Resolve dead keys (e.g. ^ and $ on AZERTY) via physical key code
@@ -298,6 +298,18 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// The key-up never arrives when the page loses focus (alt-tab, new tab): drop every held input
+// so no note rings on and no key stays "down". Latched (HOLD) notes keep ringing on purpose.
+function releaseAllInput() {
+    state.activeKeys.clear();
+    state.activeTouches.clear();
+    state.arpDown.clear();
+    document.querySelectorAll('.key.pressed').forEach(k => { if (!state.heldNotes.has(k.dataset.note)) k.classList.remove('pressed'); });
+    if (!state.hold && !state.arp?.on) releaseAllVoices();
+}
+window.addEventListener('blur', releaseAllInput);
+document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAllInput(); });
+
 document.addEventListener('keyup', (e) => {
     let key = e.key.toLowerCase();
     if (key === 'dead' && deadKeyCodeMap[e.code]) {
@@ -316,7 +328,7 @@ document.addEventListener('keyup', (e) => {
 // Keyboard layout selector
 document.getElementById('keyboardLayout').addEventListener('change', (e) => {
     state.userLayout = e.target.value;
-    localStorage.setItem('keyboardLayout', state.userLayout);
+    store.set('keyboardLayout', state.userLayout);
     createKeyboard();
     e.target.blur();
 });
@@ -325,7 +337,7 @@ document.getElementById('keyboardLayout').addEventListener('change', (e) => {
 document.getElementById('noteNotation').value = state.noteNotation;
 document.getElementById('noteNotation').addEventListener('change', (e) => {
     state.noteNotation = e.target.value;
-    localStorage.setItem('noteNotation', state.noteNotation);
+    store.set('noteNotation', state.noteNotation);
     createKeyboard();
     e.target.blur();
 });

@@ -1,5 +1,5 @@
 // Bump on every release so installed clients pick up new assets on activate.
-const CACHE_NAME = 'tonelab-synth-v29';
+const CACHE_NAME = 'tonelab-synth-v30';
 
 // App shell key. Cloudflare Pages redirects /index.html -> /, so we keep both
 // entries precached and try both on fallback.
@@ -135,11 +135,5 @@ self.addEventListener('fetch', event => {
     event.respondWith(handleNavigate(event));
   } else {
     event.respondWith(handleAsset(event));
-  }
-});
-
-self.addEventListener('message', event => {
-  if (event.data === 'SKIP_WAITING') {
-    self.skipWaiting();
   }
 });

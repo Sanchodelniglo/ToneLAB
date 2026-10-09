@@ -40,7 +40,8 @@ function load() {
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (_) { /* ignore */ }
     state.arp = { ...defaults, ...(saved || {}), on: false };
-    if (!Array.isArray(state.arp.steps) || state.arp.steps.length !== STEP_COUNT) state.arp.steps = defaults.steps.map(s => ({ ...s }));
+    if (!Array.isArray(state.arp.steps) || state.arp.steps.length !== STEP_COUNT || !state.arp.steps.every(s => s && typeof s === 'object')) state.arp.steps = defaults.steps.map(s => ({ ...s }));
+    if (!(state.arp.length >= 1 && state.arp.length <= STEP_COUNT)) state.arp.length = defaults.length;
 }
 
 function save() {

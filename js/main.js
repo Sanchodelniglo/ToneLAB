@@ -70,8 +70,8 @@ document.body.addEventListener('click', () => {
     if (!state.audioInitialized) init();
 }, { once: true });
 
-// Debug surface for the smoke test; the app itself never reads it.
-window.ToneLAB = {
+// Debug surface for scripts/smoke.sh (open index.html#debug); the app itself never reads it.
+if (location.hash === '#debug') window.ToneLAB = {
     state,
     playNote,
     stopNote,

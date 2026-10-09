@@ -19,9 +19,9 @@
         grid-template-areas: "bar" "scope" "pages" "kbd";
     }
 
-    /* Tall screens give the scope more room */
+    /* The scope grows with the screen, but the sets need the height more than it does */
     .scope-block {
-        height: clamp(96px, 14vh, 170px);
+        height: clamp(88px, 10vh, 150px);
     }
 
     .pages {
@@ -55,7 +55,7 @@
     }
 
     .env-preview {
-        height: 56px;
+        height: 48px;
     }
 
     /* One header line: logo, instrument stepper, gear (the phone layout needs a second line) */

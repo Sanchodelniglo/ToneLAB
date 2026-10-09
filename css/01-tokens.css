@@ -46,6 +46,21 @@
     --bg-mid: #0d1428;               /* middle stop of the screen gradient */
     --white: #fff;
     --black: #000;
+    /* Keys, knob body and scope screen shades (one-off gradient stops) */
+    --key-top-rgb: 55 65 110;
+    --key-bottom-rgb: 40 48 85;
+    --key-hover-top-rgb: 40 49 93;
+    --key-hover-bottom-rgb: 31 35 75;
+    --key-black-top-rgb: 20 22 50;
+    --key-black-bottom-rgb: 10 12 30;
+    --key-black-hover-top-rgb: 25 15 40;
+    --key-black-hover-bottom-rgb: 15 8 30;
+    --screen-deep-rgb: 5 8 24;
+    --knob-fill: #1c2350;
+    /* The CRT sub-pixel stripes */
+    --phosphor-red-rgb: 255 0 0;
+    --phosphor-green-rgb: 0 255 0;
+    --phosphor-blue-rgb: 0 0 255;
 
     --border-glow: rgb(var(--cyan-rgb) / 0.4);
 

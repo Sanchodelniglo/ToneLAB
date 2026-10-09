@@ -68,7 +68,7 @@ body::before {
     inset: 0;
     background:
         linear-gradient(rgb(var(--crt-dark-rgb) / 0) 50%, rgb(var(--black-rgb) / 0.15) 50%),
-        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+        linear-gradient(90deg, rgb(var(--phosphor-red-rgb) / 0.04), rgb(var(--phosphor-green-rgb) / 0.02), rgb(var(--phosphor-blue-rgb) / 0.04));
     background-size: 100% 3px, 3px 100%;
     pointer-events: none;
     z-index: 9998;

@@ -400,7 +400,7 @@ body[data-controls="sliders"] .wave-select {
 
 .knob-container:hover .knob-body,
 .knob-container.is-dragging .knob-body {
-    fill: #1c2350;
+    fill: var(--knob-fill);
     stroke: rgb(var(--cyan-rgb) / 0.7);
     filter: drop-shadow(0 0 6px rgb(var(--cyan-rgb) / 0.25));
 }

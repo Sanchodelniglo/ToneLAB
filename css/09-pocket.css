@@ -41,8 +41,9 @@ body[data-key-labels="off"] .keyboard-key-label {
         max-width: none;
         padding: 0;
         display: grid;
-        grid-template-rows: auto auto auto minmax(0, 1fr) auto;
-        grid-template-areas: "bar" "scope" "tabs" "pages" "kbd";
+        grid-template-columns: minmax(0, 1fr); /* a plain auto column grows to the widest row and crops the page on a 360px phone */
+        grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "preset" "scope" "tabs" "pages" "kbd";
     }
 
     main,
@@ -177,11 +178,29 @@ body[data-key-labels="off"] .keyboard-key-label {
         background: rgb(var(--cyan-rgb) / 0.15);
     }
 
+    /* ---- preset line under the header: ◂ select ? ▸ RND SAVE, same 44px buttons as the type stepper ---- */
+    .scope-preset {
+        grid-area: preset;
+        position: relative; /* anchors the hint popover */
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 2px var(--space-md);
+        border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.15);
+    }
+
+    /* Narrow phones: slimmer buttons leave the select room for a name */
+    @media (max-width: 380px) {
+        .scope-preset .step-btn {
+            width: 40px;
+        }
+    }
+
     /* ---- scope strip: swipe left / right = preset ---- */
     .scope-block {
         grid-area: scope;
         position: relative;
-        height: 96px;
+        height: clamp(72px, 12dvh, 110px); /* 96px on an 800px-tall phone, less on a short one */
         padding: 0;
         margin: 0;
         border: none;
@@ -195,30 +214,6 @@ body[data-key-labels="off"] .keyboard-key-label {
         height: 100%;
         min-height: 0;
         border: none;
-    }
-
-    .scope-preset {
-        position: absolute;
-        inset: 0 0 auto 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 2px 4px 0;
-        pointer-events: none;
-    }
-
-    .scope-preset .step-btn {
-        pointer-events: auto;
-        width: 44px;
-        height: 36px;
-        border-color: transparent;
-    }
-
-    .scope-preset .preset-help {
-        pointer-events: auto;
-        width: 36px;
-        height: 36px;
-        border-color: transparent;
     }
 
     .scope-preset .preset-help:disabled {
@@ -242,13 +237,16 @@ body[data-key-labels="off"] .keyboard-key-label {
         display: block;
     }
 
-    .scope-preset span {
-        font-family: var(--font-mono);
-        font-size: var(--text-xs);
-        letter-spacing: var(--tracking-wide);
-        text-transform: uppercase;
+    /* The preset name is a select, like the type above it */
+    .scope-preset select {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 44px;
+        padding: 6px 8px;
+        font-size: var(--text-sm);
+        text-align: center;
+        text-align-last: center;
         color: var(--magenta-text);
-        text-shadow: 0 0 8px rgb(var(--magenta-rgb) / 0.5);
     }
 
     /* ---- tabs ---- */
@@ -608,11 +606,15 @@ body[data-key-labels="off"] .keyboard-key-label {
     .container {
         grid-template-columns: 2fr 3fr;
         grid-template-rows: auto auto minmax(0, 1fr) auto;
-        grid-template-areas: "bar bar" "scope tabs" "scope pages" "kbd kbd";
+        grid-template-areas: "bar bar" "preset tabs" "scope pages" "kbd kbd";
     }
 
     .scope-block {
         height: auto;
+        border-right: 1px solid rgb(var(--cyan-rgb) / 0.15);
+    }
+
+    .scope-preset {
         border-right: 1px solid rgb(var(--cyan-rgb) / 0.15);
     }
 

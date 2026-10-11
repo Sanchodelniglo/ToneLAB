@@ -94,10 +94,11 @@
                         <div class="preset-stepper-row">
                             <span class="preset-label">Preset:</span>
                             <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
-                            <select id="presetSelect" aria-label="Preset"></select>
+                            <select id="presetSelect" class="preset-select" aria-label="Preset"></select>
                             <button type="button" class="help-btn type-help preset-help" id="presetHelp" aria-label="About this preset" aria-expanded="false" aria-controls="presetHint">?</button>
                             <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
-                            <button type="button" class="step-btn rnd-btn" data-randomize aria-label="Randomize the sound" title="Randomize the sound">RND</button>
+                            <button type="button" class="step-btn rnd-btn" data-randomize aria-label="Randomize the sound" title="Randomize the sound"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3h18v18H3z"/><path fill="currentColor" stroke="none" d="M5.5 5.5h3v3h-3zM15.5 5.5h3v3h-3zM10.5 10.5h3v3h-3zM5.5 15.5h3v3h-3zM15.5 15.5h3v3h-3z"/></svg></button>
+                            <button type="button" class="step-btn rnd-btn" data-preset-save aria-label="Save the sound as a preset" title="Save the sound as a preset"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3h15l3 3v15H3z"/><path d="M7 3v6h9V3"/><path d="M6 21v-8h12v8"/></svg></button>
                             <p class="control-hint type-hint" id="presetHint" data-preset-hint hidden></p>
                         </div>
                     </div>
@@ -110,6 +111,17 @@
                 </div>
             </div>
 
+            <!-- Preset line, pocket layouts only: under the header, above the scope -->
+                <div class="scope-preset" aria-live="polite">
+                    <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
+                    <select id="presetSelectMobile" class="preset-select" aria-label="Preset"></select>
+                    <button type="button" class="help-btn type-help preset-help" id="presetHelpMobile" aria-label="About this preset" aria-expanded="false" aria-controls="presetHintMobile">?</button>
+                    <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
+                    <button type="button" class="step-btn rnd-btn" data-randomize aria-label="Randomize the sound" title="Randomize the sound"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3h18v18H3z"/><path fill="currentColor" stroke="none" d="M5.5 5.5h3v3h-3zM15.5 5.5h3v3h-3zM10.5 10.5h3v3h-3zM5.5 15.5h3v3h-3zM15.5 15.5h3v3h-3z"/></svg></button>
+                    <button type="button" class="step-btn rnd-btn" data-preset-save aria-label="Save the sound as a preset" title="Save the sound as a preset"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3h15l3 3v15H3z"/><path d="M7 3v6h9V3"/><path d="M6 21v-8h12v8"/></svg></button>
+                    <p class="control-hint type-hint" id="presetHintMobile" data-preset-hint hidden></p>
+                </div>
+
             <!-- Live scope: its own box on desktop (right column), strip on mobile -->
                 <div class="scope-block" role="group" aria-labelledby="scopeHeading">
                     <div class="scope-head">
@@ -120,14 +132,6 @@
                         </div>
                     </div>
                     <canvas id="scopeCanvas" class="scope-canvas" role="img" aria-label="Oscilloscope showing the output waveform" title="What you hear, after the effects. Hold a note and turn a knob."></canvas>
-                    <div class="scope-preset" aria-live="polite">
-                        <button type="button" class="step-btn" data-preset-step="-1" aria-label="Previous preset">&#9664;</button>
-                        <span id="scopePresetName" data-preset-name>swipe for presets</span>
-                        <button type="button" class="help-btn type-help preset-help" id="presetHelpMobile" aria-label="About this preset" aria-expanded="false" aria-controls="presetHintMobile">?</button>
-                        <button type="button" class="step-btn" data-preset-step="1" aria-label="Next preset">&#9654;</button>
-                        <button type="button" class="step-btn rnd-btn" data-randomize aria-label="Randomize the sound" title="Randomize the sound">RND</button>
-                        <p class="control-hint type-hint" id="presetHintMobile" data-preset-hint hidden></p>
-                    </div>
                 </div>
 
             <div class="synth-panel effects-panel">
@@ -356,6 +360,25 @@
             </div>
         </main>
     </div>
+
+    <!-- Save / edit one of my presets (js/audio/presets.js) -->
+    <dialog class="preset-dialog" id="presetDialog" aria-labelledby="presetDialogTitle">
+        <form id="presetForm" class="preset-form">
+            <div class="sheet-head">
+                <span class="sheet-title" id="presetDialogTitle">Save preset</span>
+                <button type="button" class="sheet-close" data-dialog-close aria-label="Close">&#10005;</button>
+            </div>
+            <label class="preset-dialog-label" for="presetName">Name</label>
+            <input type="text" id="presetName" class="preset-name" maxlength="24" required pattern=".*\S.*" autocomplete="off" spellcheck="false" placeholder="My sound">
+            <p class="preset-dialog-hint" id="presetDialogHint"></p>
+            <div class="preset-dialog-actions">
+                <button type="button" class="preset-btn danger" data-preset-op="delete" hidden>Delete</button>
+                <button type="button" class="preset-btn" data-preset-op="new" hidden>Save as new</button>
+                <button type="submit" class="preset-btn active" data-preset-op="main">Save</button>
+            </div>
+        </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <!-- Settings (gear): popover on desktop, bottom sheet in the pocket layout. The CRT row is
          always here; js/ui/mobile.js adds the pocket rows (view toggle, scope mode, notation, install) above it -->

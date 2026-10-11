@@ -15,8 +15,8 @@
     }
 
     .container {
-        grid-template-rows: auto auto minmax(0, 1fr) auto;
-        grid-template-areas: "bar" "scope" "pages" "kbd";
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "preset" "scope" "pages" "kbd";
     }
 
     /* The scope grows with the screen, but the sets need the height more than it does */

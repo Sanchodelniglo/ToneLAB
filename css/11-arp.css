@@ -249,7 +249,8 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
         grid-template-areas:
             "help mode mode mode rate rate rate"
             "lights lights lights lights lights lights lights"
-            "oct  oct  oct  oct  len  len  len"
+            "oct  oct  oct  oct  oct  oct  oct"
+            "len  len  len  len  len  len  len"
             "bpm  bpm  bpm  bpm  tap  tap  tap"
             "gate gate gate gate gate gate gate"
             "swng swng swng swng swng swng swng";
@@ -346,7 +347,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     .pages .arp-settings .control-group.arp-knob:has(.knob-container) .control-label { display: contents; }
     .pages .arp-settings .control-group.arp-knob:has(.knob-container) label { grid-area: label; margin: 0; font-size: var(--text-xs); text-align: left; justify-self: start; }
     .pages .arp-settings .control-group.arp-knob:has(.knob-container) .control-value { grid-area: value; margin: 0; font-size: var(--text-sm); justify-self: end; }
-    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .help-btn { grid-area: help; position: static; width: 22px; height: 22px; opacity: 1; justify-self: start; }
+    .pages .arp-settings .control-group.arp-knob:has(.knob-container) .help-btn { grid-area: help; position: relative; width: 22px; height: 22px; opacity: 1; justify-self: start; }
     .pages .arp-settings .control-group.arp-knob:has(.knob-container) .knob-container,
     body[data-controls="sliders"] .pages .arp-settings .control-group.arp-knob .knob-container { display: none; }
 
@@ -404,40 +405,3 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     }
 
 }
-
-/* Landscape phone: two columns, lights left, settings right */
-@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
-    .arp-set .arp-strip {
-        grid-template-columns: 40px repeat(6, minmax(0, 1fr)) repeat(6, minmax(0, 1fr));
-        grid-template-areas:
-            "help mode mode mode rate rate rate lights lights lights lights lights lights"
-            "oct  oct  oct  oct  len  len  len  lights lights lights lights lights lights"
-            "bpm  bpm  bpm  bpm  tap  tap  tap  gate   gate   gate   gate   gate   gate"
-            ".    .    .    .    .    .    .    swng   swng   swng   swng   swng   swng";
-        gap: var(--space-xs) var(--space-sm);
-    }
-
-    .arp-set .arp-steps {
-        margin: 0;
-        grid-template-columns: repeat(8, minmax(0, 1fr));
-        gap: 4px;
-    }
-
-    .arp-step,
-    .arp-step:nth-child(4n + 1) {
-        height: 36px;
-    }
-
-    .arp-row {
-        grid-template-columns: 40px repeat(6, minmax(0, 1fr));
-        gap: var(--space-xs);
-    }
-
-    .arp-help-btn,
-    .arp-row select,
-    .arp-tap,
-    .arp-group {
-        height: 36px;
-    }
-}
-

@@ -35,6 +35,43 @@ setTimeout(async () => {
     knob.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     check('arrow key on a knob leaves the octave alone', S.currentOctave === oct);
 
+    // User presets through the dialog: save, edit (rename + update), save as new, delete
+    const q1 = (sel) => d.querySelector(sel), dlg = d.getElementById('presetDialog'), nameIn = d.getElementById('presetName');
+    const sel = d.getElementById('presetSelect'), mine = () => JSON.parse(w.localStorage.getItem('userPresets') || '{}').FMSynth || [];
+    const submit = () => d.getElementById('presetForm').requestSubmit();
+    const wait = () => new Promise(r => setTimeout(r, 100));
+    d.getElementById('instrumentType').value = 'FMSynth'; d.getElementById('instrumentType').dispatchEvent(new w.Event('change', { bubbles: true }));
+    await new Promise(r => setTimeout(r, 300));
+    const q = q1('#controls [data-control="attack"]');
+    q.value = 0.5; q.dispatchEvent(new w.Event('input', { bubbles: true }));
+    q1('[data-preset-save]').click();
+    check('SAVE opens the dialog', dlg.open && q1('[data-preset-op="delete"]').hidden);
+    nameIn.value = '   '; submit(); await wait();
+    check('blank name is refused', mine().length === 0 && dlg.open);
+    nameIn.value = 'Mine'; submit(); await wait();
+    check('save adds a user preset, loads it, closes the dialog', mine().length === 1 && mine()[0].params.attack === 0.5 && !dlg.open && sel.selectedOptions[0]?.parentElement.tagName === 'OPTGROUP');
+    check('pocket preset select follows the desktop one', d.getElementById('presetSelectMobile').value === sel.value && sel.value !== '');
+    check('save button is lit for a user preset', q1('[data-preset-save]').classList.contains('editing'));
+    q.value = 0.2; q.dispatchEvent(new w.Event('input', { bubbles: true }));
+    q1('[data-preset-save]').click();
+    check('edit dialog is prefilled with delete and save-as-new', dlg.open && nameIn.value === 'Mine' && !q1('[data-preset-op="delete"]').hidden);
+    nameIn.value = 'Mine2'; submit(); await wait();
+    check('update renames and overwrites', mine().length === 1 && mine()[0].name === 'Mine2' && mine()[0].params.attack === 0.2);
+    T.applyPreset('FMSynth', 0); T.applyPreset('FMSynth', sel.options.length - 2);
+    check('user preset applies its values', parseFloat(q.value) === 0.2);
+    q1('[data-preset-save]').click(); nameIn.value = 'Copy'; q1('[data-preset-op="new"]').click(); await wait();
+    check('save as new keeps the old one', mine().length === 2 && mine()[1].name === 'Copy');
+    q1('[data-preset-save]').click(); q1('[data-preset-op="delete"]').click();
+    check('first delete click only arms', dlg.open && mine().length === 2);
+    q1('[data-preset-op="delete"]').click(); await wait();
+    check('second delete click deletes', mine().length === 1 && !dlg.open && !q1('[data-preset-save]').classList.contains('editing'));
+    check('user presets run without errors', errors.length === 0, errors.join(' | '));
+    // The ? hit area (::after) must not cover the control it sits next to (it once swallowed ARP and rack slider touches)
+    d.querySelector('.view-btn[data-controls="sliders"]').click(); await wait();
+    const covered = [...d.querySelectorAll('.effect-controls input[type=range]')].filter(el => {
+      const r = el.getBoundingClientRect(); return r.width > 0 && d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) !== el; }).map(el => el.id);
+    check('no help button covers an effects slider', covered.length === 0, covered.join(','));
+    d.querySelector('.view-btn[data-controls="knobs"]').click();
     T.setArp(false);
   } catch (e) { out.push('FAIL exception ' + e.message); }
   fetch('/__result?' + encodeURIComponent(out.join('\n')));

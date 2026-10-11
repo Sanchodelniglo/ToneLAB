@@ -1,4 +1,4 @@
-/*@split 12-controls-extras.css: RND button, disabled controls, envelope preview and its placements, desktop knob size (split from styles.css, no rule changes) */
+/*@split 12-controls-extras.css: random and save icon buttons, preset save dialog and toast, disabled controls, envelope preview and its placements, desktop knob size (split from styles.css, no rule changes) */
 
 /* RND button: three letters, so it outgrows the 30px square of the arrow steppers */
 .preset-stepper .step-btn.rnd-btn {
@@ -6,6 +6,20 @@
     min-width: 38px;
     padding: 0 6px;
     letter-spacing: var(--tracking-wide);
+}
+
+/* Die (random) and floppy-disk (save) buttons: icon only; the floppy is lit while a saved preset is loaded */
+.step-btn[data-randomize] svg,
+.step-btn[data-preset-save] svg {
+    display: block;
+    flex: 0 0 auto;
+    pointer-events: none;
+}
+
+.step-btn[data-preset-save].editing {
+    border-color: var(--accent-cyan);
+    background: rgb(var(--cyan-rgb) / 0.12);
+    box-shadow: 0 0 10px rgb(var(--cyan-rgb) / 0.25);
 }
 
 /* Spread (and any control that does not apply right now): dimmed and untouchable, ? stays clickable */
@@ -181,4 +195,118 @@ body[data-crt-glitch="off"] {
 .control-group > .control-hint.hint-up {
     top: auto;
     bottom: calc(100% + 2px);
+}
+
+/* Save / edit preset dialog (native <dialog>: focus trap and Esc come with it) and its toast */
+.preset-dialog {
+    margin: auto;
+    padding: 0;
+    width: min(380px, calc(100vw - 2 * var(--space-md)));
+    color: var(--text-primary);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.4);
+    background: linear-gradient(135deg, rgb(var(--panel-top-rgb) / 0.98), rgb(var(--panel-bottom-rgb) / 0.98));
+    box-shadow: 0 8px 40px rgb(var(--black-rgb) / 0.6);
+}
+
+.preset-dialog::backdrop {
+    background: rgb(var(--overlay-rgb) / 0.7);
+}
+
+.preset-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+}
+
+.preset-dialog-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--cyan-text);
+}
+
+.preset-name {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid rgb(var(--cyan-rgb) / 0.4);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+.preset-name:focus {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: 2px;
+}
+
+.preset-dialog-hint {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.preset-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+}
+
+.preset-dialog-actions .preset-btn {
+    min-height: 36px;
+    padding: 0 var(--space-md);
+}
+
+/* Delete sits alone on the left, away from the safe buttons */
+.preset-dialog-actions .danger {
+    margin-right: auto;
+    color: var(--magenta-text);
+    border-color: rgb(var(--magenta-rgb) / 0.4);
+}
+
+.preset-dialog-actions .danger:hover,
+.preset-dialog-actions .danger.armed {
+    color: var(--magenta-text);
+    border-color: var(--accent-magenta);
+    background: rgb(var(--magenta-rgb) / 0.12);
+}
+
+.preset-dialog-actions [hidden] {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .preset-dialog-actions .preset-btn {
+        min-height: 44px;
+    }
+}
+
+.toast {
+    position: fixed;
+    top: var(--space-xl);
+    left: 50%;
+    z-index: 400;
+    max-width: calc(100vw - 2 * var(--space-md));
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-cyan);
+    color: var(--cyan-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -8px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }

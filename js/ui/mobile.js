@@ -5,7 +5,7 @@
 // the header, secondary controls into the settings sheet, effects into the pages
 // carousel) and leaving puts them back exactly where they were.
 
-import { synthPresets, applyPreset } from '../audio/presets.js';
+import { presetsFor, applyPreset } from '../audio/presets.js';
 import { state } from '../state.js';
 
 const mq = window.matchMedia('(max-width: 1023px)');
@@ -41,7 +41,6 @@ const TAB_NAMES = {
 
 const $ = (sel) => document.querySelector(sel);
 let pagesObserver = null;
-let presetObserver = null;
 let active = false;
 
 /* ---------- pages + tabs ---------- */
@@ -125,14 +124,9 @@ function activePresetIndex() {
     return btn ? parseInt(btn.dataset.preset, 10) : -1;
 }
 
-function syncPresetName() {
-    const btn = $('#presetBar .preset-btn.active');
-    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = btn ? btn.textContent : 'swipe for presets'; });
-}
-
 function stepPreset(step) {
     const type = $('#instrumentType').value;
-    const n = synthPresets[type]?.length || 0;
+    const n = presetsFor(type).length;
     if (!n) return;
     const next = (activePresetIndex() + step + n * 2) % n;
     applyPreset(type, next);
@@ -189,9 +183,6 @@ function enter() {
     pagesObserver.observe($('#controls'), { childList: true });
 
     document.addEventListener('arp-change', syncArpTab);
-    presetObserver = new MutationObserver(syncPresetName);
-    presetObserver.observe($('#presetBar'), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-    syncPresetName();
 }
 
 // The ARP tab exists only while the arp runs; rebuilt on toggle
@@ -221,7 +212,6 @@ function leave() {
     document.removeEventListener('arp-change', syncArpTab);
     document.body.classList.remove('pocket');
     pagesObserver?.disconnect();
-    presetObserver?.disconnect();
     openSheet(false);
     restoreAll();
     document.querySelectorAll('#sheetSlots > [data-pocket]').forEach(row => row.remove()); // drop the empty rows
@@ -237,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Swipe on the scope strip = previous / next preset
     const scope = $('.scope-block');
     let swipeX = null;
-    scope.addEventListener('pointerdown', (e) => { if (active && !e.target.closest('button')) swipeX = e.clientX; });
+    scope.addEventListener('pointerdown', (e) => { if (active && !e.target.closest('button, select')) swipeX = e.clientX; });
     scope.addEventListener('pointerup', (e) => {
         if (swipeX === null) return;
         const dx = e.clientX - swipeX;

@@ -1,5 +1,5 @@
 // Synth descriptions, factory presets, preset application and the preset bar UI.
-import { state } from '../state.js';
+import { state, store } from '../state.js';
 import { updateSynthParameter } from './synth.js';
 import { setEffect, EFFECT_DEFAULTS, effectHandlers } from './effects.js';
 import { updateSliderFill } from '../ui/knobs.js';
@@ -221,9 +221,119 @@ function presetHint(type, name) {
     return presetHints[`${type}/${name}`] || '';
 }
 
+// User presets: same shape as the factory ones, per instrument type, in localStorage.
+// They sit after the factory ones, so a preset index >= factory count means "mine".
+const userPresets = {};
+try {
+    for (const [type, list] of Object.entries(JSON.parse(store.get('userPresets')) || {})) {
+        userPresets[type] = Array.isArray(list) ? list.filter(p => p && typeof p.name === 'string' && p.params && typeof p.params === 'object') : [];
+    }
+} catch (_) { /* corrupt or blocked storage: start empty */ }
+
+const factoryCount = (type) => synthPresets[type]?.length || 0;
+const presetsFor = (type) => [...(synthPresets[type] || []), ...(userPresets[type] || [])];
+const persistUserPresets = () => store.set('userPresets', JSON.stringify(userPresets));
+
+// The floppy button opens the dialog; it is lit while one of my presets is loaded (then the dialog edits it).
+function syncPresetActions(isUser) {
+    const label = isUser ? 'Rename, update or delete this preset' : 'Save the sound as a preset';
+    document.querySelectorAll('[data-preset-save]').forEach(btn => {
+        btn.classList.toggle('editing', isUser);
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
+    });
+}
+
+// The current sound as a preset: every instrument control, the effects rack and the octave.
+function snapshotPreset(name) {
+    const params = {};
+    document.querySelectorAll('#controls [data-control]').forEach(el => {
+        params[el.dataset.control] = el.type === 'range' ? parseFloat(el.value) : el.value;
+    });
+    const effects = {};
+    for (const key of Object.keys(effectHandlers)) effects[key] = parseFloat(document.getElementById(key).value);
+    return { name, octave: state.currentOctave, effects, params };
+}
+
+function activePreset() {
+    const type = document.getElementById('instrumentType').value;
+    const index = parseInt(document.getElementById('presetSelect').value, 10);
+    const mine = index - factoryCount(type);
+    return { type, mine: mine >= 0 ? mine : -1 };
+}
+
+/* ---------- save / edit dialog ---------- */
+
+const dialog = document.getElementById('presetDialog');
+const nameInput = document.getElementById('presetName');
+const newBtn = dialog.querySelector('[data-preset-op="new"]');
+const delBtn = dialog.querySelector('[data-preset-op="delete"]');
+const mainBtn = dialog.querySelector('[data-preset-op="main"]');
+const toast = document.getElementById('toast');
+let toastTimer = null;
+
+function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function resetDelete() {
+    delBtn.classList.remove('armed');
+    delBtn.textContent = 'Delete';
+}
+
+function openPresetDialog() {
+    const { type, mine } = activePreset();
+    const current = mine >= 0 ? userPresets[type][mine] : null;
+    document.getElementById('presetDialogTitle').textContent = current ? 'Edit preset' : 'Save preset';
+    document.getElementById('presetDialogHint').textContent = current
+        ? 'Update replaces this preset with the sound you hear now. Rename it here too.'
+        : `Keeps the knobs, wave, effects and octave of this ${document.getElementById('instrumentType').selectedOptions[0].textContent}.`;
+    nameInput.value = current ? current.name : '';
+    newBtn.hidden = delBtn.hidden = !current;
+    mainBtn.textContent = current ? 'Update' : 'Save';
+    resetDelete();
+    dialog.showModal();
+    nameInput.select();
+}
+
+// Save a new preset, or (default on an edit) replace the loaded one; either way it ends up loaded.
+function commitPreset(asNew) {
+    const { type, mine } = activePreset();
+    const name = nameInput.value.trim();
+    const list = (userPresets[type] ||= []);
+    const replace = mine >= 0 && !asNew;
+    if (replace) list[mine] = snapshotPreset(name); else list.push(snapshotPreset(name));
+    persistUserPresets();
+    updatePresetBar(type);
+    applyPreset(type, factoryCount(type) + (replace ? mine : list.length - 1));
+    dialog.close();
+    showToast(`${replace ? 'Updated' : 'Saved'} "${name}"`);
+}
+
+// Two clicks: the first arms the button ("Sure?"), the second deletes.
+function deletePreset() {
+    if (!delBtn.classList.contains('armed')) {
+        delBtn.classList.add('armed');
+        delBtn.textContent = 'Sure?';
+        return;
+    }
+    const { type, mine } = activePreset();
+    if (mine < 0) return;
+    const [gone] = userPresets[type].splice(mine, 1);
+    persistUserPresets();
+    updatePresetBar(type);
+    showCustomPreset('Custom'); // the sound stays as it is
+    dialog.close();
+    showToast(`Deleted "${gone.name}"`);
+}
+
 function applyPreset(type, presetIndex) {
-    const preset = synthPresets[type]?.[presetIndex];
+    const preset = presetsFor(type)[presetIndex];
     if (!preset) return;
+    const isUser = presetIndex >= factoryCount(type);
 
     // Apply each param to the synth engine and update UI controls
     const controlsDiv = document.getElementById('controls');
@@ -270,19 +380,26 @@ function applyPreset(type, presetIndex) {
     document.querySelectorAll('#presetBar .preset-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.querySelector(`#presetBar .preset-btn[data-preset="${presetIndex}"]`);
     if (activeBtn) activeBtn.classList.add('active');
-    const select = document.getElementById('presetSelect');
-    if (select) select.value = String(presetIndex);
-    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = preset.name; });
-    setPresetHintText(presetHint(type, preset.name));
+    syncPresetSelects(String(presetIndex), 'Pick a preset');
+    setPresetHintText(isUser ? '' : presetHint(type, preset.name));
+    syncPresetActions(isUser);
+}
+
+// Every preset select (desktop row, pocket strip) shows the same option; '' picks the placeholder,
+// whose text is the name of a sound that is not a preset ("Random", "Custom").
+function syncPresetSelects(index, placeholder) {
+    document.querySelectorAll('.preset-select').forEach(select => {
+        select.options[0].textContent = placeholder;
+        select.value = index;
+    });
 }
 
 // Shows a name that is not one of the 8 presets (e.g. "Random"): nothing active, no hint.
 function showCustomPreset(name) {
     document.querySelectorAll('#presetBar .preset-btn').forEach(btn => btn.classList.remove('active'));
-    const select = document.getElementById('presetSelect');
-    if (select) select.value = '';
-    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = name; });
+    syncPresetSelects('', name); // no option matches: the placeholder shows the name
     setPresetHintText('');
+    syncPresetActions(false);
 }
 
 // Fills every preset-hint slot; the ? buttons are disabled while there is
@@ -302,8 +419,9 @@ function updatePresetBar(type) {
     const bar = document.getElementById('presetBar');
     bar.innerHTML = '';
 
-    const presets = synthPresets[type];
-    if (!presets) return;
+    const presets = presetsFor(type);
+    if (!presets.length) return;
+    const factory = factoryCount(type);
 
     const label = document.createElement('span');
     label.className = 'preset-label';
@@ -315,25 +433,34 @@ function updatePresetBar(type) {
         btn.className = 'preset-btn';
         btn.textContent = preset.name;
         btn.dataset.preset = i;
-        btn.title = presetHint(type, preset.name);
+        btn.title = i < factory ? presetHint(type, preset.name) : '';
         btn.addEventListener('click', () => applyPreset(type, i));
         bar.appendChild(btn);
     });
 
-    // Desktop stepper: ◂ [select] ▸ (the buttons above stay the source of truth)
-    const select = document.getElementById('presetSelect');
-    if (select) {
+    // The selects (desktop row, pocket strip); the buttons above stay the source of truth
+    document.querySelectorAll('.preset-select').forEach(select => {
         select.innerHTML = '<option value="" disabled selected>Pick a preset</option>';
+        let mine = null;
         presets.forEach((preset, i) => {
             const opt = document.createElement('option');
             opt.value = String(i);
             opt.textContent = preset.name;
-            select.appendChild(opt);
+            if (i < factory) { select.appendChild(opt); return; }
+            if (!mine) { mine = document.createElement('optgroup'); mine.label = 'My presets'; select.appendChild(mine); }
+            mine.appendChild(opt);
         });
         select.onchange = () => { if (select.value !== '') applyPreset(type, parseInt(select.value, 10)); };
-    }
-    document.querySelectorAll('[data-preset-name]').forEach(el => { el.textContent = 'swipe for presets'; });
+    });
     setPresetHintText('');
+    syncPresetActions(false);
 }
 
-export { synthDescriptions, synthPresets, presetHints, applyPreset, updatePresetBar, showCustomPreset };
+document.querySelectorAll('[data-preset-save]').forEach(btn => btn.addEventListener('click', openPresetDialog));
+document.getElementById('presetForm').addEventListener('submit', (e) => { e.preventDefault(); commitPreset(false); });
+newBtn.addEventListener('click', () => { if (nameInput.reportValidity()) commitPreset(true); });
+delBtn.addEventListener('click', deletePreset);
+dialog.querySelector('[data-dialog-close]').addEventListener('click', () => dialog.close());
+dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); }); // the backdrop
+
+export { synthDescriptions, synthPresets, presetHints, presetsFor, applyPreset, updatePresetBar, showCustomPreset };

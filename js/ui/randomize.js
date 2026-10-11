@@ -2,7 +2,7 @@
 // Writes through the same inputs as a hand gesture (value + input/change event), so
 // knobs, readouts, scope and engine follow; the instrument type stays as it is.
 import { state } from '../state.js';
-import { setEffect, effectHandlers } from '../audio/effects.js';
+import { setEffect, effectHandlers, EFFECT_DEFAULTS } from '../audio/effects.js';
 import { showCustomPreset } from '../audio/presets.js';
 
 // Controls we never touch: loudness stays where the player set it.
@@ -13,6 +13,8 @@ const BEND = { attack: 3, modAttack: 3, filterAttack: 3, modulationIndex: 2, fil
 const FLOOR = { sustain: 0.2, filterCutoff: 150 };
 // Delay feedback above this runs away into a wall of noise.
 const FEEDBACK_MAX = 0.65;
+// Special effects: most rolls leave them off, so a random sound is not always wobbling or crushed.
+const MOSTLY_OFF = new Set(['phaserMix', 'tremoloDepth', 'crushBits']);
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
@@ -56,6 +58,9 @@ function randomizeEffects() {
         const max = key === 'delayFeedback' ? Math.min(FEEDBACK_MAX, parseFloat(slider.max)) : parseFloat(slider.max);
         let v;
         if (key === 'filterFreq') v = randomIn(800, max, parseFloat(slider.step), 1, true); // never a muffled mess
+        else if (MOSTLY_OFF.has(key) && Math.random() < 0.6) v = EFFECT_DEFAULTS[key];
+        else if (key === 'crushBits') v = randomIn(3, 8, 1); // 2 bits is just noise, 9+ is clean
+        else if (key === 'crushMix') v = randomIn(0.5, max, parseFloat(slider.step)); // a crush you can hear
         else if (key === 'distortion') v = randomIn(parseFloat(slider.min), max, parseFloat(slider.step), 3); // mostly clean
         else v = randomIn(parseFloat(slider.min), max, parseFloat(slider.step), key.endsWith('Mix') || key === 'reverb' ? 1.5 : 1);
         setEffect(key, v);

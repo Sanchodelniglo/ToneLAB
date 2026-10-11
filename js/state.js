@@ -15,6 +15,9 @@ export const state = {
     distortion: null,
     filter: null,
     chorus: null,
+    phaser: null,
+    tremolo: null,
+    crusher: null,        // null where AudioWorklet is missing: the Crusher knobs then do nothing
     limiter: null,
     currentInstrumentType: 'Synth',
     currentOctave: 4,

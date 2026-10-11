@@ -87,7 +87,7 @@
         height: 20px;
     }
 
-    /* ---- effects rack: one full-width row of five sets ---- */
+    /* ---- effects rack: full-width, the eight sets wrap ---- */
     .pages > .effect-controls {
         flex: 1 1 100%;
         flex-direction: row;
@@ -108,10 +108,19 @@
         border: none;
     }
 
+    /* grid cells, not the phone's 72px flex cells (css/09-pocket.css) */
     .pages > .effect-controls .controls-grid {
+        display: grid;
         grid-template-columns: repeat(var(--cols, 1), 78px);
         justify-content: space-evenly;
         gap: var(--space-sm) 4px;
+    }
+
+    .pages > .effect-controls .controls-grid .control-group {
+        --knob-size: 72px;
+        --fader-len: 80px;
+        width: 100%;
+        flex: none;
     }
 
     /* ---- ARP strip (only while the arp runs) ---- */
@@ -120,8 +129,8 @@
     }
 }
 
-/* Narrow tablet portrait (768-899px): ten effect cells do not fit one row, so the rack is a
-   6-column grid of two even rows: Master 1 + Reverb 2 + Delay 3, then Tone 3 + Chorus 3 */
+/* Narrow tablet portrait (768-899px): sixteen effect cells do not fit one row, so the rack is a
+   6-column grid of three rows: Master 1 + Reverb 2 + Delay 3, Tone 3 + Chorus 3, Phaser 2 + Tremolo 2 + Crusher 2 */
 @media (min-width: 768px) and (max-width: 899px) and (min-height: 600px) {
     .pages > .effect-controls {
         display: grid;
@@ -139,6 +148,7 @@
     .pages > .effect-controls .control-set:nth-child(3) { grid-column: span 3; }
     .pages > .effect-controls .control-set:nth-child(4),
     .pages > .effect-controls .control-set:nth-child(5) { grid-column: span 3; }
+    .pages > .effect-controls .control-set:nth-child(n + 6) { grid-column: span 2; }
 
     .pages > .effect-controls .controls-grid {
         grid-template-columns: repeat(var(--cols, 1), minmax(0, 78px));

@@ -472,6 +472,37 @@ body[data-key-labels="off"] .keyboard-key-label {
         margin-bottom: 2px;
     }
 
+    /* FX page: the eight sets flow side by side and wrap (Master + Reverb, Delay, Tone + Chorus,
+       Phaser + Tremolo, Crusher on a phone; the one-knob Master no longer takes a whole row) instead of
+       one under the other: a short page shows a row of cells before it scrolls, a tall one is not 1300px long. */
+    .pages > .effect-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: var(--space-xs) 12px; /* cells are 72px: 1 + 2 + 3 + 2 fit one row at 844 wide */
+    }
+
+    .pages > .effect-controls .control-set {
+        width: auto;
+        max-width: 100%;
+        flex: 0 0 auto;
+        border-top: none;
+        padding: 0;
+    }
+
+    .pages > .effect-controls .controls-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+
+    .pages > .effect-controls .controls-grid .control-group {
+        --knob-size: 64px;
+        --fader-len: 72px;
+        width: 72px;
+        flex: 0 0 72px;
+    }
+
     /* ---- keyboard dock ---- */
     .keyboard-section {
         grid-area: kbd;
@@ -653,37 +684,6 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     body[data-controls="sliders"] .pages .control-group {
         --fader-len: 72px;
-    }
-
-    /* FX page: the five sets flow side by side (Master · Reverb · Delay, then
-       Tone · Chorus) instead of one under the other, so the short page shows
-       a whole row of cells before it scrolls. */
-    .pages > .effect-controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-content: flex-start;
-        gap: var(--space-xs) 12px; /* 1 + 2 + 3 cells of 72px + 2 gaps = 468px: one row at 844 wide */
-    }
-
-    .pages > .effect-controls .control-set {
-        width: auto;
-        max-width: 100%;
-        flex: 0 0 auto;
-        border-top: none;
-        padding: 0;
-    }
-
-    .pages > .effect-controls .controls-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 4px;
-    }
-
-    .pages > .effect-controls .controls-grid .control-group {
-        --knob-size: 64px;
-        --fader-len: 72px;
-        width: 72px;
-        flex: 0 0 72px;
     }
 
     /* Type stepper shares the bar line with the logo and ⋯ */

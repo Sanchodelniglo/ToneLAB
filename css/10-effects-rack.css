@@ -12,13 +12,25 @@
         flex: 1 1 auto;
     }
 
+    /* The rack scrolls inside its panel when it does not fit (8 sets on an 800px-tall screen) instead of
+       running over the keyboard; a taller screen shows it all and the rows share the spare height. */
+    .effects-rack {
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgb(var(--cyan-rgb) / 0.4) transparent;
+    }
+
     body[data-controls="sliders"] .effects-rack {
         flex-direction: column;
         flex-wrap: nowrap;
         align-items: stretch;
-        justify-content: space-evenly; /* rows breathe when the panel is taller than they are */
         gap: 0;
         margin-top: 0;
+    }
+
+    body[data-controls="sliders"] .effects-rack .control-set {
+        flex: 1 0 auto; /* rows breathe when the panel is taller than they are, never shrink */
     }
 
     /* One row per set: title at the left, controls inline after it */
@@ -148,13 +160,13 @@
     }
 
     /* ---- Knob mode: one 6-column grid for the whole rack. Every knob sits
-       on the same column (Master 1 · Reverb 2 · Delay 3 / Tone 2 · Chorus 2),
-       the two rows share the panel height, knob size follows the viewport. ---- */
+       on the same column (Master 1 · Reverb 2 · Delay 3 / Tone 2 · Chorus 2 · Phaser 2 / Tremolo 2 · Crusher 2),
+       the three rows share the panel height, knob size follows the viewport. ---- */
     body[data-controls="knobs"] .effects-rack {
         display: grid;
         flex: 1 1 auto;
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        grid-auto-rows: minmax(0, 1fr);
+        grid-auto-rows: minmax(min-content, 1fr); /* rows share spare height but never squash a knob */
         gap: var(--space-sm);
         margin-top: 0;
     }

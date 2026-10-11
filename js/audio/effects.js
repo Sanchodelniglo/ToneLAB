@@ -4,7 +4,7 @@ import { state } from '../state.js';
 import { updateSliderFill, attachKnobsToAll } from '../ui/knobs.js';
 
 // Initialize effects
-// Chain: Synth → Chorus → Filter → Distortion → Delay → Reverb → Limiter → Destination
+// Chain: Synth → Chorus → Phaser → Tremolo → Crusher → Filter → Distortion → Delay → Reverb → Limiter → Destination
 function initEffects() {
     // Brick-wall limiter so stacked chords, distortion and hot presets never clip the output.
     state.limiter = new Tone.Limiter(-1).toDestination();
@@ -13,7 +13,16 @@ function initEffects() {
     // 2x oversampling tames the aliasing fizz of the waveshaper at high drive.
     state.distortion = new Tone.Distortion({ distortion: 0, oversample: '2x', wet: 0 }).connect(state.delay);
     state.filter = new Tone.Filter({ frequency: EFFECT_DEFAULTS.filterFreq, type: 'lowpass' }).connect(state.distortion);
-    state.chorus = new Tone.Chorus({ frequency: EFFECT_DEFAULTS.chorusRate, delayTime: 3.5, depth: 0.7, wet: EFFECT_DEFAULTS.chorusMix }).connect(state.filter);
+    // The crusher sits before the filter, so the filter smooths its fizz. It needs AudioWorklet: without it the chain just skips it.
+    let next = state.filter;
+    try {
+        state.crusher = new Tone.BitCrusher({ bits: EFFECT_DEFAULTS.crushBits, wet: EFFECT_DEFAULTS.crushMix }).connect(next);
+        next = state.crusher;
+    } catch (_) { state.crusher = null; }
+    // Tremolo and phaser start with depth / mix 0: inaudible until a knob or preset turns them up.
+    state.tremolo = new Tone.Tremolo({ frequency: EFFECT_DEFAULTS.tremoloRate, depth: EFFECT_DEFAULTS.tremoloDepth, spread: 0, wet: 1 }).connect(next).start();
+    state.phaser = new Tone.Phaser({ frequency: EFFECT_DEFAULTS.phaserRate, octaves: 3, baseFrequency: 350, wet: EFFECT_DEFAULTS.phaserMix }).connect(state.tremolo);
+    state.chorus = new Tone.Chorus({ frequency: EFFECT_DEFAULTS.chorusRate, delayTime: 3.5, depth: 0.7, wet: EFFECT_DEFAULTS.chorusMix }).connect(state.phaser);
     state.chorus.start();
 }
 
@@ -28,7 +37,13 @@ const EFFECT_DEFAULTS = {
     distortion: 0,
     filterFreq: 5000,
     chorusRate: 1.5,
-    chorusMix: 0.3
+    chorusMix: 0.3,
+    phaserRate: 0.5,
+    phaserMix: 0,
+    tremoloRate: 5,
+    tremoloDepth: 0,
+    crushBits: 10, // clean: the distortion only shows below ~8 bits
+    crushMix: 1    // fully wet, so the Bits knob works on its own; Mix blends the dry sound back in
 };
 
 // Reverb regenerates its impulse response on every decay change (async + allocation),
@@ -51,6 +66,12 @@ const effectHandlers = {
     filterFreq:    { suffix: ' Hz', apply: v => { if (state.filter) state.filter.frequency.rampTo(v, 0.02); } },
     chorusRate:    { suffix: ' Hz', apply: v => { if (state.chorus) state.chorus.frequency.value = v; } },
     chorusMix:     { suffix: '',    apply: v => { if (state.chorus) state.chorus.wet.value = v; } },
+    phaserRate:    { suffix: ' Hz', apply: v => { if (state.phaser) state.phaser.frequency.value = v; } },
+    phaserMix:     { suffix: '',    apply: v => { if (state.phaser) state.phaser.wet.value = v; } },
+    tremoloRate:   { suffix: ' Hz', apply: v => { if (state.tremolo) state.tremolo.frequency.value = v; } },
+    tremoloDepth:  { suffix: '',    apply: v => { if (state.tremolo) state.tremolo.depth.value = v; } },
+    crushBits:     { suffix: ' Bit', apply: v => { if (state.crusher) state.crusher.bits.value = v; } },
+    crushMix:      { suffix: '',    apply: v => { if (state.crusher) state.crusher.wet.value = v; } },
 };
 
 // Apply one effect value to the engine and keep the slider/knob/readout in sync.

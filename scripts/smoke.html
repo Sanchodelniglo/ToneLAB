@@ -69,9 +69,16 @@ setTimeout(async () => {
     // The ? hit area (::after) must not cover the control it sits next to (it once swallowed ARP and rack slider touches)
     d.querySelector('.view-btn[data-controls="sliders"]').click(); await wait();
     const covered = [...d.querySelectorAll('.effect-controls input[type=range]')].filter(el => {
-      const r = el.getBoundingClientRect(); return r.width > 0 && d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) !== el; }).map(el => el.id);
+      el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return r.width > 0 && d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) !== el; }).map(el => el.id);
     check('no help button covers an effects slider', covered.length === 0, covered.join(','));
     d.querySelector('.view-btn[data-controls="knobs"]').click();
+    // Phaser, tremolo and crusher: nodes exist, knobs reach the engine, RND keeps them in range
+    d.querySelector('[data-randomize]').click();
+    const fxIds = ['phaserRate','phaserMix','tremoloRate','tremoloDepth','crushBits','crushMix'];
+    check('new effect sliders exist and stay in range after RND', fxIds.every(id => { const el = d.getElementById(id); return el && +el.value >= +el.min && +el.value <= +el.max; }));
+    check('phaser and tremolo nodes are in the chain', !!S.phaser && !!S.tremolo, 'crusher ' + !!S.crusher);
+    T.setEffect('tremoloDepth', 0.8); T.setEffect('phaserMix', 0.5);
+    check('effect knobs reach the engine', Math.abs(S.tremolo.depth.value - 0.8) < 0.01 && Math.abs(S.phaser.wet.value - 0.5) < 0.01);
     T.setArp(false);
   } catch (e) { out.push('FAIL exception ' + e.message); }
   fetch('/__result?' + encodeURIComponent(out.join('\n')));

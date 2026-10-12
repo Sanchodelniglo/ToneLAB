@@ -3,7 +3,7 @@
 // <head> applies the saved theme before the first paint. JS that draws on canvas (the scope)
 // listens for 'theme-change' and re-reads the colours from the CSS variables.
 const STORE = 'theme';
-const THEMES = { cyber: '#2a1a5e', sodium: '#2b1a0c', replicant: '#0a1214', analog: '#15120f' }; // value = <meta name="theme-color">
+const THEMES = { cyber: '#2a1a5e', sodium: '#2b1a0c', replicant: '#0a1214', analog: '#1b1b1a' }; // value = <meta name="theme-color">
 
 function setTheme(name, { save = true } = {}) {
     if (!(name in THEMES)) name = 'analog';

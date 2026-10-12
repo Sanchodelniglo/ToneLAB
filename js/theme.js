@@ -1,9 +1,9 @@
-// Colour themes: "cyber" (default), "sodium" and "replicant". The choice sets html[data-theme], which
-// css/15-theme-sodium.css and css/16-theme-replicant.css read; it is saved in localStorage ("theme"). An inline script in
+// Colour themes: "cyber" (default), "sodium", "replicant" and "analog". The choice sets html[data-theme], which
+// css/15-theme-sodium.css, css/16-theme-replicant.css and css/17-theme-analog.css read; it is saved in localStorage ("theme"). An inline script in
 // <head> applies the saved theme before the first paint. JS that draws on canvas (the scope)
 // listens for 'theme-change' and re-reads the colours from the CSS variables.
 const STORE = 'theme';
-const THEMES = { cyber: '#2a1a5e', sodium: '#2b1a0c', replicant: '#0d1a18' }; // value = <meta name="theme-color">
+const THEMES = { cyber: '#2a1a5e', sodium: '#2b1a0c', replicant: '#0a1214', analog: '#15120f' }; // value = <meta name="theme-color">
 
 function setTheme(name, { save = true } = {}) {
     if (!(name in THEMES)) name = 'cyber';

@@ -1,62 +1,57 @@
-/*@split 16-theme-replicant.css: "Replicant" colour theme, the palette of the "Replicant Runner" VS Code theme (deep green-black, teal, rose), selected by html[data-theme="replicant"] */
+/*@split 16-theme-replicant.css: "Replicant" colour theme (cold near-black, neon jade, neon red), selected by html[data-theme="replicant"] */
 
 /* ============================================
    THEME: REPLICANT
-   Colours are taken from the VS Code theme "Replicant Runner" (sanchodelniglo.replicant-theme):
-     background #0d1a18, panels #132321 / #1c322e, text #beb6b9, UI green #63a385,
-     teal #45c9a0 (cyan / focus), rose #ef5f77 (buttons, tab border, cursor family), pink #dd6b93, lilac #ba9af4.
-   In every theme "cyan" is the PRIMARY accent (here teal) and "magenta" the SECONDARY accent (here rose).
-   Two text colours are lifted a little from the editor theme so they pass 5.5:1 on the lightest panel:
-   muted #63a385 -> #82b59d (same hue), rose text #ef5f77 -> #f38295.
+   Started from the VS Code theme "Replicant Runner" (sanchodelniglo.replicant-theme: green-black,
+   teal #45c9a0, rose #ef5f77), then pushed to neon so it holds its own next to Cyber and Sodium:
+   the green wash is gone from the background, teal becomes jade #1ef5b8, rose becomes red #ff3b6b.
+   In every theme "cyan" is the PRIMARY accent (here jade) and "magenta" the SECONDARY accent (here red).
    ============================================ */
 
 :root[data-theme="replicant"] {
-    /* Solid colours */
-    --bg-primary: #0d1a18;
-    --bg-secondary: #132321;
-    --bg-tertiary: #1c322e;
-    --accent-cyan: #45c9a0;
-    --accent-magenta: #ef5f77;
-    --accent-yellow: #dd6b93;
-    --text-primary: #beb6b9;
-    --text-secondary: #b1a3a8;
-    --text-muted: #82b59d;
-    --text-muted-light: #93c0aa;
-    --cyan-text: #55cea7;
-    --magenta-text: #f38295;
-    --surface-deep: #10201e;
-    --surface-mid: #24413b;
-    --bg-mid: #0a1513;
-    --knob-fill: #152824;
+    /* Blade Runner night: near-black with a cold teal cast (not the old green wash), neon jade
+       as the main accent, hot neon red as the second. Text tints keep the cyber contrast:
+       jade text 11:1, red text 7:1 on the background, body text 11.6:1 (no glare) */
+    --bg-primary: #0a1214;
+    --bg-secondary: #101d20;
+    --bg-tertiary: #173034;
+    --accent-cyan: #1ef5b8;
+    --accent-magenta: #ff3b6b;
+    --accent-yellow: #ffb547;
+    --text-primary: #bccfc9;
+    --text-secondary: #a6c2ba;
+    --text-muted: #8db0a6;
+    --text-muted-light: #9cbcb2;
+    --cyan-text: #2fe0b0;
+    --magenta-text: #ff6b8f;
+    --surface-deep: #0e1b1e;
+    --surface-mid: #1b3d3b;
+    --bg-mid: #081012;
+    --knob-fill: #11222a;
 
-    /* Colour channels */
-    --cyan-rgb: 69 201 160;
-    --magenta-rgb: 239 95 119;
-    --cyan-dim-rgb: 55 160 128;
-    --magenta-dark-rgb: 179 20 55;       /* the theme's selection red #b31437 */
-    --glitch-blue-rgb: 163 113 247;      /* chromatic fringe 1: the theme's purple #a371f7 */
-    --glitch-red-rgb: 242 109 132;       /* chromatic fringe 2: rose #f26d84 */
-    --panel-top-rgb: 19 35 33;
-    --panel-bottom-rgb: 28 50 46;
-    --bg-deep-rgb: 13 26 24;
-    --bg-void-rgb: 8 17 16;
-    --overlay-rgb: 5 12 11;
-    --surface-rgb: 16 30 28;
-    --crt-dark-rgb: 14 20 18;
-    --screen-deep-rgb: 6 14 13;
+    --cyan-rgb: 30 245 184;
+    --magenta-rgb: 255 59 107;
+    --cyan-dim-rgb: 22 190 142;
+    --magenta-dark-rgb: 200 30 80;
+    --panel-top-rgb: 16 29 32;
+    --panel-bottom-rgb: 22 40 44;
+    --bg-deep-rgb: 10 18 20;
+    --bg-void-rgb: 6 12 14;
+    --overlay-rgb: 3 8 9;
+    --surface-rgb: 13 24 27;
+    --crt-dark-rgb: 12 18 18;
+    --screen-deep-rgb: 4 10 12;
 
-    /* Keys: muted green caps, near-black ebony with a rose tint when pressed */
-    --key-top-rgb: 56 76 71;
-    --key-bottom-rgb: 38 54 50;
-    --key-hover-top-rgb: 48 68 63;
-    --key-hover-bottom-rgb: 34 48 44;
-    --key-black-top-rgb: 17 30 28;
-    --key-black-bottom-rgb: 9 18 16;
-    --key-black-hover-top-rgb: 40 22 28;
-    --key-black-hover-bottom-rgb: 24 12 16;
+    --key-top-rgb: 52 72 74;
+    --key-bottom-rgb: 34 50 53;
+    --key-hover-top-rgb: 44 64 66;
+    --key-hover-bottom-rgb: 30 45 48;
+    --key-black-top-rgb: 15 26 29;
+    --key-black-bottom-rgb: 7 14 16;
+    --key-black-hover-top-rgb: 44 16 26;
+    --key-black-hover-bottom-rgb: 26 9 15;
 }
 
-/* The dropdown arrow is an SVG data URI, so it cannot read a token: same shape, teal fill */
 :root[data-theme="replicant"] .wave-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2345c9a0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231ef5b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }

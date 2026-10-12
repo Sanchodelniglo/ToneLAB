@@ -22,15 +22,16 @@ export const scope = (() => {
         const accent = ch('--cyan-rgb');
         const hex = cs.getPropertyValue('--text-secondary').trim();
         const label = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(' ');
-        TRACE = `rgb(${accent})`;
-        TRACE_GLOW = `rgb(${accent} / 0.55)`;
+        const trace = ch('--magenta-rgb'); // the wave / spectrum in the second accent, over a grid in the main one
+        TRACE = `rgb(${trace})`;
+        TRACE_GLOW = `rgb(${trace} / 0.55)`;
         GRID = `rgb(${accent} / 0.08)`;
         GRID_STRONG = `rgb(${accent} / 0.2)`;
         LABEL = `rgb(${label} / 0.7)`;
         BACKGROUND = `rgb(${ch('--bg-deep-rgb')})`;
         PERSISTENCE = `rgb(${ch('--bg-deep-rgb')} / 0.4)`; // bg-primary at low alpha = phosphor afterglow
-        FILL_TOP = `rgb(${accent} / 0.35)`;
-        FILL_BOTTOM = `rgb(${accent} / 0.02)`;
+        FILL_TOP = `rgb(${trace} / 0.35)`;
+        FILL_BOTTOM = `rgb(${trace} / 0.02)`;
     }
     readColors();
 

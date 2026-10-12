@@ -98,6 +98,7 @@
     align-self: flex-start;
     width: max-content;
     max-width: 100%;
+    white-space: normal; /* narrow rack sets (Master): the ? wraps inside the band, not into the next box */
     padding: 1px 6px;
     background: #e9e7e1;
     color: #0c0c0c;

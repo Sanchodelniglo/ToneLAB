@@ -16,6 +16,7 @@ setTimeout(async () => {
     d.getElementById('audioOverlay')?.click();
     await new Promise(r => setTimeout(r, 1000));
     const T = w.ToneLAB, S = T.state;
+    check('analog is the default theme', d.documentElement.dataset.theme === 'analog');
     check('bad saved arp data repaired', S.arp.length === 16 && S.arp.steps.every(s => s && typeof s === 'object'));
     for (const type of ['FMSynth','MembraneSynth','MetalSynth','MonoSynth','NoiseSynth','PluckSynth','PolySynth']) {
       T.initSynth(type); await new Promise(r => setTimeout(r, 150));
@@ -93,7 +94,8 @@ setTimeout(async () => {
     // Every visible ? is tappable: nothing (a wave picker once) sits on top of it
     const hidden = [...d.querySelectorAll('.help-btn')].filter(b => b.offsetParent && b.getBoundingClientRect().width > 0).filter(b => {
       b.scrollIntoView({ block: 'nearest' }); const r = b.getBoundingClientRect(); const e = d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return e && !b.contains(e) && !e.contains(b) && r.top >= 0 && r.bottom <= w.innerHeight; }).map(b => b.getAttribute('aria-label'));
+      b._by = e && (e.tagName + '.' + [...e.classList].join('.') + (e.id ? '#' + e.id : ''));
+      return e && !b.contains(e) && !e.contains(b) && r.top >= 0 && r.bottom <= w.innerHeight; }).map(b => b.getAttribute('aria-label') + ' under ' + b._by);
     check('no help button is covered', hidden.length === 0, hidden.join(' | '));
     T.setArp(false);
   } catch (e) { out.push('FAIL exception ' + e.message); }

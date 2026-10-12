@@ -303,7 +303,10 @@ const VIEW_MARGIN = 8;
 function place(parts) {
     const { list, btn } = parts;
     const anchor = btn.getBoundingClientRect();
-    const width = Math.min(Math.max(anchor.width, parts.wave ? LIST_MIN_WIDTH : 0), window.innerWidth - VIEW_MARGIN * 2);
+    // Text lists are never narrower than their longest option ("≡ As played" under a small arp button)
+    list.style.width = '';
+    const natural = parts.wave ? LIST_MIN_WIDTH : list.offsetWidth;
+    const width = Math.min(Math.max(anchor.width, natural), window.innerWidth - VIEW_MARGIN * 2);
     list.style.width = `${width}px`;
     list.style.left = `${Math.max(VIEW_MARGIN, Math.min(anchor.left, window.innerWidth - width - VIEW_MARGIN))}px`;
     // Wave lists show every shape at once; only a short landscape phone makes them scroll

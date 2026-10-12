@@ -47,6 +47,10 @@ setTimeout(async () => {
     d.getElementById('keyboardLayout').value = 'azerty';
     check('picker follows a value set by code', d.querySelector('[data-picker-for="keyboardLayout"]').textContent === 'AZERTY');
     d.getElementById('keyboardLayout').value = 'qwerty';
+    d.querySelector('[data-picker-for="arpMode"]').click();
+    const arpList = d.querySelector('.picker-list:not([hidden])');
+    check('arp pattern list has no scrollbar', arpList && arpList.scrollWidth <= arpList.clientWidth && arpList.scrollHeight <= arpList.clientHeight, arpList && `${arpList.scrollWidth}/${arpList.clientWidth}`);
+    d.body.dispatchEvent(new w.PointerEvent('pointerdown', { bubbles: true }));
 
     // User presets through the dialog: save, edit (rename + update), save as new, delete
     const q1 = (sel) => d.querySelector(sel), dlg = d.getElementById('presetDialog'), nameIn = d.getElementById('presetName');

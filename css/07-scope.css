@@ -178,6 +178,39 @@
     stroke: var(--accent-magenta);
 }
 
+/* Text pickers (instrument, presets, notes, layout, arp): the wave picker without the shape.
+   The wrapper steps out of the layout, so the button sits where the select sat and the
+   slot rules (height, flex, grid area) target .picker-btn / [data-picker-for]. */
+.picker-text {
+    display: contents;
+}
+
+.picker-btn {
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: auto;
+    min-height: 0;
+    padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.75rem, 2vw, 1rem);
+}
+
+.picker-btn .wave-picker-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.picker-list {
+    grid-template-columns: 1fr;
+}
+
+.picker-group {
+    padding: 0.4rem 0.4rem 0.2rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
 #currentNote {
     color: var(--cyan-text);
     font-weight: var(--weight-bold);

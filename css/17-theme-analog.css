@@ -218,7 +218,6 @@
     box-shadow: inset 0 0 6px rgb(var(--magenta-rgb) / 0.25);
 }
 
-:root[data-theme="analog"] select,
 :root[data-theme="analog"] .wave-picker-btn {
     background-color: #121211;
     border-color: #444441;

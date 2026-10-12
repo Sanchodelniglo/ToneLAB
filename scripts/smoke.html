@@ -35,12 +35,18 @@ setTimeout(async () => {
     knob.focus(); const oct = S.currentOctave;
     knob.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     check('arrow key on a knob leaves the octave alone', S.currentOctave === oct);
-    const presetSel = d.getElementById('presetSelect');
-    presetSel.focus(); presetSel.value = '1'; presetSel.dispatchEvent(new w.Event('change'));
-    const ev = new w.KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true });
-    presetSel.dispatchEvent(ev);
-    check('note key plays after picking a preset in the select', S.activeKeys.has('t') && ev.defaultPrevented);
+    // Selects are pickers: pick a preset through the popup, then the keys still play
+    const presetBtn = d.querySelector('[data-picker-for="presetSelect"]');
+    check('every select has a picker', [...d.querySelectorAll('select:not(.wave-select)')].every(s => s.hidden && d.querySelector(`[data-picker-for="${s.id}"]`)));
+    presetBtn.click();
+    d.querySelector('.picker-list:not([hidden]) .wave-picker-option[data-value="1"]').click();
+    check('picker sets the preset and shows its name', d.getElementById('presetSelect').value === '1' && presetBtn.textContent === d.getElementById('presetSelect').selectedOptions[0].textContent);
+    key('keydown', {});
+    check('note key plays after picking a preset', S.activeKeys.has('t'));
     w.dispatchEvent(new w.Event('blur'));
+    d.getElementById('keyboardLayout').value = 'azerty';
+    check('picker follows a value set by code', d.querySelector('[data-picker-for="keyboardLayout"]').textContent === 'AZERTY');
+    d.getElementById('keyboardLayout').value = 'qwerty';
 
     // User presets through the dialog: save, edit (rename + update), save as new, delete
     const q1 = (sel) => d.querySelector(sel), dlg = d.getElementById('presetDialog'), nameIn = d.getElementById('presetName');

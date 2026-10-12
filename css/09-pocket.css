@@ -140,7 +140,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         display: none;
     }
 
-    .type-stepper select {
+    .type-stepper .picker-btn {
         flex: 1 1 auto;
         min-width: 0;
         max-width: none;
@@ -238,7 +238,7 @@ body[data-key-labels="off"] .keyboard-key-label {
     }
 
     /* The preset name is a select, like the type above it */
-    .scope-preset select {
+    .scope-preset .picker-btn {
         flex: 1 1 auto;
         min-width: 0;
         height: 44px;
@@ -738,7 +738,7 @@ body[data-key-labels="off"] .keyboard-key-label {
         padding: 0 var(--space-md);
     }
 
-    .type-stepper select {
+    .type-stepper .picker-btn {
         max-width: 240px;
     }
 

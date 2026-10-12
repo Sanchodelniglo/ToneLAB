@@ -131,59 +131,78 @@ function previewSVG(type) {
     return svg;
 }
 
-/* ---- Wave picker: a dropdown that shows the shape next to each name ----
+/* ---- Pickers: a styled dropdown in place of a native <select> ----
    The native <select> stays in the DOM (hidden) as the source of truth, so
-   presets, the engine and the change listener keep working untouched. */
+   presets, the engine and the change listeners keep working untouched.
+   Wave pickers show the shape next to each name; text pickers (instrument,
+   presets, notes, layout, arp) show the option text in one column. */
 
 const pickers = new Map(); // select element → picker parts
 
-export function buildWavePicker(select, labelId) {
-    // The control grid is rebuilt on every synth switch: drop pickers whose select is gone
-    pickers.forEach((_, sel) => { if (!sel.isConnected) pickers.delete(sel); });
-
-    const wrap = document.createElement('div');
-    wrap.className = 'wave-picker';
-
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'wave-picker-btn';
-    btn.setAttribute('aria-haspopup', 'listbox');
-    btn.setAttribute('aria-expanded', 'false');
-    if (labelId) btn.setAttribute('aria-labelledby', `${labelId} ${select.id}Name`);
-    btn.appendChild(previewSVG(select.value));
-    const name = document.createElement('span');
-    name.className = 'wave-picker-name';
-    name.id = `${select.id}Name`;
-    name.textContent = waveLabel(select.value);
-    btn.appendChild(name);
-
-    const list = document.createElement('ul');
-    list.className = 'wave-picker-list';
-    list.setAttribute('role', 'listbox');
-    list.setAttribute('tabindex', '-1');
-    list.hidden = true;
-    const options = [...select.options].map(opt => {
+function fillOptions(parts, select) {
+    parts.list.replaceChildren();
+    parts.options = [];
+    const add = (opt) => {
+        if (opt.disabled) return; // the "Pick a preset" placeholder only shows in the button
         const li = document.createElement('li');
         li.className = 'wave-picker-option';
         li.setAttribute('role', 'option');
         li.setAttribute('tabindex', '-1');
         li.dataset.value = opt.value;
         li.setAttribute('aria-selected', String(opt.value === select.value));
-        li.appendChild(previewSVG(opt.value));
+        if (parts.wave) li.appendChild(previewSVG(opt.value));
         const span = document.createElement('span');
-        span.textContent = waveLabel(opt.value);
+        span.textContent = parts.wave ? waveLabel(opt.value) : opt.textContent;
         li.appendChild(span);
-        list.appendChild(li);
-        return li;
-    });
+        parts.list.appendChild(li);
+        parts.options.push(li);
+    };
+    for (const child of select.children) {
+        if (child.tagName !== 'OPTGROUP') { add(child); continue; }
+        const head = document.createElement('li');
+        head.className = 'picker-group';
+        head.setAttribute('role', 'presentation');
+        head.textContent = child.label;
+        parts.list.appendChild(head);
+        [...child.children].forEach(add);
+    }
+}
 
-    wrap.appendChild(btn);
-    wrap.appendChild(list);
+function makePicker(select, { wave, labelledBy }) {
+    // The control grid is rebuilt on every synth switch: drop pickers whose select is gone
+    pickers.forEach((_, sel) => { if (!sel.isConnected) pickers.delete(sel); });
+
+    const wrap = document.createElement('div');
+    wrap.className = wave ? 'wave-picker' : 'wave-picker picker-text';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = wave ? 'wave-picker-btn' : 'wave-picker-btn picker-btn';
+    btn.dataset.pickerFor = select.id;
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    const name = document.createElement('span');
+    name.className = 'wave-picker-name';
+    name.id = `${select.id}Name`;
+    name.textContent = wave ? waveLabel(select.value) : (select.selectedOptions[0]?.textContent ?? '');
+    if (labelledBy) btn.setAttribute('aria-labelledby', `${labelledBy} ${name.id}`);
+    if (wave) btn.appendChild(previewSVG(select.value));
+    btn.appendChild(name);
+
+    const list = document.createElement('ul');
+    list.className = wave ? 'wave-picker-list' : 'wave-picker-list picker-list';
+    list.setAttribute('role', 'listbox');
+    list.setAttribute('tabindex', '-1');
+    if (labelledBy) list.setAttribute('aria-labelledby', labelledBy);
+    list.hidden = true;
+
+    wrap.append(btn, list);
     select.insertAdjacentElement('afterend', wrap);
     select.hidden = true;
 
-    const parts = { wrap, btn, list, options, name };
+    const parts = { wrap, btn, list, name, wave, options: [] };
     pickers.set(select, parts);
+    fillOptions(parts, select);
 
     // Keyboard users get focus back on the button; pointer users get it released
     // so the computer keyboard goes straight back to playing notes.
@@ -206,8 +225,9 @@ export function buildWavePicker(select, labelId) {
         if (li) choose(li.dataset.value, false);
     });
     list.addEventListener('keydown', (e) => {
+        const { options } = parts;
         const current = options.indexOf(document.activeElement);
-        const move = (idx) => options[Math.max(0, Math.min(options.length - 1, idx))].focus();
+        const move = (idx) => options[Math.max(0, Math.min(options.length - 1, idx))]?.focus();
         switch (e.key) {
             case 'ArrowDown': case 'ArrowRight': e.preventDefault(); move(current + 1); break;
             case 'ArrowUp': case 'ArrowLeft': e.preventDefault(); move(current - 1); break;
@@ -218,7 +238,44 @@ export function buildWavePicker(select, labelId) {
             case 'Tab': close(parts, false); break;
         }
     });
-    return wrap;
+    return parts;
+}
+
+export function buildWavePicker(select, labelId) {
+    return makePicker(select, { wave: true, labelledBy: labelId }).wrap;
+}
+
+// Text picker for a static <select> in the page (built once, at start-up)
+export function buildTextPicker(select) {
+    let labelledBy = null;
+    const label = select.labels[0];
+    if (label) {
+        label.id ||= `${select.id}Label`;
+        labelledBy = label.id;
+    } else if (select.getAttribute('aria-label')) {
+        const span = document.createElement('span');
+        span.id = `${select.id}Label`;
+        span.hidden = true;
+        span.textContent = select.getAttribute('aria-label');
+        select.insertAdjacentElement('beforebegin', span);
+        labelledBy = span.id;
+    }
+    const parts = makePicker(select, { wave: false, labelledBy });
+    if (select.title) parts.btn.title = select.title;
+
+    // Code sets these values directly (preset load, saved layout, arp shortcuts) and rebuilds
+    // the option lists (presets, arp): the button follows every set and every rebuild.
+    for (const prop of ['value', 'selectedIndex']) {
+        const native = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, prop);
+        Object.defineProperty(select, prop, {
+            configurable: true,
+            get() { return native.get.call(this); },
+            set(v) { native.set.call(this, v); refreshWavePreview(select); }
+        });
+    }
+    new MutationObserver(() => { fillOptions(parts, select); refreshWavePreview(select); })
+        .observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['selected', 'disabled', 'label'] });
+    select.addEventListener('change', () => refreshWavePreview(select));
 }
 
 function open(parts, select) {
@@ -233,8 +290,8 @@ function open(parts, select) {
     parts.openedAt = performance.now();
     place(parts);
     const selected = parts.options.find(li => li.dataset.value === select.value) || parts.options[0];
-    selected.focus();
-    selected.scrollIntoView({ block: 'nearest' });
+    selected?.focus();
+    selected?.scrollIntoView({ block: 'nearest' });
 }
 
 // The list is position: fixed so a scrolling control column (layout ≥1024)
@@ -246,7 +303,7 @@ const VIEW_MARGIN = 8;
 function place(parts) {
     const { list, btn } = parts;
     const anchor = btn.getBoundingClientRect();
-    const width = Math.min(Math.max(anchor.width, LIST_MIN_WIDTH), window.innerWidth - VIEW_MARGIN * 2);
+    const width = Math.min(Math.max(anchor.width, parts.wave ? LIST_MIN_WIDTH : 0), window.innerWidth - VIEW_MARGIN * 2);
     list.style.width = `${width}px`;
     list.style.left = `${Math.max(VIEW_MARGIN, Math.min(anchor.left, window.innerWidth - width - VIEW_MARGIN))}px`;
     const height = list.offsetHeight;
@@ -291,9 +348,13 @@ document.addEventListener('pointerdown', (e) => {
 export function refreshWavePreview(select) {
     const parts = pickers.get(select);
     if (!parts) return;
+    parts.options.forEach(li => li.setAttribute('aria-selected', String(li.dataset.value === select.value)));
+    if (!parts.wave) {
+        parts.name.textContent = select.selectedOptions[0]?.textContent ?? '';
+        return;
+    }
     parts.btn.querySelector('.wave-preview path').setAttribute('d', wavePath(select.value));
     parts.name.textContent = waveLabel(select.value);
-    parts.options.forEach(li => li.setAttribute('aria-selected', String(li.dataset.value === select.value)));
     // Lets other controls react to the wave (Spread only works on fat waves) without importing us
     select.dispatchEvent(new CustomEvent('wavesync', { bubbles: true }));
 }

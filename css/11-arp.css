@@ -24,7 +24,7 @@
     gap: var(--space-sm) var(--space-md);
 }
 
-.arp-row select {
+.arp-row .picker-btn {
     height: 30px;
     padding: 0 8px;
     font-size: var(--text-xs);
@@ -272,8 +272,8 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     }
 
     .arp-help { grid-area: help; display: flex; }
-    #arpMode  { grid-area: mode; }
-    #arpRate  { grid-area: rate; }
+    [data-picker-for="arpMode"] { grid-area: mode; }
+    [data-picker-for="arpRate"] { grid-area: rate; }
     .arp-group[aria-label="Octaves"]        { grid-area: oct; }
     .arp-group[aria-label="Pattern length"] { grid-area: len; }
     .arp-bpm-stepper { grid-area: bpm; }
@@ -283,7 +283,7 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
     .pages .arp-settings .control-group.arp-knob:has(#arpBpm) { display: none; }
 
     .arp-help-btn,
-    .arp-row select,
+    .arp-row .picker-btn,
     .arp-tap {
         height: 44px;
         width: 100%;

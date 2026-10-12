@@ -71,7 +71,7 @@
         display: none;
     }
 
-    .instrument-bar .type-stepper select {
+    .instrument-bar .type-stepper .picker-btn {
         min-width: 150px;
         height: 30px;
         padding: 0 8px;
@@ -231,7 +231,7 @@
         min-width: 0;
     }
 
-    #presetSelect {
+    [data-picker-for="presetSelect"] {
         flex: 0 1 150px;
         min-width: 110px;
         width: 150px;
@@ -331,7 +331,7 @@
         display: none;
     }
 
-    .keyboard-panel .keyboard-controls select {
+    .keyboard-panel .keyboard-controls .picker-btn {
         height: 30px;
         padding: 0 8px;
         font-size: var(--text-xs);

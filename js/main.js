@@ -13,6 +13,10 @@ import './pwa.js';
 import './ui/mobile.js';
 import './ui/randomize.js';
 import { initArp, setArp } from './ui/arp.js';
+import { buildTextPicker } from './ui/wavePreview.js';
+
+// Every select in the page gets the wave picker look (wave selects get theirs in controls.js)
+document.querySelectorAll('select:not(.wave-select)').forEach(buildTextPicker);
 
 // Initialize
 let audioInitStarted = false;

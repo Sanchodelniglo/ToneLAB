@@ -32,8 +32,9 @@
     --magenta-rgb: 45 212 207;
     --cyan-dim-rgb: 214 120 30;
     --magenta-dark-rgb: 20 150 148;
-    --glitch-blue-rgb: 45 212 207;    /* glitch fringes = the two accents: teal */
-    --glitch-red-rgb: 255 154 46;     /* and sodium amber */
+    /* glitch fringes: the theme's two hues at Cyber's brightness (lum 0.08 / 0.22), so the split is as soft as in Cyber */
+    --glitch-blue-rgb: 19 89 87;      /* teal */
+    --glitch-red-rgb: 185 111 33;     /* sodium amber */
     --panel-top-rgb: 20 28 33;
     --panel-bottom-rgb: 28 39 45;
     --bg-deep-rgb: 14 19 23;

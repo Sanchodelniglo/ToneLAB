@@ -44,8 +44,9 @@
     --surface-rgb: 29 29 28;
     --crt-dark-rgb: 14 14 14;
     --screen-deep-rgb: 6 6 6;    /* the scope screen stays black glass */
-    --glitch-blue-rgb: 236 235 229; /* glitch fringes: silkscreen white and LED red, no neon blue */
-    --glitch-red-rgb: 255 59 59;
+    /* glitch fringes: the theme's two hues at Cyber's brightness (lum 0.08 / 0.22), so the split is as soft as in Cyber */
+    --glitch-blue-rgb: 81 80 78;    /* silkscreen white, dimmed */
+    --glitch-red-rgb: 240 56 56;    /* LED red */
 
     --key-top-rgb: 242 240 234;
     --key-bottom-rgb: 222 219 212;

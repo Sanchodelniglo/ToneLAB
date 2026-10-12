@@ -31,6 +31,8 @@
 
     --cyan-rgb: 30 245 184;
     --magenta-rgb: 255 59 107;
+    --glitch-blue-rgb: 30 245 184;    /* glitch fringes = the two accents: jade */
+    --glitch-red-rgb: 255 59 107;     /* and neon red (were Cyber's blue and pink) */
     --cyan-dim-rgb: 22 190 142;
     --magenta-dark-rgb: 200 30 80;
     --panel-top-rgb: 16 29 32;

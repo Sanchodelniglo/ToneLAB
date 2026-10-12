@@ -72,7 +72,7 @@
     left: var(--space-sm);
 }
 
-/* Title and its ? stay on one line, even in the 1-knob Master column */
+/* Title and its ? stay on one line, even in the 1-knob Out column (keep its name short) */
 .control-set-title:has(.set-help) {
     white-space: nowrap;
 }

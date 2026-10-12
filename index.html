@@ -135,18 +135,18 @@
             <div class="synth-panel effects-panel">
                 <div class="panel-header">
                     <h2 class="panel-title"><span id="effectsHeading">Effects</span> <button type="button" class="help-btn set-help" aria-label="About the effects" aria-expanded="false" aria-controls="setHint_effects">?</button></h2>
-                    <p class="control-hint set-hint" id="setHint_effects" hidden>Effects change the sound after the instrument, in this order: chorus, phaser, tremolo, crusher, tone, delay, reverb, then the master volume. Turn a Mix or Depth to 0 to switch that effect off.</p>
+                    <p class="control-hint set-hint" id="setHint_effects" hidden>Effects change the sound after the instrument, in this order: chorus, phaser, tremolo, crusher, tone, delay, reverb, then the output volume (Out). Turn a Mix or Depth to 0 to switch that effect off.</p>
                 </div>
                 <div class="effect-controls control-sets effects-rack" role="group" aria-labelledby="effectsHeading">
-                    <section class="control-set" role="group" aria-label="Master">
-                        <h3 class="control-set-title">Master <button type="button" class="help-btn set-help" aria-label="About the Master effect" aria-expanded="false" aria-controls="setHint_fx_master">?</button></h3>
+                    <section class="control-set" role="group" aria-label="Out">
+                        <h3 class="control-set-title">Out <button type="button" class="help-btn set-help" aria-label="About the output" aria-expanded="false" aria-controls="setHint_fx_master">?</button></h3>
                         <p class="control-hint set-hint" id="setHint_fx_master" hidden>Final level of everything you hear, after all the effects.</p>
                         <div class="controls-grid">
                         <div class="control-group control-group--volume">
                             <div class="control-label">
                                 <label for="masterVolume">Volume</label>
                                 <span class="control-value" id="masterVolumeValue">75%</span>
-                                <button type="button" class="help-btn" aria-label="What does Master Volume do?" aria-expanded="false" aria-controls="masterVolumeHint">?</button>
+                                <button type="button" class="help-btn" aria-label="What does the output volume do?" aria-expanded="false" aria-controls="masterVolumeHint">?</button>
                             </div>
                             <p class="control-hint" id="masterVolumeHint" hidden>Loudness of the whole app. It does not change the sound, only how loud it is. 0 = silent.</p>
                             <input type="range" id="masterVolume" min="0" max="100" step="1" value="75" data-default-value="75">

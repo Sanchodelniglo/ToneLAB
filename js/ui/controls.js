@@ -338,7 +338,7 @@ function updateControls(type) {
             { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: fatWaveforms, default: 'square' },
             { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
             { name: 'Filter Q', id: 'filterQ', min: 0, max: 20, step: 0.1, default: 6 },
-            { name: 'Filter Cutoff', id: 'filterCutoff', min: 20, max: 20000, step: 10, default: 1000, suffix: ' Hz' },
+            { name: 'Filter Cutoff', id: 'filterCutoff', min: 20, max: 20000, step: 10, default: 200, suffix: ' Hz' },
             { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.9 },

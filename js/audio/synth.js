@@ -207,7 +207,10 @@ function updateSynthParameter(param, value) {
                 if (state.synth.filter) state.synth.filter.Q.value = value;
                 break;
             case 'filterCutoff':
-                if (state.synth.filter) state.synth.filter.frequency.value = value;
+                // MonoSynth: the filter envelope drives filter.frequency (Tone zeroes the param's own value),
+                // so a write there only added Hz on top. The knob moves the floor of the envelope sweep.
+                if (state.synth.filterEnvelope) state.synth.filterEnvelope.baseFrequency = value;
+                else if (state.synth.filter) state.synth.filter.frequency.value = value;
                 break;
             case 'filterAttack':
                 if (state.synth.filterEnvelope) state.synth.filterEnvelope.attack = value;

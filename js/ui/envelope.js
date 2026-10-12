@@ -1,6 +1,7 @@
 // Envelope preview: a small ADSR curve above every envelope set (Envelope, Filter
 // Envelope, Mod Envelope) that redraws as the knobs move. Read-only: it follows the
-// range inputs, which stay the source of truth.
+// range inputs, which stay the source of truth. While a note sounds, a playhead shows
+// where it is on each curve and lights its letter (A, D, S, R).
 
 const SETS = {
     'Envelope':        { a: 'attack',       d: 'decay',       s: 'sustain',       r: 'release' },
@@ -33,6 +34,8 @@ function curve({ a, d, s, r }) {
         line: `M${PAD} ${y(0)} L${x1} ${y(1)} L${x2} ${y(s)} L${x3} ${y(s)} L${x4} ${y(0)}`,
         area: `M${PAD} ${y(0)} L${x1} ${y(1)} L${x2} ${y(s)} L${x3} ${y(s)} L${x4} ${y(0)} Z`,
         points: [[x1, y(1)], [x2, y(s)], [x3, y(s)]],
+        xs: [PAD, x1, x2, x3, x4],
+        y,
         base: y(0),
         // stage centres (in viewBox units) and widths, for the A D S R letters
         stages: [[(PAD + x1) / 2, x1 - PAD], [(x1 + x2) / 2, x2 - x1], [(x2 + x3) / 2, x3 - x2], [(x3 + x4) / 2, x4 - x3]]
@@ -62,6 +65,9 @@ function build(set, grid) {
     mk('env-guides');
     mk('env-area', { style: `fill:url(#${gid})` });
     mk('env-line');
+    mk('env-playhead');
+    mk('env-head-ring'); // the live dot: a ring under a white centre, bigger than the corner dots
+    mk('env-head');
     // A zero-length round-capped stroke stays a true circle although the svg stretches to fit
     for (let i = 0; i < 3; i++) mk('env-dot');
     box.appendChild(svg);
@@ -77,14 +83,22 @@ function build(set, grid) {
     return box;
 }
 
-function draw(set) {
+// The envelope times of a set, or null when it has no preview
+function adsrOf(set) {
     const map = SETS[set.getAttribute('aria-label')];
     const box = set.querySelector('.env-preview');
-    if (!map || !box) return;
+    if (!map || !box) return null;
     const a = valueOf(set, map.a), r = valueOf(set, map.r);
-    if (a === undefined || r === undefined) return;
+    if (a === undefined || r === undefined) return null;
     const d = valueOf(set, map.d) ?? 0;
     const s = valueOf(set, map.s) ?? (map.s ? 0 : 1); // a set with a sustain id but no knob (MetalSynth) decays to silence
+    return { map, box, a, d, s, r };
+}
+
+function draw(set) {
+    const env = adsrOf(set);
+    if (!env) return;
+    const { map, box, a, d, s, r } = env;
     const { line, area, points, base, stages } = curve({ a, d, s, r });
     const svg = box.firstChild;
     svg.querySelector('.env-line').setAttribute('d', line);
@@ -108,6 +122,76 @@ function draw(set) {
         : `${set.getAttribute('aria-label')} shape: attack ${t(a)}, release ${t(r)}`);
 }
 
+/* ---- Live playhead: from the last voicestart, through A and D at the knobs' times, resting in S
+   while a key is held (it crosses the plateau in 1 s), then through R after voicerelease.
+   The animation stops while every playhead rests (a held pad costs nothing); voicerelease and
+   knob moves draw again. ---- */
+const live = { start: -1, release: -1 }; // performance.now() ms; release -1 = still held
+let raf = 0;
+
+// Where the note is at t seconds after its start (release ignored): stage index, fraction, level
+function heldAt(t, { a, d, s }) {
+    if (t < a) return [0, t / a, t / a];
+    if (t < a + d) return [1, (t - a) / d, 1 - (1 - s) * ((t - a) / d)];
+    return [2, Math.min(1, t - a - d), s];
+}
+
+// Draws one playhead: 'moving', 'resting' (end of S, key held) or false (no note, or release over)
+function head(set, now) {
+    const env = adsrOf(set);
+    if (!env) return false;
+    const { box, r } = env;
+    let stage, frac, level;
+    if (live.release >= 0 && now >= live.release) {
+        const tr = (now - live.release) / 1000;
+        if (tr >= r) return clearHead(box);
+        // The playhead jumps to R and the dot rides the drawn curve down from the sustain level,
+        // even when the key went up mid-attack (the curve is the shape to read, not a meter)
+        [stage, frac, level] = [3, tr / r, env.s * (1 - tr / r)];
+    } else {
+        [stage, frac, level] = heldAt((now - live.start) / 1000, env);
+    }
+    const { xs, y, base } = curve(env);
+    const x = xs[stage] + frac * (xs[stage + 1] - xs[stage]);
+    const svg = box.firstChild;
+    svg.querySelector('.env-playhead').setAttribute('d', `M${x} ${PAD}V${base}`);
+    svg.querySelectorAll('.env-head, .env-head-ring').forEach(el => el.setAttribute('d', `M${x} ${y(level)}h0`));
+    box.classList.add('is-playing');
+    box.querySelectorAll('.env-stage').forEach((el, i) => el.classList.toggle('is-live', i === stage));
+    // An arp step has a release time but no voicerelease: it keeps moving until then
+    return stage === 2 && frac === 1 && live.release < 0 ? 'resting' : 'moving';
+}
+
+function clearHead(box) {
+    box.classList.remove('is-playing');
+    box.firstChild.querySelector('.env-playhead').setAttribute('d', '');
+    box.firstChild.querySelectorAll('.env-head, .env-head-ring').forEach(el => el.setAttribute('d', ''));
+    box.querySelectorAll('.env-stage.is-live').forEach(el => el.classList.remove('is-live'));
+    return false;
+}
+
+// Draws every playhead now and keeps one animation loop going while a note sounds
+function frame() {
+    cancelAnimationFrame(raf);
+    const now = performance.now(); // same clock as live.start / live.release (the rAF stamp is the frame start)
+    let moving = false;
+    document.querySelectorAll('.control-set').forEach(set => { if (head(set, now) === 'moving') moving = true; });
+    raf = moving ? requestAnimationFrame(frame) : 0;
+}
+
+document.addEventListener('voicestart', (e) => {
+    const now = performance.now();
+    live.start = now;
+    const seconds = e.detail?.duration;
+    live.release = seconds == null ? -1 : now + seconds * 1000; // an arp step brings its own release
+    frame(); // show it on the same tick as the key, then animate
+});
+document.addEventListener('voicerelease', () => {
+    if (live.start < 0 || live.release >= 0) return;
+    live.release = performance.now();
+    frame();
+});
+
 // Called after every control rebuild: adds a preview to each envelope set, then draws them
 export function attachEnvelopePreviews(root) {
     root.querySelectorAll('.control-set').forEach(set => {
@@ -125,6 +209,8 @@ export function updateEnvelopePreviews(root = document) {
 // Knob drags, wheel, keyboard and Randomize all fire 'input' on the range; presets announce themselves
 document.addEventListener('input', (e) => {
     const set = e.target.closest?.('.control-set');
-    if (set) draw(set);
+    if (!set) return;
+    draw(set);
+    if (live.start >= 0) frame(); // a resting playhead follows the knob (Sustain moves its dot)
 });
 document.addEventListener('presetapplied', () => updateEnvelopePreviews());

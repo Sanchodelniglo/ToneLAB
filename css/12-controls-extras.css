@@ -99,6 +99,39 @@
     filter: drop-shadow(0 0 4px rgb(var(--magenta-rgb) / 0.9));
 }
 
+/* Live playhead: where the sound is now; its stage letter lights up */
+/* Near-white with a dark halo: reads on the dark screen and across the curve in every theme */
+.env-playhead {
+    fill: none;
+    stroke: rgb(var(--white-rgb) / 0.9);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 1.5px rgb(var(--black-rgb) / 0.9));
+}
+
+.env-head-ring {
+    fill: none;
+    stroke: var(--accent-magenta);
+    stroke-width: 13;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px rgb(var(--black-rgb) / 0.9));
+}
+
+.env-head {
+    fill: none;
+    stroke: rgb(var(--white-rgb));
+    stroke-width: 7;
+    stroke-linecap: round;
+}
+
+.env-preview.is-playing .env-stage {
+    opacity: 0.35;
+}
+
+.env-preview .env-stage.is-live {
+    opacity: 1;
+    color: var(--cyan-text);
+}
+
 /* A D S R under the baseline, centred on their stage; hidden when the stage is too thin */
 .env-stage {
     position: absolute;

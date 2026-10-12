@@ -109,6 +109,36 @@ setTimeout(async () => {
     check('no help button is covered', hidden.length === 0, hidden.join(' | '));
     T.setArp(false);
 
+    // Envelope playhead: A lights while the attack runs, R after the key is up
+    T.initSynth('MonoSynth'); await wait();
+    const envSet = d.querySelector('#controls .control-set[aria-label="Envelope"]');
+    const atk = envSet.querySelector('[data-control="attack"]'); atk.value = 1; atk.dispatchEvent(new w.Event('input', { bubbles: true }));
+    const live = () => envSet.querySelector('.env-stage.is-live')?.textContent;
+    T.playNote('C4'); await wait();
+    const during = live();
+    T.stopNote('C4'); await wait();
+    check('envelope playhead follows the note (A while held, R after release)', during === 'A' && live() === 'R', `${during} then ${live()}`);
+    // Released mid-attack above a low sustain: the playhead jumps to R, the dot on the curve at the sustain level
+    const sus = envSet.querySelector('[data-control="sustain"]'); sus.value = 0.1; sus.dispatchEvent(new w.Event('input', { bubbles: true }));
+    atk.value = 2; atk.dispatchEvent(new w.Event('input', { bubbles: true }));
+    T.playNote('C4'); await new Promise(r => setTimeout(r, 1000)); T.stopNote('C4');
+    const sDot = envSet.querySelectorAll('.env-dot')[2].getAttribute('d'), dot = envSet.querySelector('.env-head').getAttribute('d');
+    const xy = (dd) => (dd.match(/^M([\d.]+) ([\d.]+)h0/) || []).slice(1).map(Number);
+    const [sx, sy] = xy(sDot), [hx, hy] = xy(dot);
+    check('early release jumps to R with the dot on the curve at the sustain level', live() === 'R' && Math.abs(sx - hx) < 1 && Math.abs(sy - hy) < 0.5, `S end ${sDot} dot ${dot}`);
+    sus.value = 0.9; sus.dispatchEvent(new w.Event('input', { bubbles: true }));
+
+    // A held note rests in S: the animation stops (no frames), and the release starts it again
+    atk.value = 0; atk.dispatchEvent(new w.Event('input', { bubbles: true }));
+    T.playNote('C4'); await new Promise(r => setTimeout(r, 1800)); // past every preview's A + D + 1 s plateau
+    let frames = 0; const rafWas = w.requestAnimationFrame; w.requestAnimationFrame = (cb) => { if (cb.name === 'frame') frames++; return rafWas.call(w, cb); }; // the scope animates too
+    atk.dispatchEvent(new w.Event('input', { bubbles: true })); // a knob move draws once (rAF barely runs in headless)
+    const restFrames = frames, restStage = live();
+    T.stopNote('C4');
+    check('a held note rests in S without animating, release resumes', restFrames === 0 && restStage === 'S' && live() === 'R' && frames > 0,
+      `resting: ${restFrames} frames on ${restStage}; after release: ${frames} frames on ${live()}`);
+    w.requestAnimationFrame = rafWas;
+
     // Learn mode: off by default, starts on the Mono Synth from zero, one step per knob, RND never counts
     const step = () => d.getElementById('learnStep').textContent;
     const setOf = (name) => d.querySelector(`#controls .control-set[aria-label="${name}"]`);

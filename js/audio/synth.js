@@ -268,6 +268,8 @@ function playNote(note) {
         }
     };
 
+    // The envelope previews run a playhead from here (ui/envelope.js)
+    document.dispatchEvent(new Event('voicestart'));
     try {
         trigger(nextTriggerTime());
     } catch (error) {
@@ -308,6 +310,7 @@ function stopNote(note) {
 
     if (state.activeKeys.size === 0 && state.activeTouches.size === 0) {
         setNoteReadout('\u2014');
+        document.dispatchEvent(new Event('voicerelease')); // the last key is up: the playhead enters R
     }
 }
 
@@ -326,6 +329,9 @@ function triggerArpStep(note, duration, time, velocity = 1) {
         } else {
             state.synth.triggerAttackRelease(note, duration, time, velocity);
         }
+        // Playhead in time with the audio: Draw fires on the frame closest to the step
+        const seconds = Tone.Time(duration).toSeconds();
+        Tone.Draw.schedule(() => document.dispatchEvent(new CustomEvent('voicestart', { detail: { duration: seconds } })), time);
     } catch (error) {
         console.log('Arp step error:', error);
     }
@@ -339,6 +345,7 @@ function releaseAllVoices() {
         else state.synth.triggerRelease();
     } catch (_) { /* nothing sounding */ }
     setNoteReadout('\u2014');
+    document.dispatchEvent(new Event('voicerelease'));
 }
 
 // Debug accessors for the trigger clock (window.ToneLAB smoke-test surface).

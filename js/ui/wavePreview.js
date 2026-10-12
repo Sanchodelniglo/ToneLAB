@@ -306,6 +306,8 @@ function place(parts) {
     const width = Math.min(Math.max(anchor.width, parts.wave ? LIST_MIN_WIDTH : 0), window.innerWidth - VIEW_MARGIN * 2);
     list.style.width = `${width}px`;
     list.style.left = `${Math.max(VIEW_MARGIN, Math.min(anchor.left, window.innerWidth - width - VIEW_MARGIN))}px`;
+    // Wave lists show every shape at once; only a short landscape phone makes them scroll
+    if (parts.wave) list.style.maxHeight = `${window.innerHeight - VIEW_MARGIN * 2}px`;
     const height = list.offsetHeight;
     const below = anchor.bottom + LIST_GAP;
     const fitsBelow = below + height <= window.innerHeight - VIEW_MARGIN;

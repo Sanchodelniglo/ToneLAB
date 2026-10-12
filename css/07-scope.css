@@ -114,8 +114,7 @@
        backdrop-filter can clip or offset it */
     position: fixed;
     z-index: 300;
-    max-height: 240px;
-    overflow-y: auto;
+    overflow-y: auto; /* only when taller than the viewport (wavePreview.js caps it) */
     margin: 0;
     padding: 2px;
     list-style: none;
@@ -200,6 +199,7 @@
 
 .picker-list {
     grid-template-columns: 1fr;
+    max-height: min(240px, calc(100dvh - 16px)); /* long lists (presets) scroll; wave lists show every shape at once */
 }
 
 .picker-group {

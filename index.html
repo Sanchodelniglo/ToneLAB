@@ -101,6 +101,13 @@
                     </div>
                 </div>
 
+                <!-- Learn mode (Settings): the current stage and its task -->
+                <div class="learn-bar" id="learnBar" hidden>
+                    <span class="learn-step" id="learnStep"></span>
+                    <span class="learn-task" id="learnTask" aria-live="polite"></span>
+                    <button type="button" class="preset-btn view-btn chip" id="learnSkip">Skip</button>
+                </div>
+
                 <nav class="tab-bar" id="tabBar" aria-label="Control pages"></nav>
                 <div class="pages" id="pages">
                     <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
@@ -476,6 +483,13 @@
                         <button type="button" class="preset-btn view-btn chip" data-theme-choice="replicant" aria-pressed="false">Replicant</button>
                     </div>
                 </div>
+                <div class="sheet-row" id="learnRow">
+                    <div class="sheet-row-text"><span class="sheet-row-title">Learn</span><span class="sheet-row-hint">A guided path on the Mono Synth: one idea at a time, the next section lights up.</span></div>
+                    <div class="view-toggle learn-toggle" role="group" aria-label="Learn mode">
+                        <button type="button" class="preset-btn view-btn chip" data-learn aria-pressed="false">Learn</button>
+                        <button type="button" class="preset-btn view-btn chip" data-learn-restart>Restart</button>
+                    </div>
+                </div>
                 <div class="sheet-row" id="crtRow">
                     <div class="sheet-row-text"><span class="sheet-row-title">CRT screen</span><span class="sheet-row-hint">Scanlines, vignette, flicker (with the noise) and the colour glitch. Turn off what bothers you or slows the device.</span></div>
                     <div class="view-toggle crt-toggle" role="group" aria-label="CRT effects">
@@ -507,6 +521,7 @@
     <link rel="modulepreload" href="js/ui/wavePreview.js">
     <link rel="modulepreload" href="js/ui/mobile.js">
     <link rel="modulepreload" href="js/ui/randomize.js">
+    <link rel="modulepreload" href="js/ui/learn.js">
     <link rel="modulepreload" href="js/ui/envelope.js">
     <link rel="modulepreload" href="js/ui/arp.js">
     <script type="module" src="js/main.js"></script>

@@ -42,8 +42,8 @@ body[data-key-labels="off"] .keyboard-key-label {
         padding: 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr); /* a plain auto column grows to the widest row and crops the page on a 360px phone */
-        grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
-        grid-template-areas: "bar" "preset" "scope" "tabs" "pages" "kbd";
+        grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar" "preset" "learn" "scope" "tabs" "pages" "kbd"; /* learn: empty row while Learn is off */
     }
 
     main,
@@ -681,8 +681,8 @@ body[data-key-labels="off"] .keyboard-key-label {
 @media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
     .container {
         grid-template-columns: 2fr 3fr;
-        grid-template-rows: auto auto minmax(0, 1fr) auto;
-        grid-template-areas: "bar bar" "preset tabs" "scope pages" "kbd kbd";
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "bar bar" "preset tabs" "learn learn" "scope pages" "kbd kbd";
     }
 
     .scope-block {

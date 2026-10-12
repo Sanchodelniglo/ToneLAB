@@ -31,7 +31,8 @@ export const state = {
     userLayout: 'qwerty',
     noteNotation: store.get('noteNotation') || 'english',
     oscSpread: 20,            // detune in cents for fat waves; re-applied whenever the wave becomes fat
-    audioInitialized: false
+    audioInitialized: false,
+    autoInput: false          // true while code (RND) writes the controls: Learn goals ignore it
 };
 
 // Keyboard layouts — 2 octaves (25 notes: C to C)

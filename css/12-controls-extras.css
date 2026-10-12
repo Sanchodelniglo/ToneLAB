@@ -310,3 +310,86 @@ body[data-crt-glitch="off"] {
     opacity: 1;
     transform: translate(-50%, 0);
 }
+
+/* ---- Learn mode (js/ui/learn.js): the current stage lights up, later ones wait dimmed but usable ---- */
+.learn-bar {
+    grid-area: learn; /* pocket and tablet grids; a plain block in the desktop column */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-sm);
+    margin: var(--space-xs) 0;
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid rgb(var(--magenta-rgb) / 0.5);
+    background: rgb(var(--magenta-rgb) / 0.06);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-primary);
+}
+
+.learn-bar[hidden] {
+    display: none;
+}
+
+.learn-step {
+    color: var(--magenta-text);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.learn-task {
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+/* Goal reached: the bar turns to the primary accent until the player presses Next */
+.learn-bar.is-ready {
+    border-color: rgb(var(--cyan-rgb) / 0.6);
+    background: rgb(var(--cyan-rgb) / 0.06);
+}
+
+/* Next pulses 3 times when the goal is reached (the animation restarts each time .is-ready comes on) */
+.learn-bar.is-ready #learnSkip {
+    animation: learn-next-pulse 0.6s ease-in-out 3;
+}
+
+@keyframes learn-next-pulse {
+    50% { box-shadow: 0 0 0 3px rgb(var(--cyan-rgb) / 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .learn-bar.is-ready #learnSkip {
+        animation: none;
+    }
+}
+
+.control-set.is-next {
+    outline: 2px solid var(--accent-magenta);
+    outline-offset: -2px;
+}
+
+.control-set.is-later,
+.tab-btn.is-later {
+    opacity: 0.35;
+    transition: opacity var(--transition-fast);
+}
+
+/* Suggest, never lock: a dimmed section wakes up under the pointer or the keyboard */
+.control-set.is-later:hover,
+.control-set.is-later:focus-within {
+    opacity: 1;
+}
+
+.tab-btn.is-next {
+    color: var(--magenta-text);
+}
+
+/* The knob of the current step */
+.control-group.learn-focus {
+    outline: 1px dashed var(--accent-magenta);
+    outline-offset: 2px;
+}
+
+.control-group.learn-focus .control-label label {
+    color: var(--magenta-text);
+}

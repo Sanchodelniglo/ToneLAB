@@ -14,6 +14,7 @@ import './ui/mobile.js';
 import './ui/randomize.js';
 import { initArp, setArp } from './ui/arp.js';
 import { buildTextPicker } from './ui/wavePreview.js';
+import './ui/learn.js';
 
 // Every select in the page gets the wave picker look (wave selects get theirs in controls.js)
 document.querySelectorAll('select:not(.wave-select)').forEach(buildTextPicker);
@@ -83,6 +84,7 @@ if (location.hash === '#debug') window.ToneLAB = {
     setEffect,
     updateControls,
     applyPreset,
+    get learnSteps() { return import('./ui/learn.js').then(m => m.STEPS); },
     setArp,
     // Same contract as the old initSynth, which rebuilt the control panel itself.
     initSynth: (type) => { initSynth(type); updateControls(type); },

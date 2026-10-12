@@ -108,6 +108,45 @@ setTimeout(async () => {
       return e && !b.contains(e) && !e.contains(b) && r.top >= 0 && r.bottom <= w.innerHeight; }).map(b => b.getAttribute('aria-label') + ' under ' + b._by);
     check('no help button is covered', hidden.length === 0, hidden.join(' | '));
     T.setArp(false);
+
+    // Learn mode: off by default, starts on the Mono Synth from zero, one step per knob, RND never counts
+    const step = () => d.getElementById('learnStep').textContent;
+    const setOf = (name) => d.querySelector(`#controls .control-set[aria-label="${name}"]`);
+    const ctl = (id) => d.querySelector(`#controls [data-control="${id}"]`) || d.getElementById(id);
+    const put = (id, v) => { const el = ctl(id); el.value = v; el.dispatchEvent(new w.Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); };
+    check('learn is off by default', d.getElementById('learnBar').hidden);
+    T.initSynth('FMSynth'); await wait();
+    d.querySelector('[data-learn]').click(); await wait();
+    const steps = await T.learnSteps;
+    check('learn switches to the Mono Synth and lights step 1', S.currentInstrumentType === 'MonoSynth' && step().startsWith(`Learn 1/${steps.length}`)
+      && setOf('Oscillator').classList.contains('is-next') && setOf('Filter').classList.contains('is-later'), step());
+    check('learn starts from zero, sound kept audible', ctl('oscType').value === 'sine' && +ctl('attack').value === 0 && +ctl('reverb').value === 0
+      && +ctl('sustain').value === 1 && +ctl('filterCutoff').value === 20000 && +ctl('crushMix').value === 1 && +d.getElementById('masterVolume').value > 0,
+      `sus ${ctl('sustain').value} cut ${ctl('filterCutoff').value}`);
+    const WIN = { spread: 50, attack: 0.8, sustain: 0.8, decay: 0.8, release: 2, filterCutoff: 2000, filterQ: 10, filterAttack: 0.5, filterDecay: 0.8,
+      filterSustain: 0.8, filterRelease: 2, reverb: 0.5, reverbSize: 6, delayMix: 0.5, delayTime: 0.5, delayFeedback: 0.7, filterFreq: 5000,
+      distortion: 0.5, chorusMix: 0.6, chorusRate: 5, phaserMix: 0.6, phaserRate: 4, tremoloDepth: 0.8, tremoloRate: 10, crushBits: 4, crushMix: 0.8 };
+    let stuck = '';
+    const next = d.getElementById('learnSkip');
+    for (const [i, s] of steps.entries()) {
+      if (!step().startsWith(`Learn ${i + 1}/`)) { stuck = `step ${i + 1} (${s.ctl}) not reached: ${step()}`; break; }
+      if (s.ctl === 'sustain' && +ctl('sustain').value !== 0) { stuck = 'sustain did not drop to 0 at its step'; break; }
+      if (s.ctl === 'delayMix' && +ctl('reverb').value !== 0) { stuck = 'reverb still on during the delay steps (not solo)'; break; }
+      if (s.ctl === 'filterAttack' && !(+ctl('attack').value <= 0.02 && +ctl('filterCutoff').value <= 400 && d.getElementById('learnTask').textContent.includes('Learn set'))) {
+        stuck = `filter envelope not set up to be heard: attack ${ctl('attack').value}, cutoff ${ctl('filterCutoff').value}`; break; }
+      if (i === 3) { d.querySelector('[data-randomize]').click(); put('attack', 0.1); if (next.textContent !== 'Skip') { stuck = 'RND or another knob counted'; break; } }
+      if (s.ctl === 'oscType') ['square', 'sawtooth', 'triangle'].forEach(v => put('oscType', v));
+      else { if (s.ctl === 'spread') put('oscType', 'fatsawtooth'); put(s.ctl, WIN[s.ctl]); }
+      if (!next.textContent.startsWith('Next') || !step().startsWith(`Learn ${i + 1}/`)) { stuck = `step ${i + 1} (${s.ctl}): goal not shown, or moved on by itself`; break; }
+      if (s.ctl === 'reverbSize' && +ctl('reverb').value !== 0.5) { stuck = 'reverb went off before Next'; break; }
+      if (i === 0 && w.getComputedStyle(next).animationName !== 'learn-next-pulse') { stuck = 'Next does not pulse when the goal is reached'; break; }
+      next.click();
+    }
+    check(`every knob step completes in order (${steps.length} steps)`, !stuck && step() === 'Learn' && !d.querySelector('.is-next, .is-later, .learn-focus'), stuck || step());
+    check('effects play solo, then all come back at the end', +ctl('reverb').value === 0.5 && +ctl('delayMix').value === 0.5 && +ctl('chorusMix').value === 0.6,
+      `reverb ${ctl('reverb').value} delay ${ctl('delayMix').value}`);
+    d.querySelector('[data-learn]').click();
+    check('learn off hides the bar', d.getElementById('learnBar').hidden);
   } catch (e) { out.push('FAIL exception ' + e.message); }
   fetch('/__result?' + encodeURIComponent(out.join('\n')));
 }, 1500);

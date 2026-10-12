@@ -67,8 +67,13 @@ function randomizeEffects() {
 
 function randomize() {
     if (!state.audioInitialized) return;
-    randomizeSynth();
-    randomizeEffects();
+    state.autoInput = true; // not the player's hand: Learn goals ignore these events
+    try {
+        randomizeSynth();
+        randomizeEffects();
+    } finally {
+        state.autoInput = false;
+    }
     showCustomPreset('Random');
 }
 

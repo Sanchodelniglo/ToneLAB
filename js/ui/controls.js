@@ -456,6 +456,7 @@ function updateControls(type) {
     attachEnvelopePreviews(controlsDiv);
     sizeControlSets(controlsDiv);
     syncSpread();
+    document.dispatchEvent(new Event('controlsbuilt')); // learn.js marks the new sets
 }
 
 // Static effects sets (index.html) get their column count once

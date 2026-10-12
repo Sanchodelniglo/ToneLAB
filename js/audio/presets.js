@@ -420,4 +420,4 @@ delBtn.addEventListener('click', deletePreset);
 dialog.querySelector('[data-dialog-close]').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); }); // the backdrop
 
-export { synthDescriptions, synthPresets, presetHints, presetsFor, applyPreset, updatePresetBar, showCustomPreset };
+export { synthDescriptions, synthPresets, presetHints, presetsFor, applyPreset, updatePresetBar, showCustomPreset, showToast };

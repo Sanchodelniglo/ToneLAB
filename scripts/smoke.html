@@ -34,6 +34,12 @@ setTimeout(async () => {
     knob.focus(); const oct = S.currentOctave;
     knob.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     check('arrow key on a knob leaves the octave alone', S.currentOctave === oct);
+    const presetSel = d.getElementById('presetSelect');
+    presetSel.focus(); presetSel.value = '1'; presetSel.dispatchEvent(new w.Event('change'));
+    const ev = new w.KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true });
+    presetSel.dispatchEvent(ev);
+    check('note key plays after picking a preset in the select', S.activeKeys.has('t') && ev.defaultPrevented);
+    w.dispatchEvent(new w.Event('blur'));
 
     // User presets through the dialog: save, edit (rename + update), save as new, delete
     const q1 = (sel) => d.querySelector(sel), dlg = d.getElementById('presetDialog'), nameIn = d.getElementById('presetName');

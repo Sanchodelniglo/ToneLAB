@@ -287,10 +287,12 @@ document.addEventListener('keydown', (e) => {
         return;
     }
 
-    // Note playing — only block if focused on a select or text input (where letter keys have native behavior)
-    if (tag === 'SELECT' || tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type !== 'range')) return;
+    // Note playing — text fields keep their letters. A focused select (a preset just picked) still plays:
+    // note keys skip its type-ahead, arrows and Enter keep working.
+    if (tag === 'TEXTAREA' || (tag === 'INPUT' && document.activeElement.type !== 'range')) return;
 
     const keyElement = document.querySelector(`[data-keyboard-key="${key}"]`);
+    if (tag === 'SELECT' && keyElement) e.preventDefault();
     if (keyElement && !state.activeKeys.has(key)) {
         if (noteOn(keyElement.dataset.note, keyElement)) {
             state.activeKeys.add(key);

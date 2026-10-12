@@ -50,7 +50,7 @@
     }
 
     body[data-controls="sliders"] .effects-rack .control-set-title {
-        flex: 0 0 56px;
+        flex: 0 0 80px; /* "TREMOLO ?" */
     }
 
     /* Two controls per line: every label keeps its full word; Delay's third

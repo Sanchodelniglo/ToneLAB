@@ -258,6 +258,30 @@ body[data-key-labels="off"] .keyboard-key-label {
         scrollbar-width: none;
     }
 
+    .tab-list {
+        display: flex;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* Section ? of the page on screen (instrument pages only: FX and ARP have their own) */
+    .tab-help {
+        position: static;
+        flex: 0 0 44px;
+        width: 44px;
+        height: auto;
+        min-height: 44px;
+        opacity: 1;
+        border: none;
+        border-left: 1px solid rgb(var(--cyan-rgb) / 0.15);
+        color: var(--cyan-text);
+        font-size: var(--text-sm);
+    }
+
+    .tab-help[hidden] {
+        display: none;
+    }
+
     .tab-bar::-webkit-scrollbar {
         display: none;
     }
@@ -433,8 +457,29 @@ body[data-key-labels="off"] .keyboard-key-label {
     }
 
     .pages .control-group:has(.wave-select) .control-label {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
         justify-content: flex-start;
+        gap: var(--space-xs);
         margin: 0;
+    }
+
+    .pages .control-group:has(.wave-select) .control-label label {
+        min-width: 0;
+        text-align: left;
+    }
+
+    /* The ? follows the name: absolute at the top right, it sat under the full-width picker */
+    .pages .control-group:has(.wave-select) .help-btn {
+        position: relative; /* anchors the hit-area ::after */
+        top: auto;
+        right: auto;
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        opacity: 1;
     }
 
     .pages .control-group:has(.wave-select) .wave-picker {
@@ -699,6 +744,10 @@ body[data-key-labels="off"] .keyboard-key-label {
 
     .tab-btn {
         height: 36px;
+    }
+
+    .tab-help {
+        min-height: 36px;
     }
 
     .keyboard-controls .octave-btn {

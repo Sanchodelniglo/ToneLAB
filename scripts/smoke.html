@@ -79,6 +79,16 @@ setTimeout(async () => {
     check('phaser and tremolo nodes are in the chain', !!S.phaser && !!S.tremolo, 'crusher ' + !!S.crusher);
     T.setEffect('tremoloDepth', 0.8); T.setEffect('phaserMix', 0.5);
     check('effect knobs reach the engine', Math.abs(S.tremolo.depth.value - 0.8) < 0.01 && Math.abs(S.phaser.wet.value - 0.5) < 0.01);
+    // Every set title carries a section ? with its hint
+    const titles = [...d.querySelectorAll('.control-set-title')].filter(t => !t.closest('.arp-set'));
+    const bare = titles.filter(t => { const b = t.querySelector('.set-help'); return !b || !d.getElementById(b.getAttribute('aria-controls')); }).map(t => t.textContent.trim());
+    check('every section has a hint', bare.length === 0, bare.join(','));
+    check('the Effects box has a hint', !!d.querySelector('.panel-title .set-help[aria-controls="setHint_effects"]') && !!d.getElementById('setHint_effects'));
+    // Every visible ? is tappable: nothing (a wave picker once) sits on top of it
+    const hidden = [...d.querySelectorAll('.help-btn')].filter(b => b.offsetParent && b.getBoundingClientRect().width > 0).filter(b => {
+      b.scrollIntoView({ block: 'nearest' }); const r = b.getBoundingClientRect(); const e = d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return e && !b.contains(e) && !e.contains(b) && r.top >= 0 && r.bottom <= w.innerHeight; }).map(b => b.getAttribute('aria-label'));
+    check('no help button is covered', hidden.length === 0, hidden.join(' | '));
     T.setArp(false);
   } catch (e) { out.push('FAIL exception ' + e.message); }
   fetch('/__result?' + encodeURIComponent(out.join('\n')));

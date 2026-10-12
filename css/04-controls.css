@@ -33,6 +33,69 @@
     color: var(--text-muted);
 }
 
+/* Section ? after a set title: the same popover as the knob hints, hung under the title */
+.control-set:has(> .set-hint),
+.scope-head,
+.panel-header:has(> .set-hint),
+.effect-controls:has(> .set-hint) {
+    position: relative;
+}
+
+.control-set-title .set-help,
+.panel-title .set-help {
+    position: relative; /* anchors the hit-area ::after (WCAG 2.2 target size) */
+    top: auto;
+    right: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    vertical-align: 1px;
+    letter-spacing: 0;
+}
+
+.control-set-title .set-help::after,
+.panel-title .set-help::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+}
+
+.control-set:hover > .control-set-title .set-help,
+.scope-head:hover .set-help,
+.panel-header:hover .set-help {
+    opacity: 1;
+}
+
+.set-hint {
+    top: calc(var(--space-sm) + 18px); /* controls.js (fitHint) moves it just under the title */
+    left: var(--space-sm);
+}
+
+/* Title and its ? stay on one line, even in the 1-knob Master column */
+.control-set-title:has(.set-help) {
+    white-space: nowrap;
+}
+
+/* The big display-font panel title: the ? sits on its middle */
+.panel-title .set-help {
+    vertical-align: middle;
+}
+
+.control-set:has(> .control-set-title .set-help:focus-visible) > .set-hint,
+.scope-head:has(.set-help:focus-visible) > .set-hint,
+.panel-header:has(.set-help:focus-visible) > .set-hint {
+    display: block;
+}
+
+@media (hover: hover) {
+    .control-set:has(> .control-set-title .set-help:hover) > .set-hint,
+    .scope-head:has(.set-help:hover) > .set-hint,
+    .panel-header:has(.set-help:hover) > .set-hint {
+        display: block;
+    }
+}
+
 /* --cols / --cells are set per set by controls.js (sizeControlSets) */
 .controls-grid {
     display: grid;

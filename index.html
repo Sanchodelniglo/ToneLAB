@@ -104,7 +104,7 @@
                     </div>
                 </div>
 
-                <nav class="tab-bar" id="tabBar" role="tablist" aria-label="Control pages"></nav>
+                <nav class="tab-bar" id="tabBar" aria-label="Control pages"></nav>
                 <div class="pages" id="pages">
                     <div id="controls" class="control-sets" role="group" aria-labelledby="instrumentHeading"></div>
                     <section class="control-set arp-set" id="arpSet" role="group" aria-label="Arpeggiator settings" hidden></section>
@@ -125,7 +125,8 @@
             <!-- Live scope: its own box on desktop (right column), strip on mobile -->
                 <div class="scope-block" role="group" aria-labelledby="scopeHeading">
                     <div class="scope-head">
-                        <h3 class="control-set-title" id="scopeHeading">Scope</h3>
+                        <h3 class="control-set-title"><span id="scopeHeading">Scope</span> <button type="button" class="help-btn set-help" aria-label="About the scope" aria-expanded="false" aria-controls="setHint_scope">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_scope" hidden>What you hear, after the effects. Wave shows the shape of the sound, Spectrum shows which pitches are loud. Hold a note and turn a knob to watch it change.</p>
                         <div class="scope-modes" role="group" aria-label="Scope display mode">
                             <button type="button" class="preset-btn scope-btn active" id="scopeModeWave" data-scope-mode="wave" aria-pressed="true">Wave</button>
                             <button type="button" class="preset-btn scope-btn" id="scopeModeSpectrum" data-scope-mode="spectrum" aria-pressed="false">Spectrum</button>
@@ -136,23 +137,28 @@
 
             <div class="synth-panel effects-panel">
                 <div class="panel-header">
-                    <h2 class="panel-title" id="effectsHeading">Effects</h2>
+                    <h2 class="panel-title"><span id="effectsHeading">Effects</span> <button type="button" class="help-btn set-help" aria-label="About the effects" aria-expanded="false" aria-controls="setHint_effects">?</button></h2>
+                    <p class="control-hint set-hint" id="setHint_effects" hidden>Effects change the sound after the instrument, in this order: chorus, phaser, tremolo, crusher, tone, delay, reverb, then the master volume. Turn a Mix or Depth to 0 to switch that effect off.</p>
                 </div>
                 <div class="effect-controls control-sets effects-rack" role="group" aria-labelledby="effectsHeading">
                     <section class="control-set" role="group" aria-label="Master">
-                        <h3 class="control-set-title">Master</h3>
+                        <h3 class="control-set-title">Master <button type="button" class="help-btn set-help" aria-label="About the Master effect" aria-expanded="false" aria-controls="setHint_fx_master">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_master" hidden>Final level of everything you hear, after all the effects.</p>
                         <div class="controls-grid">
                         <div class="control-group control-group--volume">
                             <div class="control-label">
                                 <label for="masterVolume">Volume</label>
                                 <span class="control-value" id="masterVolumeValue">75%</span>
+                                <button type="button" class="help-btn" aria-label="What does Master Volume do?" aria-expanded="false" aria-controls="masterVolumeHint">?</button>
                             </div>
+                            <p class="control-hint" id="masterVolumeHint" hidden>Loudness of the whole app. It does not change the sound, only how loud it is. 0 = silent.</p>
                             <input type="range" id="masterVolume" min="0" max="100" step="1" value="75" data-default-value="75">
                         </div>
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Reverb">
-                        <h3 class="control-set-title">Reverb</h3>
+                        <h3 class="control-set-title">Reverb <button type="button" class="help-btn set-help" aria-label="About the Reverb effect" aria-expanded="false" aria-controls="setHint_fx_reverb">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_reverb" hidden>A virtual room. It adds the echoes of the walls, so the sound seems further away and wider.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -175,7 +181,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Delay">
-                        <h3 class="control-set-title">Delay</h3>
+                        <h3 class="control-set-title">Delay <button type="button" class="help-btn set-help" aria-label="About the Delay effect" aria-expanded="false" aria-controls="setHint_fx_delay">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_delay" hidden>Repeats of the sound, in time. Time sets the gap between repeats, Feedback how many you hear.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -207,7 +214,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Tone">
-                        <h3 class="control-set-title">Tone</h3>
+                        <h3 class="control-set-title">Tone <button type="button" class="help-btn set-help" aria-label="About the Tone effect" aria-expanded="false" aria-controls="setHint_fx_tone">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_tone" hidden>Shapes the whole sound: Cutoff removes the highs, Distortion adds drive and grit.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -230,7 +238,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Chorus">
-                        <h3 class="control-set-title">Chorus</h3>
+                        <h3 class="control-set-title">Chorus <button type="button" class="help-btn set-help" aria-label="About the Chorus effect" aria-expanded="false" aria-controls="setHint_fx_chorus">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_chorus" hidden>Copies of the sound, slightly out of tune and late, played together. It makes the sound wide and shimmery.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -253,7 +262,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Phaser">
-                        <h3 class="control-set-title">Phaser</h3>
+                        <h3 class="control-set-title">Phaser <button type="button" class="help-btn set-help" aria-label="About the Phaser effect" aria-expanded="false" aria-controls="setHint_fx_phaser">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_phaser" hidden>A sweeping filter that cuts moving notches in the sound. It gives the 80s whoosh on pads and chords.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -276,7 +286,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Tremolo">
-                        <h3 class="control-set-title">Tremolo</h3>
+                        <h3 class="control-set-title">Tremolo <button type="button" class="help-btn set-help" aria-label="About the Tremolo effect" aria-expanded="false" aria-controls="setHint_fx_tremolo">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_tremolo" hidden>The volume goes up and down in a loop. It gives a pulse or a shake.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">
@@ -299,7 +310,8 @@
                         </div>
                     </section>
                     <section class="control-set" role="group" aria-label="Crusher">
-                        <h3 class="control-set-title">Crusher</h3>
+                        <h3 class="control-set-title">Crusher <button type="button" class="help-btn set-help" aria-label="About the Crusher effect" aria-expanded="false" aria-controls="setHint_fx_crusher">?</button></h3>
+                        <p class="control-hint set-hint" id="setHint_fx_crusher" hidden>Lowers the bit depth, which turns the smooth wave into steps. That gives a buzzy, lo-fi digital grit.</p>
                         <div class="controls-grid">
                         <div class="control-group">
                             <div class="control-label">

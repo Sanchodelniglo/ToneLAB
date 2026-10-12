@@ -33,12 +33,18 @@ function closeAllHints(except) {
 function fitHint(hint) {
     hint.style.transform = '';
     hint.classList.remove('hint-up');
+    // Section hint: just under its title, whatever the title height is in this layout
+    // (top of the page when the title is hidden or elsewhere, as on the phone FX page)
+    if (hint.classList.contains('set-hint')) {
+        const title = hint.parentElement.querySelector(':scope > .control-set-title, :scope > .panel-title');
+        hint.style.top = `${title ? title.offsetTop + title.offsetHeight + 4 : 4}px`;
+    }
     // A hover preview is still display: none here; measure it without showing it
     const forced = getComputedStyle(hint).display === 'none';
     if (forced) { hint.style.display = 'block'; hint.style.visibility = 'hidden'; }
     const r = hint.getBoundingClientRect();
     const margin = 8;
-    const group = hint.closest('.control-group');
+    const group = hint.closest('.control-group') || hint.closest('.control-set'); // section hints hang under the set title
     let dy = 0;
     // Limits: the screen, narrowed to the nearest scrolling box (it clips the hint, and in
     // phone landscape the scope sits right next to it, so a hint pushed left disappears)
@@ -75,10 +81,12 @@ function fitHint(hint) {
 // Hover preview (mouse): place the hint before it shows, once per cell
 let fittedGroup = null;
 document.addEventListener('pointerover', (e) => {
-    const group = e.target.closest?.('.control-group');
+    const group = e.target.closest?.('.control-group, .control-set-title');
     if (!group || group === fittedGroup) return;
     fittedGroup = group;
-    const hint = group.querySelector(':scope > .control-hint');
+    const hint = group.matches('.control-set-title')
+        ? group.parentElement.querySelector(':scope > .set-hint')
+        : group.querySelector(':scope > .control-hint');
     if (hint) fitHint(hint);
 }, { passive: true });
 
@@ -177,6 +185,23 @@ const GROUP_OVERRIDES = {
     PluckSynth: { resonance: 'String' },
     DuoSynth: { harmonicity: 'Voices', spread: 'Voices' }
 };
+// One line per instrument section, behind a ? next to its title (the knob hints say what each knob does,
+// these say what the section is for).
+const SET_HINTS = {
+    'Oscillator': 'The sound source. Its wave shape sets the basic tone before anything else shapes it.',
+    'Envelope': 'How the loudness moves on each note: Attack fades in, Decay falls, Sustain holds while you press, Release fades out after you let go.',
+    'Operators': 'Two oscillators. The modulator changes the volume (AM) or the pitch (FM) of the carrier: their ratio and depth make the overtones.',
+    'Mod Envelope': 'How the modulation moves on each note. A slow attack makes the tone change while you hold the key.',
+    'Pitch': 'A fast pitch drop on every hit. That drop is what makes it sound like a drum.',
+    'Tone': 'Pitch and colour of the metal: how high, how bright and how clangy each hit is.',
+    'Filter': 'Removes the high tones above the cutoff. Resonance adds a peak at the cutoff for the classic squelch.',
+    'Filter Envelope': 'Moves the filter on each note: it opens on Attack, closes to the Sustain level on Decay, then closes fully on Release.',
+    'Noise': 'Random hiss instead of a pitched wave. The colour sets how bright or deep it is.',
+    'String': 'A plucked string model: a short burst rings through a tuned delay and fades like a real string.',
+    'Vibrato': 'A pitch wobble on both voices. Amount sets how far, Rate how fast.',
+    'Voices': 'Two oscillators played together. Harmonicity sets the pitch of the second voice against the first.'
+};
+
 function groupFor(type, id) {
     return GROUP_OVERRIDES[type]?.[id] || GROUP_BY_ID[id] || 'Controls';
 }
@@ -212,9 +237,15 @@ function setGrid(container, sets, name) {
         const title = document.createElement('h3');
         title.className = 'control-set-title';
         title.textContent = name;
+        set.appendChild(title);
+        const desc = SET_HINTS[name];
+        if (desc) {
+            const hintId = `setHint_inst_${name.replace(/\W+/g, '').toLowerCase()}`;
+            title.insertAdjacentHTML('beforeend', ` <button type="button" class="help-btn set-help" aria-label="About the ${name} section" aria-expanded="false" aria-controls="${hintId}">?</button>`);
+            set.insertAdjacentHTML('beforeend', `<p class="control-hint set-hint" id="${hintId}" hidden>${desc}</p>`);
+        }
         const grid = document.createElement('div');
         grid.className = 'controls-grid';
-        set.appendChild(title);
         set.appendChild(grid);
         container.appendChild(set);
         sets.set(name, grid);

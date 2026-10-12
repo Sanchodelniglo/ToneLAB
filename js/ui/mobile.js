@@ -54,7 +54,7 @@ function pageList() {
 function tabName(page) {
     if (page.classList.contains('effect-controls')) return 'FX';
     if (page.classList.contains('arp-set')) return '\u25CF ARP';
-    const title = page.querySelector('.control-set-title')?.textContent.trim() || '';
+    const title = page.getAttribute('aria-label') || ''; // the title text also holds the section ?
     return TAB_NAMES[title] || title.slice(0, 5).toUpperCase();
 }
 
@@ -62,6 +62,12 @@ function buildTabs() {
     const bar = $('#tabBar');
     const pages = $('#pages');
     bar.innerHTML = '';
+    // The tabs sit in their own tablist: the section ? after them is not a tab
+    const list = document.createElement('div');
+    list.className = 'tab-list';
+    list.setAttribute('role', 'tablist');
+    list.setAttribute('aria-label', 'Control pages');
+    bar.appendChild(list);
     pageList().forEach((page, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -75,8 +81,16 @@ function buildTabs() {
             markTab(i); // highlight now, the scroll event confirms it later
             slideTo(pages, i * pages.clientWidth);
         });
-        bar.appendChild(btn);
+        list.appendChild(btn);
     });
+    // The phone hides the instrument set titles and the Effects title (the tab names the page), so their
+    // section ? lives here and follows the page on screen; the ARP page carries its own ? button.
+    const help = document.createElement('button');
+    help.type = 'button';
+    help.className = 'help-btn tab-help';
+    help.textContent = '?';
+    help.setAttribute('aria-expanded', 'false');
+    bar.appendChild(help);
     pages.scrollTo({ left: 0 });
     syncTabs();
 }
@@ -109,6 +123,29 @@ function slideTo(el, target) {
 
 function markTab(idx) {
     $('#tabBar').querySelectorAll('.tab-btn').forEach((b, i) => b.setAttribute('aria-selected', String(i === idx)));
+    syncTabHelp(idx);
+}
+
+// Point the tab bar ? at the section hint of the page on screen; a hint left open on the old page closes
+function syncTabHelp(idx) {
+    const help = $('#tabBar .tab-help');
+    if (!help) return;
+    const page = pageList()[idx];
+    const hint = page?.querySelector(':scope > .set-hint');
+    const current = help.getAttribute('aria-controls');
+    if (current === (hint?.id ?? null)) return;
+    if (help.getAttribute('aria-expanded') === 'true') {
+        const open = document.getElementById(current);
+        if (open) open.hidden = true;
+        help.setAttribute('aria-expanded', 'false');
+    }
+    help.hidden = !hint;
+    if (hint) {
+        help.setAttribute('aria-controls', hint.id);
+        help.setAttribute('aria-label', `About the ${page.getAttribute('aria-label') || $('#effectsHeading').textContent} section`);
+    } else {
+        help.removeAttribute('aria-controls');
+    }
 }
 
 function syncTabs() {
@@ -170,6 +207,8 @@ function enter() {
         moveTo(el, row);
     });
     moveTo($('.effect-controls'), $('#pages'), $('#arpSet'));
+    // The Effects box title is hidden here: its section hint rides along on the FX page, opened from the tab bar ?
+    moveTo($('#setHint_effects'), $('.effect-controls'), $('.effect-controls').firstChild);
     // The whole arp strip becomes the ARP page (lights included); the keyboard box keeps only the ARP switch
     moveTo($('#arpStrip'), $('#arpSet'));
     syncArpTab();

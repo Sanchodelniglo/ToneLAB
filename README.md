@@ -29,7 +29,7 @@ It runs in the browser, works offline, and installs as an app.
 - **CRT look**: scanlines, RGB phosphors, vignette, flicker, static, and a colour glitch. The **gear** button opens Settings, where each of Scanlines, Vignette, Flicker and Glitch can be turned off. They start off for Flicker and Glitch when the system asks for reduced motion
 - **Three layouts**: a one-screen workstation on desktop (1024px and wider), a tablet layout (768 to 1023px wide) that shows every set at once, and a phone layout with tabs, a preset strip on the scope, and a landscape split
 - **PWA**: install it as an app, works fully offline (no CDN at runtime)
-- **Four colour themes** in Settings (gear): **Cyber** (cyan and magenta, the default), **Sodium** (amber and teal on smoggy blue-black, like a rainy city at night) , **Replicant** (neon jade and neon red on a cold near-black, Blade Runner style) and **Analog** (a black-case hardware synth: matte black chassis, white silkscreen, boxed sections, black knobs, grey fader caps, red LEDs, white keys). The choice is saved. Text colours are tuned for contrast in all of them (see "Colours" below)
+- **Four colour themes** in Settings (gear): **Analog** (the default: a black-case hardware synth, matte black chassis, white silkscreen, boxed sections, black knobs, grey fader caps, red LEDs, white keys), **Cyber** (cyan and magenta), **Sodium** (amber and teal on smoggy blue-black, like a rainy city at night), and **Replicant** (neon jade and neon red on a cold near-black, Blade Runner style). The choice is saved. Text colours are tuned for contrast in all of them (see "Colours" below)
 
 ## Controls
 
@@ -79,7 +79,7 @@ Reference: [Alec Lownes - CRT Display](https://aleclownes.com/2017/02/01/crt-dis
 
 ## Colours
 
-All colours are tokens in `css/01-tokens.css`. A theme is a block that gives the same tokens new values (`css/15-theme-sodium.css`, `css/16-theme-replicant.css` and `css/17-theme-analog.css`, selected by `html[data-theme="..."]`). In every theme `cyan` is the primary accent and `magenta` the secondary accent. Solid colours are plain variables (`--accent-cyan`, `--text-primary`). Translucent colours are channel triplets, used as `rgb(var(--cyan-rgb) / 0.25)`. Text uses lifted tints (`--cyan-text`, `--magenta-text`) so it stays readable: body text about 11-12:1 and the secondary accent at least 5.5:1 against the panels.
+All colours are tokens in `css/01-tokens.css` (the Cyber values). A theme is a block that gives the same tokens new values (`css/15-theme-sodium.css`, `css/16-theme-replicant.css` and `css/17-theme-analog.css`, selected by `html[data-theme="..."]`). In every theme `cyan` is the primary accent and `magenta` the secondary accent. Solid colours are plain variables (`--accent-cyan`, `--text-primary`). Translucent colours are channel triplets, used as `rgb(var(--cyan-rgb) / 0.25)`. Text uses lifted tints (`--cyan-text`, `--magenta-text`) so it stays readable: body text about 11-12:1 and the secondary accent at least 5.5:1 against the panels.
 
 ## Project Structure
 

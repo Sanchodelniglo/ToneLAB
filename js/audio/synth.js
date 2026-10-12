@@ -31,12 +31,6 @@ function initSynth(type) {
     state.oscSpread = 20; // the Spread knob is rebuilt at its default with the controls
 
     switch(type) {
-        case 'Synth':
-            state.synth = new Tone.Synth(synthConfig).connect(state.chorus);
-            break;
-        case 'AMSynth':
-            state.synth = new Tone.AMSynth(synthConfig).connect(state.chorus);
-            break;
         case 'FMSynth':
             state.synth = new Tone.FMSynth(synthConfig).connect(state.chorus);
             break;
@@ -58,9 +52,6 @@ function initSynth(type) {
         case 'PolySynth':
             state.synth = new Tone.PolySynth(Tone.Synth, synthConfig).connect(state.chorus);
             break;
-        case 'DuoSynth':
-            state.synth = new Tone.DuoSynth(synthConfig).connect(state.chorus);
-            break;
     }
 
     state.currentInstrumentType = type;
@@ -70,17 +61,6 @@ function initSynth(type) {
 
 function getSynthConfig(type) {
     const configs = {
-        'Synth': {
-            oscillator: { type: 'sine' },
-            envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 }
-        },
-        'AMSynth': {
-            harmonicity: 3,
-            oscillator: { type: 'sine' },
-            envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 },
-            modulation: { type: 'square' },
-            modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
-        },
         'FMSynth': {
             harmonicity: 3,
             modulationIndex: 10,
@@ -122,31 +102,16 @@ function getSynthConfig(type) {
         'PolySynth': {
             oscillator: { type: 'sine' },
             envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 }
-        },
-        'DuoSynth': {
-            vibratoAmount: 0.5,
-            vibratoRate: 5,
-            harmonicity: 1.5,
-            voice0: {
-                oscillator: { type: 'sine' },
-                filterEnvelope: { attack: 0.01, decay: 0, sustain: 1, release: 0.5 },
-                envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 }
-            },
-            voice1: {
-                oscillator: { type: 'sine' },
-                filterEnvelope: { attack: 0.01, decay: 0, sustain: 1, release: 0.5 },
-                envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 }
-            }
         }
     };
 
-    return configs[type] || configs['Synth'];
+    return configs[type] || configs['MonoSynth'];
 }
 
 // fatsine / fatsquare / fattriangle / fatsawtooth: 3 detuned copies (Tone FatOscillator)
 const isFat = (type) => typeof type === 'string' && type.startsWith('fat');
 
-// AM/FM synths expose harmonicity and modulationIndex as Signals (.value),
+// FMSynth exposes harmonicity and modulationIndex as Signals (.value),
 // MetalSynth exposes them as plain numbers. Write whichever the synth has.
 function setParam(target, prop, value) {
     const current = target[prop];
@@ -176,9 +141,6 @@ function updateSynthParameter(param, value) {
                 state.oscSpread = value;
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ oscillator: { spread: value } });
-                } else if (state.synth.voice0) {
-                    state.synth.voice0.oscillator.spread = value;
-                    state.synth.voice1.oscillator.spread = value;
                 } else if (state.synth.oscillator) {
                     state.synth.oscillator.spread = value;
                 }
@@ -189,24 +151,9 @@ function updateSynthParameter(param, value) {
             case 'noiseType':
                 if (state.synth.noise) state.synth.noise.type = value;
                 break;
-            case 'voice0Type':
-                if (state.synth.voice0) {
-                    state.synth.voice0.oscillator.type = value;
-                    if (isFat(value)) state.synth.voice0.oscillator.spread = state.oscSpread;
-                }
-                break;
-            case 'voice1Type':
-                if (state.synth.voice1) {
-                    state.synth.voice1.oscillator.type = value;
-                    if (isFat(value)) state.synth.voice1.oscillator.spread = state.oscSpread;
-                }
-                break;
             case 'attack':
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ envelope: { attack: value } });
-                } else if (state.synth.voice0) {
-                    state.synth.voice0.envelope.attack = value;
-                    state.synth.voice1.envelope.attack = value;
                 } else {
                     state.synth.envelope.attack = value;
                 }
@@ -214,9 +161,6 @@ function updateSynthParameter(param, value) {
             case 'decay':
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ envelope: { decay: value } });
-                } else if (state.synth.voice0) {
-                    state.synth.voice0.envelope.decay = value;
-                    state.synth.voice1.envelope.decay = value;
                 } else {
                     state.synth.envelope.decay = value;
                 }
@@ -224,9 +168,6 @@ function updateSynthParameter(param, value) {
             case 'sustain':
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ envelope: { sustain: value } });
-                } else if (state.synth.voice0) {
-                    state.synth.voice0.envelope.sustain = value;
-                    state.synth.voice1.envelope.sustain = value;
                 } else {
                     state.synth.envelope.sustain = value;
                 }
@@ -234,9 +175,6 @@ function updateSynthParameter(param, value) {
             case 'release':
                 if (state.currentInstrumentType === 'PolySynth') {
                     state.synth.set({ envelope: { release: value } });
-                } else if (state.synth.voice0) {
-                    state.synth.voice0.envelope.release = value;
-                    state.synth.voice1.envelope.release = value;
                 } else {
                     state.synth.envelope.release = value;
                 }
@@ -288,15 +226,6 @@ function updateSynthParameter(param, value) {
                 break;
             case 'dampening':
                 if (state.synth.dampening !== undefined) state.synth.dampening = value;
-                break;
-            case 'vibratoAmount':
-                if (state.synth.vibratoAmount) state.synth.vibratoAmount.value = value;
-                break;
-            case 'vibratoRate':
-                if (state.synth.vibratoRate) state.synth.vibratoRate.value = value;
-                break;
-            case 'volume':
-                state.synth.volume.value = value;
                 break;
         }
     } catch (error) {

@@ -36,7 +36,7 @@ const SHEET_ROWS = [
 const TAB_NAMES = {
     'Oscillator': 'OSC', 'Envelope': 'ENV', 'Filter': 'FLT', 'Filter Envelope': 'F.ENV',
     'Operators': 'OPS', 'Mod Envelope': 'M.ENV', 'Pitch': 'PITCH', 'Tone': 'TONE',
-    'String': 'STR', 'Voices': 'VOICE'
+    'String': 'STR'
 };
 
 const $ = (sel) => document.querySelector(sel);

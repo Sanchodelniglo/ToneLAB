@@ -164,7 +164,7 @@ document.addEventListener('dblclick', (e) => {
 // named set, with a few per-synth overrides where the same id means something
 // else (MetalSynth's harmonicity is tone colour, not an operator ratio).
 const GROUP_BY_ID = {
-    oscType: 'Oscillator', spread: 'Oscillator', volume: 'Oscillator',
+    oscType: 'Oscillator', spread: 'Oscillator',
     attack: 'Envelope', decay: 'Envelope', sustain: 'Envelope', release: 'Envelope',
     harmonicity: 'Operators', modulationIndex: 'Operators', modType: 'Operators',
     modAttack: 'Mod Envelope', modRelease: 'Mod Envelope',
@@ -173,24 +173,20 @@ const GROUP_BY_ID = {
     filterQ: 'Filter', filterCutoff: 'Filter',
     filterAttack: 'Filter Envelope', filterDecay: 'Filter Envelope', filterSustain: 'Filter Envelope', filterRelease: 'Filter Envelope',
     noiseType: 'Noise',
-    attackNoise: 'String', dampening: 'String',
-    vibratoAmount: 'Vibrato', vibratoRate: 'Vibrato',
-    voice0Type: 'Voices', voice1Type: 'Voices'
+    attackNoise: 'String', dampening: 'String'
 };
 const GROUP_OVERRIDES = {
-    AMSynth: { oscType: 'Operators' },
     FMSynth: { oscType: 'Operators' },
     MembraneSynth: { oscType: 'Pitch' },
     MetalSynth: { harmonicity: 'Tone', modulationIndex: 'Tone', octaves: 'Tone' },
-    PluckSynth: { resonance: 'String' },
-    DuoSynth: { harmonicity: 'Voices', spread: 'Voices' }
+    PluckSynth: { resonance: 'String' }
 };
 // One line per instrument section, behind a ? next to its title (the knob hints say what each knob does,
 // these say what the section is for).
 const SET_HINTS = {
     'Oscillator': 'The sound source. Its wave shape sets the basic tone before anything else shapes it.',
     'Envelope': 'How the loudness moves on each note: Attack fades in, Decay falls, Sustain holds while you press, Release fades out after you let go.',
-    'Operators': 'Two oscillators. The modulator changes the volume (AM) or the pitch (FM) of the carrier: their ratio and depth make the overtones.',
+    'Operators': 'Two oscillators. The modulator bends the pitch of the carrier (FM): their ratio and depth make the overtones.',
     'Mod Envelope': 'How the modulation moves on each note. A slow attack makes the tone change while you hold the key.',
     'Pitch': 'A fast pitch drop on every hit. That drop is what makes it sound like a drum.',
     'Tone': 'Pitch and colour of the metal: how high, how bright and how clangy each hit is.',
@@ -198,8 +194,6 @@ const SET_HINTS = {
     'Filter Envelope': 'Moves the filter on each note: it opens on Attack, closes to the Sustain level on Decay, then closes fully on Release.',
     'Noise': 'Random hiss instead of a pitched wave. The colour sets how bright or deep it is.',
     'String': 'A plucked string model: a short burst rings through a tuned delay and fades like a real string.',
-    'Vibrato': 'A pitch wobble on both voices. Amount sets how far, Rate how fast.',
-    'Voices': 'Two oscillators played together. Harmonicity sets the pitch of the second voice against the first.'
 };
 
 function groupFor(type, id) {
@@ -288,7 +282,6 @@ function updateControls(type) {
         decay: 'Time to fall from the peak to the sustain level \u2014 try 0.1s for snappy plucks, 1s+ for ringing keys.',
         sustain: 'Level held while the key is down \u2014 0 makes a pluck that dies away, 0.8+ gives a steady organ-like note.',
         release: 'Fade-out after you let go \u2014 0.1s is tight and dry; try 2-4s for pads that linger and blend.',
-        volume: 'Loudness in dB, 0 is the maximum \u2014 try about -14 dB for buzzy square/sawtooth, -8 dB for soft sines.',
         harmonicity: 'Pitch ratio between the two oscillators \u2014 whole numbers stay musical; try 1.5 for a fifth, 3.5 for bells.',
         modType: 'Wave of the modulator \u2014 sine gives smooth tones, square and sawtooth add buzz; start with sine for clean keys.',
         modulationIndex: 'Modulation depth \u2014 low is soft and pure, high is bright and harsh; try 5-10 for keys, 40+ for clangs.',
@@ -307,33 +300,9 @@ function updateControls(type) {
         noiseType: 'Noise color \u2014 white is hissy, pink balanced, brown deep and rumbly; try white for snares, pink for wind.',
         attackNoise: 'Strength of the pick burst \u2014 low is a soft fingertip, high is a hard pick; try 5+ for a twangy banjo.',
         dampening: 'How fast high tones die out \u2014 low is muffled like a muted bass; try 6000+ Hz for a bright harp shimmer.',
-        vibratoAmount: 'Depth of the pitch wobble \u2014 0 is steady, 1 is seasick; try 0.1 for a singing lead, 0.8 for alien warble.',
-        vibratoRate: 'Speed of the pitch wobble \u2014 slow sways, fast flutters; try 5 Hz for natural vibrato, 10+ for odd effects.',
-        voice0Type: 'Wave of the first voice \u2014 sawtooth is rich and bright, triangle soft; try sawtooth for leads.',
-        voice1Type: 'Wave of the second voice \u2014 pick a different shape from voice 0, e.g. square under a sawtooth, for a thicker blend.'
     };
 
     const controlSets = {
-        'Synth': [
-            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: fatWaveforms, default: 'sine' },
-            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
-            { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
-            { name: 'Volume', id: 'volume', min: -60, max: 0, step: 1, default: -10, suffix: ' dB' }
-        ],
-        'AMSynth': [
-            { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.1, default: 3 },
-            { name: 'Oscillator Type', id: 'oscType', type: 'wave', values: extendedWaveforms, default: 'sine' },
-            { name: 'Modulation Type', id: 'modType', type: 'wave', values: extendedWaveforms, default: 'square' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
-            { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' },
-            { name: 'Mod Attack', id: 'modAttack', min: 0, max: 2, step: 0.001, default: 0.5, suffix: ' Sec' },
-            { name: 'Mod Release', id: 'modRelease', min: 0, max: 5, step: 0.01, default: 0.5, suffix: ' Sec' }
-        ],
         'FMSynth': [
             { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.1, default: 3 },
             { name: 'Modulation Index', id: 'modulationIndex', min: 0, max: 100, step: 1, default: 10 },
@@ -398,22 +367,10 @@ function updateControls(type) {
             { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
             { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
             { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' }
-        ],
-        'DuoSynth': [
-            { name: 'Vibrato Amount', id: 'vibratoAmount', min: 0, max: 1, step: 0.01, default: 0.5 },
-            { name: 'Vibrato Rate', id: 'vibratoRate', min: 0, max: 20, step: 0.1, default: 5, suffix: ' Hz' },
-            { name: 'Harmonicity', id: 'harmonicity', min: 0.5, max: 10, step: 0.01, default: 1.5 },
-            { name: 'Voice 0 Osc', id: 'voice0Type', type: 'wave', values: fatWaveforms, default: 'sine' },
-            { name: 'Voice 1 Osc', id: 'voice1Type', type: 'wave', values: fatWaveforms, default: 'sine' },
-            { name: 'Spread', id: 'spread', min: 0, max: 100, step: 1, default: 20, suffix: ' ct' },
-            { name: 'Attack', id: 'attack', min: 0, max: 2, step: 0.001, default: 0.05, suffix: ' Sec' },
-            { name: 'Decay', id: 'decay', min: 0, max: 2, step: 0.01, default: 0.1, suffix: ' Sec' },
-            { name: 'Sustain', id: 'sustain', min: 0, max: 1, step: 0.01, default: 0.3 },
-            { name: 'Release', id: 'release', min: 0, max: 5, step: 0.01, default: 1, suffix: ' Sec' }
         ]
     };
 
-    const controls = controlSets[type] || controlSets['Synth'];
+    const controls = controlSets[type] || controlSets['MonoSynth'];
     let controlIndex = 0;
 
     const sets = new Map();

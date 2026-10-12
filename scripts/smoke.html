@@ -17,11 +17,11 @@ setTimeout(async () => {
     await new Promise(r => setTimeout(r, 1000));
     const T = w.ToneLAB, S = T.state;
     check('bad saved arp data repaired', S.arp.length === 16 && S.arp.steps.every(s => s && typeof s === 'object'));
-    for (const type of ['Synth','AMSynth','FMSynth','MembraneSynth','MetalSynth','MonoSynth','NoiseSynth','PluckSynth','PolySynth','DuoSynth']) {
+    for (const type of ['FMSynth','MembraneSynth','MetalSynth','MonoSynth','NoiseSynth','PluckSynth','PolySynth']) {
       T.initSynth(type); await new Promise(r => setTimeout(r, 150));
       T.playNote('C4'); T.stopNote('C4');
     }
-    check('all 10 instruments build and play without errors', errors.length === 0, errors.join(' | '));
+    check('all 7 instruments build and play without errors', errors.length === 0, errors.join(' | '));
     const key = (type, init) => d.dispatchEvent(new w.KeyboardEvent(type, { key: 't', bubbles: true, cancelable: true, ...init }));
     S.activeKeys.clear();
     key('keydown', { metaKey: true });

@@ -19,7 +19,7 @@ export const state = {
     tremolo: null,
     crusher: null,        // null where AudioWorklet is missing: the Crusher knobs then do nothing
     limiter: null,
-    currentInstrumentType: 'Synth',
+    currentInstrumentType: 'MonoSynth',
     currentOctave: 4,
     minOctave: 0,
     maxOctave: 7,

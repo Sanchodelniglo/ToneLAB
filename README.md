@@ -6,8 +6,8 @@ It runs in the browser, works offline, and installs as an app.
 ## Features
 
 ### Sound
-- **10 synthesizer types**, each with a short description: Synth, AM, FM, Membrane, Metal, Mono, Noise, Pluck, Poly, Duo
-- **85 presets**: 8 per synth in two banks, plus 5 fat-wave presets. Each preset sets the knobs, the octave, and the full effects rack. Every preset has a one-line hint for beginners (`?` next to the preset name)
+- **7 synthesizer types**, each with a short description: Mono, Poly, FM, Pluck, Membrane, Metal, Noise
+- **68 presets**, 8 to 19 per synth. Each preset sets the knobs, the octave, and the full effects rack. Every preset has a one-line hint for beginners (`?` next to the preset name)
 - **Wave picker** with a drawing of each shape. Besides sine, square, triangle, sawtooth, pulse and PWM, it has partial-limited shapes (for example `sawtooth4`) and **fat waves**: three detuned copies of a wave, with a **Spread** knob that sets the detune in cents (only active on a fat wave)
 - **Effects rack**: reverb (mix, size), delay (time, feedback, mix), distortion, filter cutoff, chorus (rate, mix), phaser (rate, mix), tremolo (rate, depth), bit crusher (bits, mix), and a brick-wall limiter on the master output
 - **Scope**: oscilloscope or log-frequency spectrum of what you hear, after the effects

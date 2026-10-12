@@ -26,8 +26,8 @@ async function init() {
         initEffects();
         scope.start(state.limiter);
         initMasterVolume();
-        initSynth('Synth');
-        updateControls('Synth');
+        initSynth('MonoSynth');
+        updateControls('MonoSynth');
 
         state.userLayout = detectKeyboardLayout();
         document.getElementById('keyboardLayout').value = state.userLayout;

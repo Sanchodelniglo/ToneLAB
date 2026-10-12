@@ -5,10 +5,8 @@ import { state } from '../state.js';
 import { setEffect, effectHandlers, EFFECT_DEFAULTS } from '../audio/effects.js';
 import { showCustomPreset } from '../audio/presets.js';
 
-// Controls we never touch: loudness stays where the player set it.
-const SKIP = new Set(['volume']);
 // Range shaping: the raw random t in 0..1 is bent so most results stay playable.
-const BEND = { attack: 3, modAttack: 3, filterAttack: 3, modulationIndex: 2, filterQ: 2, vibratoAmount: 2, spread: 2, release: 2, decay: 2, modRelease: 2, filterDecay: 2, filterRelease: 2 };
+const BEND = { attack: 3, modAttack: 3, filterAttack: 3, modulationIndex: 2, filterQ: 2, spread: 2, release: 2, decay: 2, modRelease: 2, filterDecay: 2, filterRelease: 2 };
 // Floors that keep the sound audible and the filter open enough.
 const FLOOR = { sustain: 0.2, filterCutoff: 150 };
 // Delay feedback above this runs away into a wall of noise.
@@ -45,7 +43,7 @@ function randomizeSynth() {
     const anyFat = controls.some(el => el.tagName === 'SELECT' && el.value.startsWith('fat'));
     controls.filter(el => el.type === 'range').forEach(el => {
         const id = el.dataset.control;
-        if (SKIP.has(id) || (id === 'spread' && !anyFat)) return;
+        if (id === 'spread' && !anyFat) return;
         el.value = randomSlider(el, id);
         el.dispatchEvent(new Event('input', { bubbles: true }));
     });

@@ -58,7 +58,6 @@ body[data-key-labels="off"] .keyboard-key-label {
     .instrument-bar,
     .preset-stepper,
     .scope-head,
-    header #installBtn,
     .keyboard-panel .panel-title,
     .keyboard-panel .info-display,
     .skip-link {
@@ -171,6 +170,19 @@ body[data-key-labels="off"] .keyboard-key-label {
         margin-left: auto;
         font-size: var(--text-md);
         line-height: 1;
+    }
+
+    /* Install (only when the browser offers it, pwa.js): just left of the gear, same height */
+    header #installBtn {
+        flex: 0 0 auto;
+        height: 44px;
+        margin: 0 0 0 auto;
+        padding: 0 var(--space-md);
+        font-size: var(--text-xs);
+    }
+
+    header:has(#installBtn:not([style*="none"])) .more-btn {
+        margin-left: 0;
     }
 
     .step-btn:active,

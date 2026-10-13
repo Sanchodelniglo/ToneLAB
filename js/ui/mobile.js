@@ -30,7 +30,6 @@ const SHEET_ROWS = [
     { sel: '.key-labels-toggle', title: 'Key labels', hint: 'What is printed on each key: the note name, the computer key.' },
     { sel: '.keyboard-controls .instrument-select:has(#noteNotation)', title: 'Note names', hint: 'C D E or Do Re Mi on the keys.' },
     { sel: '.keyboard-controls .instrument-select:has(#keyboardLayout)', title: 'Computer keyboard', hint: 'Only matters with a physical keyboard plugged in.' },
-    { sel: '#installBtn', title: 'Install', hint: 'Add ToneLAB to your home screen. Works offline, no browser bar.' }
 ];
 
 const TAB_NAMES = {

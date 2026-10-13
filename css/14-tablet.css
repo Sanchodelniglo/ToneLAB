@@ -68,8 +68,9 @@
         order: 2;
     }
 
+    header #installBtn,
     .more-btn {
-        order: 3;
+        order: 3; /* after the stepper; Install comes first in the DOM, so it sits left of the gear */
     }
 
     /* No tab names the sets any more: bring the titles back */

@@ -85,10 +85,6 @@
     border-top: none;
 }
 
-/* Install only when the browser offers it (pwa.js flips the inline display) */
-.sheet-row:has(> #installBtn[style*="none"]) {
-    display: none;
-}
 
 .sheet-row-text {
     flex: 1 1 auto;

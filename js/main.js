@@ -53,7 +53,7 @@ async function init() {
         console.error('Audio initialization failed:', error);
         const overlay = document.getElementById('audioOverlay');
         if (overlay) {
-            const content = overlay.querySelector('.audio-overlay-content p');
+            const content = overlay.querySelector('.audio-overlay-tap');
             if (content) {
                 content.textContent = 'Audio could not start. Try a different browser or check sound settings.';
                 content.style.color = '#ff4444';

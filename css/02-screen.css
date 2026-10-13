@@ -185,8 +185,8 @@ body::after {
     z-index: 9999;
     background: rgb(var(--bg-deep-rgb) / 0.95);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow-y: auto; /* a phone on its side scrolls the intro */
+    padding: var(--space-lg) var(--space-md);
     cursor: pointer;
     transition: opacity 0.4s ease-out;
     -webkit-backdrop-filter: blur(10px);
@@ -199,6 +199,8 @@ body::after {
 }
 
 .audio-overlay-content {
+    margin: auto; /* centred, and still scrollable from the top when taller than the screen */
+    max-width: 34rem;
     text-align: center;
     color: var(--text-primary);
 }
@@ -212,10 +214,45 @@ body::after {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: var(--tracking-display);
+    margin-bottom: var(--space-sm);
+}
+
+.audio-overlay-sub {
+    font-size: var(--text-lg);
+    color: var(--cyan-text);
+    margin-bottom: var(--space-md);
+}
+
+.audio-overlay-intro {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+}
+
+.audio-overlay-list {
+    margin: 0 0 var(--space-md);
+    padding: 0;
+    list-style: none;
+    text-align: left;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.audio-overlay-list li {
+    margin-bottom: var(--space-xs);
+}
+
+.audio-overlay-list strong {
+    color: var(--text-primary);
+}
+
+.audio-overlay-motto {
+    font-weight: var(--weight-bold);
+    color: var(--magenta-text);
     margin-bottom: var(--space-lg);
 }
 
-.audio-overlay-content p {
+.audio-overlay-tap {
     font-family: var(--font-mono);
     font-size: var(--text-base);
     color: var(--text-secondary);

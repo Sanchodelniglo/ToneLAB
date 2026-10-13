@@ -30,6 +30,21 @@ if ('serviceWorker' in navigator && !isLocalDev) {
 }
 
 // PWA Install prompt
+// Credits (Settings → Credits): a native dialog, Esc and the focus trap come with it
+const credits = document.getElementById('creditsDialog');
+document.querySelectorAll('[data-credits-open]').forEach(btn => btn.addEventListener('click', () => credits.showModal()));
+credits.querySelector('[data-dialog-close]').addEventListener('click', () => credits.close());
+credits.addEventListener('click', (e) => { if (e.target === credits) credits.close(); }); // the backdrop
+
+// The release number is the service worker cache name (tonelab-synth-vNN): one number to bump.
+// No cache (local dev, blocked storage) leaves "dev".
+if (window.caches) {
+    caches.keys().then(keys => {
+        const v = Math.max(0, ...keys.map(k => +(k.match(/^tonelab-synth-v(\d+)$/)?.[1] || 0)));
+        if (v) document.getElementById('appVersion').textContent = String(v);
+    }).catch(() => { /* storage blocked: stays "dev" */ });
+}
+
 let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 

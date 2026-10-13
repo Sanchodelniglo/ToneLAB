@@ -263,3 +263,14 @@
     background: linear-gradient(180deg, #3a1010, #1a0606);
     border-color: var(--accent-magenta);
 }
+
+/* Credits links: the primary is the white print, as the text around them; links are the red LED */
+:root[data-theme="analog"] .credits-plate a {
+    color: var(--magenta-text);
+    text-decoration-color: rgb(var(--magenta-rgb) / 0.45);
+}
+
+:root[data-theme="analog"] .credits-plate a:hover,
+:root[data-theme="analog"] .credits-plate a:focus-visible {
+    color: var(--cyan-text);
+}

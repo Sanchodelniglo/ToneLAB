@@ -189,3 +189,124 @@
         box-shadow: 0 8px 40px rgb(var(--black-rgb) / 0.6);
     }
 }
+
+/* Credits dialog: a spec plate, printed labels left, values right. It takes the whole
+   screen but a small margin; the type grows with it and the body scrolls when short */
+.preset-dialog.credits-dialog {
+    width: calc(100vw - 2 * var(--space-md));
+    height: calc(100dvh - 2 * var(--space-md));
+    max-width: none;
+    max-height: none;
+    flex-direction: column;
+}
+
+.preset-dialog.credits-dialog[open] {
+    display: flex;
+}
+
+/* The title bar sits right in the dialog (the sheet and the Save dialog pad it through their body) */
+.credits-dialog > .sheet-head {
+    flex: 0 0 auto;
+    padding: var(--space-md) clamp(var(--space-md), 2.5vw, var(--space-xl));
+}
+
+.credits-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: clamp(var(--space-md), 4vw, 3rem);
+    font-size: clamp(0.875rem, 0.6rem + 0.9vw, 1.25rem);
+    /* One centred column at a reading width; centred when it fits, scrolled from the top when not */
+    display: grid;
+    grid-template-columns: minmax(0, 40rem);
+    justify-content: center;
+    align-content: safe center;
+}
+
+/* Wide screens: brand and tagline on the left, the plate on the right, like a panel and its label */
+@media (min-width: 900px) and (orientation: landscape) {
+    .credits-body {
+        grid-template-columns: minmax(0, 22rem) minmax(0, 40rem);
+        grid-template-areas: "brand plate" "tag plate";
+        column-gap: clamp(2rem, 5vw, 5rem);
+    }
+
+    .credits-brand { grid-area: brand; align-self: end; }
+    .credits-tag { grid-area: tag; align-self: start; }
+    .credits-plate { grid-area: plate; align-self: center; }
+}
+
+/* Narrow phones: each label above its value, so the values keep the full width */
+@media (max-width: 479px) {
+    .credits-plate {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .credits-plate dt {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .credits-plate dd {
+        padding-top: 0.15em;
+    }
+}
+
+.credits-brand {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1rem + 5vw, 4.5rem);
+    font-weight: var(--weight-black);
+    color: var(--cyan-text);
+    letter-spacing: var(--tracking-display);
+}
+
+.credits-tag {
+    margin: 2px 0 var(--space-lg);
+    font-size: 1.1em;
+    color: var(--magenta-text);
+}
+
+.credits-plate {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    margin: 0;
+    border-top: 1px solid rgb(var(--cyan-rgb) / 0.2);
+}
+
+.credits-plate dt,
+.credits-plate dd {
+    margin: 0;
+    padding: 0.7em 0;
+    border-bottom: 1px solid rgb(var(--cyan-rgb) / 0.12);
+}
+
+.credits-plate dt {
+    padding-right: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.75em;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    line-height: 1.9;
+}
+
+.credits-plate dd {
+    font-size: 1em;
+    line-height: 1.45;
+    color: var(--text-primary);
+}
+
+.credits-plate a {
+    color: var(--cyan-text);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--cyan-rgb) / 0.4);
+    text-underline-offset: 3px;
+}
+
+.credits-plate a:hover,
+.credits-plate a:focus-visible {
+    color: var(--magenta-text);
+    text-decoration-color: currentColor;
+}
+

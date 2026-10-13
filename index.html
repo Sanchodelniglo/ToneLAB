@@ -475,6 +475,26 @@
             </div>
         </form>
     </dialog>
+    <dialog class="preset-dialog credits-dialog" id="creditsDialog" aria-labelledby="creditsTitle">
+        <div class="sheet-head">
+            <span class="sheet-title" id="creditsTitle">Credits</span>
+            <button type="button" class="sheet-close" data-dialog-close aria-label="Close">&#10005;</button>
+        </div>
+        <div class="credits-body">
+            <p class="credits-brand">ToneLAB</p>
+            <p class="credits-tag">Turn knobs, make noise, learn how it works.</p>
+            <!-- A spec plate, like the label on the back of a synth: printed labels left, values right -->
+            <dl class="credits-plate">
+                <dt>Made by</dt><dd><a href="https://github.com/Sanchodelniglo" target="_blank" rel="noopener">Sanchodelniglo</a></dd>
+                <dt>Sound engine</dt><dd><a href="https://tonejs.github.io/" target="_blank" rel="noopener">Tone.js</a> · <a href="https://github.com/tambien" target="_blank" rel="noopener">Yotam Mann</a> · <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a></dd>
+                <dt>Fonts</dt><dd><a href="https://fonts.google.com/specimen/Orbitron" target="_blank" rel="noopener">Orbitron</a> · <a href="https://fonts.google.com/specimen/Share+Tech+Mono" target="_blank" rel="noopener">Share Tech Mono</a> · <a href="https://rsms.me/inter/" target="_blank" rel="noopener">Inter</a> · <a href="https://openfontlicense.org" target="_blank" rel="noopener">SIL Open Font License</a></dd>
+                <dt>CRT screen</dt><dd>Inspired by <a href="https://aleclownes.com/2017/02/01/crt-display.html" target="_blank" rel="noopener">Alec Lownes</a></dd>
+                <dt>Themes</dt><dd>Replicant: <a href="https://marketplace.visualstudio.com/items?itemName=sanchodelniglo.replicant-theme" target="_blank" rel="noopener">Replicant Runner</a> palette · Analog: 80s hardware synths</dd>
+                <dt>Thanks</dt><dd>To my daughters, for nights so short they barely existed. ToneLAB was born in the hours they gave me.</dd>
+                <dt>Version</dt><dd id="appVersion">dev</dd>
+            </dl>
+        </div>
+    </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <!-- Settings (gear): popover on desktop, bottom sheet in the pocket layout. The CRT row is
@@ -510,6 +530,10 @@
                         <button type="button" class="preset-btn view-btn chip active" data-crt="flicker" aria-pressed="true">Flicker</button>
                         <button type="button" class="preset-btn view-btn chip active" data-crt="glitch" aria-pressed="true">Glitch</button>
                     </div>
+                </div>
+                <div class="sheet-row" id="creditsRow">
+                    <div class="sheet-row-text"><span class="sheet-row-title">Credits</span><span class="sheet-row-hint">Who made ToneLAB and what it runs on.</span></div>
+                    <button type="button" class="preset-btn view-btn chip" data-credits-open aria-haspopup="dialog">Credits</button>
                 </div>
             </div>
         </div>

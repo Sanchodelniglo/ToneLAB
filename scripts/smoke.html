@@ -109,6 +109,27 @@ setTimeout(async () => {
     check('no help button is covered', hidden.length === 0, hidden.join(' | '));
     T.setArp(false);
 
+    // Init: every knob back to its default, every effect dry, the volume untouched, a note still plays
+    T.initSynth('MonoSynth'); await wait();
+    d.querySelector('[data-randomize]').click();
+    const vol = d.getElementById('masterVolume').value;
+    d.querySelector('[data-init]').click();
+    const GATE = { attack: 0, decay: 0, sustain: 1, release: 0, filterAttack: 0, filterDecay: 0, filterSustain: 1, filterRelease: 0 };
+    const knobs = [...d.querySelectorAll('#controls input[type=range][data-control]')];
+    const offDefault = knobs.filter(el => +el.value !== (GATE[el.dataset.control] ?? +el.dataset.defaultValue)).map(el => el.dataset.control);
+    const KEEP = { filterFreq: 10000, distortion: 0, crushBits: 10, crushMix: 1 };
+    const wet = [...d.querySelectorAll('.effects-rack input[type=range]')].filter(el => el.id !== 'masterVolume')
+      .filter(el => +el.value !== (KEEP[el.id] ?? +el.min)).map(el => el.id);
+    const initErrors = errors.length; T.playNote('C4'); T.stopNote('C4');
+    check('Init: knobs at default, envelopes a gate, effects at minimum (Tone open, Crusher clean), volume kept', !offDefault.length && !wet.length && d.getElementById('masterVolume').value === vol, `off ${offDefault} wet ${wet}`);
+    check('Init plays without errors', errors.length === initErrors);
+    T.initSynth('FMSynth'); await wait(); d.querySelector('[data-randomize]').click(); d.querySelector('[data-init]').click();
+    const modA = d.querySelector('#controls [data-control="modAttack"]'), modR = d.querySelector('#controls [data-control="modRelease"]');
+    check('Init sets the FM Mod Envelope to a gate (A 0, R 0)', +modA.value === 0 && +modR.value === 0, `${modA.value} / ${modR.value}`);
+    T.initSynth('MetalSynth'); await wait(); d.querySelector('[data-init]').click();
+    const metalDecay = d.querySelector('#controls [data-control="decay"]');
+    check('Init keeps an envelope without Sustain audible (Metal decay at its default)', +metalDecay.value === +metalDecay.dataset.defaultValue && +metalDecay.value > 0, metalDecay.value);
+
     // Envelope playhead: A lights while the attack runs, R after the key is up
     T.initSynth('MonoSynth'); await wait();
     const envSet = d.querySelector('#controls .control-set[aria-label="Envelope"]');

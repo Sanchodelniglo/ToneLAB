@@ -65,6 +65,40 @@ function randomizeEffects() {
     }
 }
 
+// Init: the plainest sound that still plays. Every knob back to its own default (all audible),
+// envelopes become a gate (on while the key is down), every effect knob at its minimum, except
+// Tone (open, no distortion) and Crusher (clean), which would mute or crush it; Out is not an effect knob.
+const KEEP = { filterFreq: 10000, distortion: 0, crushBits: 10, crushMix: 1 };
+// Gate envelope: A 0, D 0, S full, R 0, only where a Sustain knob exists (MetalSynth has none:
+// A 0 + D 0 there would be silence, so it keeps its defaults). The Mod Envelope has a fixed full
+// sustain and only A and R knobs: both go to 0.
+const GATES = [['attack', 'decay', 'sustain', 'release'], ['filterAttack', 'filterDecay', 'filterSustain', 'filterRelease']];
+const MOD_GATE = { modAttack: 0, modRelease: 0 };
+
+function initSound() {
+    if (!state.audioInitialized) return;
+    state.autoInput = true; // not the player's hand: Learn goals ignore these events
+    try {
+        const controls = [...document.querySelectorAll('#controls [data-control]')];
+        controls.filter(el => el.tagName === 'SELECT').forEach(el => {
+            el.value = [...el.options].find(o => o.defaultSelected)?.value ?? el.value;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        const gate = { ...MOD_GATE }; // knobs the instrument does not have are never looked up
+        GATES.forEach(([a, d, s, r]) => {
+            if (controls.some(el => el.dataset.control === s)) Object.assign(gate, { [a]: 0, [d]: 0, [s]: 1, [r]: 0 });
+        });
+        controls.filter(el => el.type === 'range').forEach(el => {
+            el.value = gate[el.dataset.control] ?? el.dataset.defaultValue;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        for (const key of Object.keys(effectHandlers)) setEffect(key, KEEP[key] ?? parseFloat(document.getElementById(key).min));
+    } finally {
+        state.autoInput = false;
+    }
+    showCustomPreset('Init');
+}
+
 function randomize() {
     if (!state.audioInitialized) return;
     state.autoInput = true; // not the player's hand: Learn goals ignore these events
@@ -76,6 +110,11 @@ function randomize() {
     }
     showCustomPreset('Random');
 }
+
+document.querySelectorAll('[data-init]').forEach(btn => btn.addEventListener('click', () => {
+    initSound();
+    btn.blur(); // keep the computer keyboard playing notes
+}));
 
 document.querySelectorAll('[data-randomize]').forEach(btn => btn.addEventListener('click', () => {
     randomize();

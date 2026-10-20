@@ -94,7 +94,8 @@ ToneLAB/
   js/audio/           effects.js (rack, limiter), synth.js (engine, note triggers), presets.js
   js/ui/              controls.js (knob grid, hints), knobs.js (SVG knobs), keyboard.js (keys, HOLD, touch),
                       scope.js (oscilloscope / spectrum), wavePreview.js (wave picker), envelope.js (ADSR preview),
-                      randomize.js (RND), arp.js (arpeggiator), mobile.js (phone shell, settings sheet)
+                      randomize.js (RND), arp.js (arpeggiator), mobile.js (phone shell, settings sheet),
+                      manual.js (Settings → Manual dialog)
   styles.css          entry point: @imports css/ in cascade order (the order is the cascade)
   css/                01 tokens · 02 screen (CRT) · 03 panels · 04 controls · 05 keyboard · 06 responsive ·
                       07 scope · 08 desktop · 09 pocket (phone) · 10 effects rack · 11 arp · 12 extras ·

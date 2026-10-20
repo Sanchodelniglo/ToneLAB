@@ -274,3 +274,13 @@
 :root[data-theme="analog"] .credits-plate a:focus-visible {
     color: var(--cyan-text);
 }
+
+/* Manual key map: the analog white keys need dark print, like the real keyboard */
+:root[data-theme="analog"] .m-key:not(.black),
+:root[data-theme="analog"] .m-key:not(.black) b {
+    color: #2a2a2a;
+}
+
+:root[data-theme="analog"] .m-key:not(.black) {
+    border-color: rgb(0 0 0 / 0.55);
+}

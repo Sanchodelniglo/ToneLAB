@@ -15,6 +15,7 @@ import './ui/randomize.js';
 import { initArp, setArp } from './ui/arp.js';
 import { buildTextPicker } from './ui/wavePreview.js';
 import './ui/learn.js';
+import './ui/manual.js';
 
 // Every select in the page gets the wave picker look (wave selects get theirs in controls.js)
 document.querySelectorAll('select:not(.wave-select)').forEach(buildTextPicker);

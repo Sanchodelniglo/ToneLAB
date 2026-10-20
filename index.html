@@ -486,6 +486,7 @@
             <!-- A spec plate, like the label on the back of a synth: printed labels left, values right -->
             <dl class="credits-plate">
                 <dt>Made by</dt><dd><a href="https://github.com/Sanchodelniglo" target="_blank" rel="noopener">Sanchodelniglo</a></dd>
+                <dt>Source</dt><dd><a href="https://github.com/Sanchodelniglo/ToneLAB" target="_blank" rel="noopener">GitHub</a> · <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a></dd>
                 <dt>Sound engine</dt><dd><a href="https://tonejs.github.io/" target="_blank" rel="noopener">Tone.js</a> · <a href="https://github.com/tambien" target="_blank" rel="noopener">Yotam Mann</a> · <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a></dd>
                 <dt>Fonts</dt><dd><a href="https://fonts.google.com/specimen/Orbitron" target="_blank" rel="noopener">Orbitron</a> · <a href="https://fonts.google.com/specimen/Share+Tech+Mono" target="_blank" rel="noopener">Share Tech Mono</a> · <a href="https://rsms.me/inter/" target="_blank" rel="noopener">Inter</a> · <a href="https://openfontlicense.org" target="_blank" rel="noopener">SIL Open Font License</a></dd>
                 <dt>CRT screen</dt><dd>Inspired by <a href="https://aleclownes.com/2017/02/01/crt-display.html" target="_blank" rel="noopener">Alec Lownes</a></dd>
@@ -493,6 +494,300 @@
                 <dt>Thanks</dt><dd>To my daughters, for nights so short they barely existed. ToneLAB was born in the hours they gave me.</dd>
                 <dt>Version</dt><dd id="appVersion">dev</dd>
             </dl>
+        </div>
+    </dialog>
+    <!-- Manual (Settings → Manual): the owner's manual, one chapter per part of the panel. Layout text:
+         .m-desk on the desktop layout, .m-pocket on phones and tablets (body.pocket). Input text:
+         .m-mouse with a mouse, .m-touch on touch screens (pointer: coarse) -->
+    <dialog class="preset-dialog credits-dialog manual-dialog" id="manualDialog" aria-labelledby="manualTitle">
+        <svg width="0" height="0" class="m-sprite" aria-hidden="true" focusable="false">
+            <symbol id="m-i-init" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4"/></symbol>
+            <symbol id="m-i-dice" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path fill="currentColor" stroke="none" d="M5.5 5.5h3v3h-3zM15.5 5.5h3v3h-3zM10.5 10.5h3v3h-3zM5.5 15.5h3v3h-3zM15.5 15.5h3v3h-3z"/></symbol>
+            <symbol id="m-i-save" viewBox="0 0 24 24"><path d="M3 3h15l3 3v15H3z"/><path d="M7 3v6h9V3"/><path d="M6 21v-8h12v8"/></symbol>
+            <symbol id="m-i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+        </svg>
+        <div class="sheet-head">
+            <span class="sheet-title" id="manualTitle">Manual</span>
+            <button type="button" class="sheet-close" data-dialog-close aria-label="Close">&#10005;</button>
+        </div>
+        <div class="manual-body">
+            <nav class="manual-toc" aria-label="Chapters">
+                <ol>
+                    <li><a href="#m-start"><span>01</span> Quick start</a></li>
+                    <li><a href="#m-panel"><span>02</span> The panel</a></li>
+                    <li><a href="#m-basics"><span>03</span> How a synth works</a></li>
+                    <li><a href="#m-synths"><span>04</span> Instruments</a></li>
+                    <li><a href="#m-knobs"><span>05</span> Knobs and help</a></li>
+                    <li><a href="#m-presets"><span>06</span> Presets</a></li>
+                    <li><a href="#m-keys"><span>07</span> Keyboard</a></li>
+                    <li><a href="#m-arp"><span>08</span> Arpeggiator</a></li>
+                    <li><a href="#m-fx"><span>09</span> Effects</a></li>
+                    <li><a href="#m-scope"><span>10</span> Scope</a></li>
+                    <li><a href="#m-learn"><span>11</span> Learn mode</a></li>
+                    <li><a href="#m-settings"><span>12</span> Settings and saving</a></li>
+                    <li><a href="#m-trouble"><span>13</span> Troubleshooting</a></li>
+                    <li class="m-mouse"><a href="#m-shortcuts"><span>14</span> Shortcuts</a></li>
+                </ol>
+            </nav>
+
+            <div class="manual-doc">
+                <section class="m-chapter" id="m-start" aria-labelledby="m-start-h">
+                    <h2 id="m-start-h"><span>01</span> Quick start</h2>
+                    <p class="m-lead">From silence to your first sound in five steps.</p>
+                    <ol class="m-steps">
+                        <li><b>Wake the audio.</b> Tap anywhere on the start screen. Browsers keep sound off until you touch the page.</li>
+                        <li><b>Play a note.</b> <span class="m-mouse">Press a letter on your computer keyboard (chapter 07 shows which), or click a key of the Virtual Keyboard.</span><span class="m-touch">Tap a key at the bottom of the screen.</span></li>
+                        <li><b>Pick a sound.</b> <span class="m-desk">Step through the presets with the <span class="m-btn">◀</span> <span class="m-btn">▶</span> arrows beside Preset.</span><span class="m-pocket">Step through the presets with the <span class="m-btn">◀</span> <span class="m-btn">▶</span> arrows on the preset line, or swipe the scope strip left or right.</span></li>
+                        <li><b>Change it.</b> Hold a note and turn a knob. The scope draws the sound as it changes.</li>
+                        <li><b>Start over.</b> <span class="m-btn"><svg class="m-ico"><use href="#m-i-init"/></svg>Init</span> gives you a plain sound. <span class="m-btn"><svg class="m-ico"><use href="#m-i-dice"/></svg>Random</span> gives you a surprise.</li>
+                    </ol>
+                    <p class="m-try"><b>Try</b> Mono Synth, preset Acid Bass. Hold a low note and turn the Filter Q and the Filter Envelope Decay. That squelch is the sound of acid house.</p>
+                </section>
+
+                <section class="m-chapter" id="m-panel" aria-labelledby="m-panel-h">
+                    <h2 id="m-panel-h"><span>02</span> The panel</h2>
+                    <p class="m-lead">ToneLAB changes its layout with the screen. This chapter shows the layout you use now.</p>
+                    <dl class="m-plate m-desk">
+                        <dt>Header</dt><dd>The ToneLAB name, Install App (when your browser offers it) and the <span class="m-btn"><svg class="m-ico"><use href="#m-i-gear"/></svg>Settings</span> gear.</dd>
+                        <dt>Instrument</dt><dd>Left column. On top: the instrument type <span class="m-btn">◀</span> <span class="m-btn">▶</span>, the preset <span class="m-btn">◀</span> <span class="m-btn">▶</span>, then Init, Random and Save. Under it: the knobs, in sections. Knobs / Sliders sits on the title line.</dd>
+                        <dt>Scope</dt><dd>Top right. The sound you hear, drawn live. Wave / Spectrum on its title line.</dd>
+                        <dt>Effects</dt><dd>Bottom right. The effects rack and the Out volume.</dd>
+                        <dt>Virtual Keyboard</dt><dd>Bottom. Octave, HOLD and ARP, the label chips, the note names and the computer layout. The arpeggiator strip opens here.</dd>
+                    </dl>
+                    <dl class="m-plate m-pocket">
+                        <dt>Header</dt><dd>ToneLAB, Install App (when your browser offers it), the <span class="m-btn"><svg class="m-ico"><use href="#m-i-gear"/></svg>Settings</span> gear, and the instrument type <span class="m-btn">◀</span> <span class="m-btn">▶</span>.</dd>
+                        <dt>Preset line</dt><dd>The preset <span class="m-btn">◀</span> <span class="m-btn">▶</span>, then Init, Random and Save.</dd>
+                        <dt>Scope strip</dt><dd>The sound you hear, drawn live. Swipe it left or right to change the preset.</dd>
+                        <dt>Pages</dt><dd>On a phone: one tab per knob section, then FX for the effects, then ARP while the arpeggiator runs. Tap a tab or swipe the page. On a tablet: every section on one page that scrolls.</dd>
+                        <dt>Keyboard</dt><dd><span class="m-btn">◀ OCT</span>, the octave number, <span class="m-btn">OCT ▶</span>, then HOLD and ARP, then the keys.</dd>
+                        <dt>Settings</dt><dd>The gear also holds what does not fit on a small screen: Knobs / Sliders, the scope mode, key labels, note names and the computer layout.</dd>
+                    </dl>
+                    <p class="m-pocket m-note">Turn a phone sideways: the scope moves to the left, the pages to the right and the keys stay underneath.</p>
+                </section>
+
+                <section class="m-chapter" id="m-basics" aria-labelledby="m-basics-h">
+                    <h2 id="m-basics-h"><span>03</span> How a synth works</h2>
+                    <p class="m-lead">Every sound in ToneLAB goes through the same chain. The names on the knobs come from it.</p>
+                    <div class="m-flow" role="img" aria-label="Signal flow: oscillator, then filter, then amplifier, then effects, then out. An envelope shapes the filter and the amplifier over time.">
+                        <span class="m-block">Oscillator<small>makes the tone</small></span>
+                        <span class="m-arrow" aria-hidden="true"></span>
+                        <span class="m-block">Filter<small>darker or brighter</small></span>
+                        <span class="m-arrow" aria-hidden="true"></span>
+                        <span class="m-block">Amp<small>louder or softer</small></span>
+                        <span class="m-arrow" aria-hidden="true"></span>
+                        <span class="m-block">Effects<small>space and colour</small></span>
+                        <span class="m-arrow" aria-hidden="true"></span>
+                        <span class="m-block">Out</span>
+                        <span class="m-env">Envelopes move the filter and the amp each time you press a key</span>
+                    </div>
+                    <dl class="m-plate">
+                        <dt>Wave</dt><dd>The shape the oscillator repeats. Sine is pure and soft. Triangle is a little brighter. Square is hollow, like a clarinet. Sawtooth is bright and buzzy, the classic synth sound. The numbered waves (square 2, sawtooth 5…) keep only that many harmonics, so they sound softer.</dd>
+                        <dt>Fat wave</dt><dd>Three copies of a wave, a little out of tune with each other. They sound wide and thick. Spread sets how far apart they are.</dd>
+                        <dt>Cutoff</dt><dd>The filter lets the low part of the sound through and removes the high part. Cutoff is where it starts to cut. Low = dark and muffled, high = bright and open.</dd>
+                        <dt>Q</dt><dd>Resonance. A boost right at the cutoff. A little sounds sharper, a lot whistles and squelches.</dd>
+                        <dt>Envelope</dt><dd>How a value moves after you press a key, in four stages:
+                            <span class="m-adsr"><b>A</b> Attack: time to reach the top.</span>
+                            <span class="m-adsr"><b>D</b> Decay: time to fall to the sustain level.</span>
+                            <span class="m-adsr"><b>S</b> Sustain: the level held while you keep the key down. It is a level, not a time.</span>
+                            <span class="m-adsr"><b>R</b> Release: time to fade out after you let go.</span>
+                            The Envelope shapes the volume. The Filter Envelope moves the cutoff.</dd>
+                        <dt>FM</dt><dd>Frequency modulation: a second oscillator wobbles the pitch of the first so fast that you hear a new tone, not a wobble. Harmonicity sets the ratio between the two. Modulation Index sets how strong the effect is.</dd>
+                        <dt>Octave</dt><dd>Twelve keys up or down. Each octave doubles or halves the pitch.</dd>
+                    </dl>
+                </section>
+
+                <section class="m-chapter" id="m-synths" aria-labelledby="m-synths-h">
+                    <h2 id="m-synths-h"><span>04</span> Instruments</h2>
+                    <p class="m-lead">Seven instruments, each built a different way. Change them with the instrument <span class="m-btn">◀</span> <span class="m-btn">▶</span> or open the list. The <span class="m-q">?</span> beside the name explains the one you have.</p>
+                    <div class="m-table-wrap">
+                        <table class="m-table">
+                            <thead><tr><th scope="col">Instrument</th><th scope="col">What it is</th><th scope="col">Start with</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Mono Synth</th><td>One voice with a resonant filter and its own filter envelope. The classic analog bass and lead. It has every block of chapter 03.</td><td>Acid Bass</td></tr>
+                                <tr><th scope="row">Poly Synth</th><td>A simple synth that plays chords. The best place to learn the basics.</td><td>Dreamy Pad</td></tr>
+                                <tr><th scope="row">FM Synth</th><td>Glassy, bell-like tones from frequency modulation. The 80s DX7 sound.</td><td>Electric Piano</td></tr>
+                                <tr><th scope="row">Pluck Synth</th><td>A model of a plucked string: a short burst of noise rings and fades.</td><td>Nylon Guitar</td></tr>
+                                <tr><th scope="row">Membrane Synth</th><td>A sine whose pitch drops fast on each hit, like a drum skin.</td><td>Kick Drum</td></tr>
+                                <tr><th scope="row">Metal Synth</th><td>Six clashing oscillators for cymbals, hats and gongs. Its pitch comes from the Frequency knob, not from the key.</td><td>Closed Hat</td></tr>
+                                <tr><th scope="row">Noise Synth</th><td>Noise shaped by an envelope. No pitch: every key sounds the same.</td><td>Snare Hit</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="m-note">Only Poly Synth plays several notes at once. The others play one note at a time: a new key replaces the last one.</p>
+                </section>
+
+                <section class="m-chapter" id="m-knobs" aria-labelledby="m-knobs-h">
+                    <h2 id="m-knobs-h"><span>05</span> Knobs and help</h2>
+                    <p class="m-lead">Each knob shows its value above and its name below.</p>
+                    <p class="m-touch"><b>Turn.</b> Put a finger on a knob or a fader and drag up or down. Up is more. The value shows above it while you move.</p>
+                    <div class="m-table-wrap m-mouse">
+                        <table class="m-table m-table-2">
+                            <thead><tr><th scope="col">Do this</th><th scope="col">To get</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Drag up or down</th><td>Raise or lower the value. Up is more.</td></tr>
+                                <tr><th scope="row"><kbd>Shift</kbd> + drag</th><td>Fine steps, about seven times slower.</td></tr>
+                                <tr><th scope="row">Scroll over it</th><td>Small steps. Hold <kbd>Shift</kbd> for finer ones.</td></tr>
+                                <tr><th scope="row">Double-click</th><td>Back to the default value.</td></tr>
+                                <tr><th scope="row"><kbd>↑</kbd> <kbd>→</kbd> / <kbd>↓</kbd> <kbd>←</kbd></th><td>One step up or down (after <kbd>Tab</kbd> to the knob).</td></tr>
+                                <tr><th scope="row"><kbd>Page Up</kbd> / <kbd>Page Down</kbd></th><td>A tenth of the range.</td></tr>
+                                <tr><th scope="row"><kbd>Home</kbd> / <kbd>End</kbd></th><td>Minimum / maximum.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p><b>Knobs or sliders.</b> The same controls can show as vertical faders. Switch with Knobs / Sliders <span class="m-desk">on the Instrument title line</span><span class="m-pocket">in Settings, row Controls</span>. Touch screens start on sliders, which are easier to hit with a thumb.<span class="m-mouse"> Faders take the same scroll, keys and double-click.</span></p>
+                    <p><b>Greyed out.</b> Spread works only on a fat wave. Pick a wave whose name starts with "fat" and it wakes up.</p>
+                    <p><b>Help everywhere.</b> Every knob, section and box has a small <span class="m-q">?</span>. Tap it to pin the hint, tap elsewhere<span class="m-mouse"> or press <kbd>Esc</kbd></span> to close.<span class="m-mouse"> With a mouse, hover it for a quick look.</span> The hints say what to listen for and give values to try.</p>
+                    <p><b>Wave pickers.</b> A wave control shows the shape it plays. Open it and pick from the drawn shapes.<span class="m-mouse"> With the keyboard: <kbd>↑</kbd> <kbd>↓</kbd> to move, <kbd>Enter</kbd> to choose, <kbd>Esc</kbd> to close.</span></p>
+                </section>
+
+                <section class="m-chapter" id="m-presets" aria-labelledby="m-presets-h">
+                    <h2 id="m-presets-h"><span>06</span> Presets</h2>
+                    <p class="m-lead">68 ready-made sounds, each one for its own instrument. Mono Synth has 9, Poly Synth 19, the others 8.</p>
+                    <p><b>Choose.</b> Use the preset <span class="m-btn">◀</span> <span class="m-btn">▶</span> or open the list<span class="m-pocket">, or swipe the scope strip</span>. The <span class="m-q">?</span> beside the name says what to play and which knob to turn.</p>
+                    <p><b>What a preset sets.</b> The instrument knobs and waves, the octave and every effect. It never touches the Out volume, HOLD or the arpeggiator.</p>
+                    <dl class="m-plate">
+                        <dt><span class="m-btn"><svg class="m-ico"><use href="#m-i-init"/></svg>Init</span></dt><dd>The plainest sound that still plays: default knobs, an envelope that opens and closes with the key, effects off. A clean start to build your own.</dd>
+                        <dt><span class="m-btn"><svg class="m-ico"><use href="#m-i-dice"/></svg>Random</span></dt><dd>A new random sound for this instrument: waves, knobs and effects. The ranges are bent so it stays playable. The volume, octave and instrument stay as they are.</dd>
+                        <dt><span class="m-btn"><svg class="m-ico"><use href="#m-i-save"/></svg>Save</span></dt><dd>Keep the sound you hear as your own preset: knobs, waves, effects and octave. Give it a name of up to 24 characters. It shows under "My presets" at the end of the list.</dd>
+                    </dl>
+                    <p><b>Change your own preset.</b> Load it: the Save button lights up. Press it to Update (replace it with the sound you hear now, and rename it), Save as new (keep both) or Delete. Delete asks "Sure?" first: press it again.</p>
+                    <p class="m-warn"><b>Note</b> Your presets live in this browser on this device. Clearing the site data deletes them, and another browser does not see them.</p>
+                </section>
+
+                <section class="m-chapter" id="m-keys" aria-labelledby="m-keys-h">
+                    <h2 id="m-keys-h"><span>07</span> Keyboard</h2>
+                    <p class="m-lead"><span class="m-mouse">Play with the letters of your computer keyboard, the mouse or your fingers.</span><span class="m-touch">Play with your fingers. Use several at once.</span></p>
+                    <figure class="m-keymap m-mouse">
+                        <div class="m-piano" aria-hidden="true"></div>
+                        <figcaption>Your keys for layout <b data-manual-layout>QWERTY</b>: twenty notes, from C up to the G of the next octave. Wrong letters? Choose your layout <span class="m-desk">in the Layout list of the Virtual Keyboard bar</span><span class="m-pocket">in Settings, row Computer keyboard</span>. ToneLAB does not detect it.</figcaption>
+                    </figure>
+                    <dl class="m-plate">
+                        <dt>Octave</dt><dd><span class="m-btn">◀ OCT</span> and <span class="m-btn">OCT ▶</span><span class="m-mouse">, or the <kbd>←</kbd> <kbd>→</kbd> arrow keys</span>. From 0 to 7, 4 is the middle. Presets set it too.</dd>
+                        <dt>HOLD</dt><dd>Notes keep ringing after you let go. Press a lit key again to stop it. Turn HOLD off to stop them all.</dd>
+                        <dt>Labels</dt><dd>Notes and Keys choose what is printed on each key: the note name, the computer letter, both or none. Note names show as C D E or Do Ré Mi.<span class="m-pocket"> Both are in Settings.</span></dd>
+                        <dt>Touch</dt><dd>Use several fingers at once. Slide a finger across the keys to glide from note to note. On a one-note instrument the pitch slides. Android phones give a short buzz on each note.</dd>
+                    </dl>
+                </section>
+
+                <section class="m-chapter" id="m-arp" aria-labelledby="m-arp-h">
+                    <h2 id="m-arp-h"><span>08</span> Arpeggiator</h2>
+                    <p class="m-lead">Hold a chord and the arpeggiator plays its notes one after the other, in time.</p>
+                    <ol class="m-steps">
+                        <li>Press ARP, beside HOLD. <span class="m-desk">Its strip opens above the keys.</span><span class="m-pocket">On a phone an ARP tab appears and opens. On a tablet the ARP section shows at the end of the page.</span></li>
+                        <li>Hold two or three keys. The pattern plays while you hold them.</li>
+                        <li>Turn HOLD on to free your hands: each key you press joins the pattern, press it again to take it out.</li>
+                    </ol>
+                    <dl class="m-plate">
+                        <dt>Pattern</dt><dd>↗ Up, ↘ Down, ⋀ Up-down, ⁂ Random, or ≡ As played (the order you pressed the keys).</dd>
+                        <dt>Rate</dt><dd>Note length: 1/4, 1/8, 1/16 or 1/8T (triplets).</dd>
+                        <dt>OCT</dt><dd>1, 2 or 3: the pattern climbs one or two octaves higher before it starts again.</dd>
+                        <dt>LEN</dt><dd>8, 12 or 16 steps in the loop.</dd>
+                        <dt>BPM</dt><dd>Tempo, 60 to 180. Or tap TAP four times on the beat.</dd>
+                        <dt>Gate</dt><dd>How long each note lasts within its step. Short is staccato, 100% is legato.</dd>
+                        <dt>Swing</dt><dd>Pushes every second step late, for a shuffled groove.</dd>
+                        <dt>Step lights</dt><dd>Tap a light to mute that step (a rest). Double tap it to make an accent: louder and a little longer. The running step lights white.</dd>
+                    </dl>
+                    <p class="m-note">The arpeggiator remembers its settings. It is always off when ToneLAB starts.</p>
+                </section>
+
+                <section class="m-chapter" id="m-fx" aria-labelledby="m-fx-h">
+                    <h2 id="m-fx-h"><span>09</span> Effects</h2>
+                    <p class="m-lead">After the instrument, the sound goes through this chain. A Mix or Depth at 0 turns that effect off.</p>
+                    <p class="m-chain" aria-label="Effect chain: Chorus, Phaser, Tremolo, Crusher, Tone, Delay, Reverb, Out">
+                        <span>Chorus</span><span>Phaser</span><span>Tremolo</span><span>Crusher</span><span>Tone</span><span>Delay</span><span>Reverb</span><span>Out</span>
+                    </p>
+                    <div class="m-table-wrap">
+                        <table class="m-table">
+                            <thead><tr><th scope="col">Effect</th><th scope="col">Knobs</th><th scope="col">What it does</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Chorus</th><td>Rate, Mix</td><td>Adds a slightly detuned copy that moves. Wider, shimmering.</td></tr>
+                                <tr><th scope="row">Phaser</th><td>Rate, Mix</td><td>A sweeping, swooshing notch through the sound.</td></tr>
+                                <tr><th scope="row">Tremolo</th><td>Rate, Depth</td><td>The volume pulses up and down.</td></tr>
+                                <tr><th scope="row">Crusher</th><td>Bits, Mix</td><td>Fewer bits = rougher, like an old video game.</td></tr>
+                                <tr><th scope="row">Tone</th><td>Cutoff, Distortion</td><td>A last filter on everything, then grit.</td></tr>
+                                <tr><th scope="row">Delay</th><td>Time, Feedback, Mix</td><td>Echoes. Feedback sets how many come back.</td></tr>
+                                <tr><th scope="row">Reverb</th><td>Mix, Size</td><td>A room around the sound. Size is how long it rings.</td></tr>
+                                <tr><th scope="row">Out</th><td>Volume</td><td>The final level. The only knob no preset, Init or Random changes.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="m-note">A limiter after the reverb keeps loud sounds from distorting your speakers.</p>
+                </section>
+
+                <section class="m-chapter" id="m-scope" aria-labelledby="m-scope-h">
+                    <h2 id="m-scope-h"><span>10</span> Scope</h2>
+                    <p class="m-lead">The screen shows what you hear, after the effects.</p>
+                    <dl class="m-plate">
+                        <dt>Wave</dt><dd>The shape of the sound over a few hundredths of a second. A steady note holds still so you can study its shape.</dd>
+                        <dt>Spectrum</dt><dd>Which pitches are loud, low on the left, high on the right. Turn the Cutoff and watch the right side drop.</dd>
+                        <dt>Switch</dt><dd><span class="m-desk">Wave / Spectrum on the Scope title line.</span><span class="m-pocket">Settings, row Scope.</span></dd>
+                        <dt>Envelopes</dt><dd>Each envelope section draws its curve above its knobs. When you play, a dot runs along it and the letter of the current stage (A, D, S or R) lights up.</dd>
+                    </dl>
+                </section>
+
+                <section class="m-chapter" id="m-learn" aria-labelledby="m-learn-h">
+                    <h2 id="m-learn-h"><span>11</span> Learn mode</h2>
+                    <p class="m-lead">A guided path through all 27 knobs of the Mono Synth and the effects, one at a time.</p>
+                    <ol class="m-steps">
+                        <li>Open <span class="m-btn"><svg class="m-ico"><use href="#m-i-gear"/></svg>Settings</span> and press Learn.</li>
+                        <li>ToneLAB switches to the Mono Synth and sets the knobs to zero. A bar under the presets gives one task.</li>
+                        <li>The knob to turn has a dashed frame. Play notes and turn it until you hear the change. A ✓ shows and Next ▸ pulses.</li>
+                        <li>Press Next ▸ to go on, or Skip if you want to move ahead. Nothing moves on by itself.</li>
+                    </ol>
+                    <p>Effects play one at a time so you hear each one alone. At the end, all the values you chose come back together. Learn remembers your step if you close the app. Press Learn again in Settings to stop, or Restart to begin at step 1.</p>
+                </section>
+
+                <section class="m-chapter" id="m-settings" aria-labelledby="m-settings-h">
+                    <h2 id="m-settings-h"><span>12</span> Settings and saving</h2>
+                    <dl class="m-plate">
+                        <dt>Theme</dt><dd>Analog (black hardware synth), Cyber (neon), Sodium (amber street light) or Replicant (jade and red).</dd>
+                        <dt>CRT screen</dt><dd>Scanlines, Vignette, Flicker and Glitch. Turn off what bothers your eyes or slows your device. If your system asks for reduced motion, Flicker and Glitch start off.</dd>
+                        <dt>Learn</dt><dd>See chapter 11.</dd>
+                        <dt>Manual, Credits</dt><dd>This manual, and who made ToneLAB with the version number.</dd>
+                    </dl>
+                    <p><b>What ToneLAB remembers</b> in this browser: theme, screen effects, knobs or sliders, scope mode, key labels, note names, keyboard layout, arpeggiator settings, your presets and your Learn step.</p>
+                    <p><b>What it forgets</b> when you close it: the instrument, the knob positions, the effects, the octave and the volume. Save a preset to keep a sound.</p>
+                    <dl class="m-plate">
+                        <dt>Install</dt><dd>When your browser offers it, Install App shows in the header and puts ToneLAB on your home screen or dock. On iPhone and iPad: Share, then Add to Home Screen.</dd>
+                        <dt>Offline</dt><dd>After the first visit, ToneLAB works without a connection.</dd>
+                        <dt>Updates</dt><dd>A new version loads by itself the next time you open ToneLAB online. The page reloads once.</dd>
+                    </dl>
+                </section>
+
+                <section class="m-chapter" id="m-trouble" aria-labelledby="m-trouble-h">
+                    <h2 id="m-trouble-h"><span>13</span> Troubleshooting</h2>
+                    <dl class="m-faq">
+                        <dt>No sound</dt><dd>Tap the page once: browsers need a touch first. Look at the Out volume. Check that your device is not muted. On iPhone, the silent switch can mute the browser.</dd>
+                        <dt class="m-mouse">Letters play the wrong notes, or none</dt><dd class="m-mouse">Choose your keyboard layout (chapter 07). Click outside text fields first. Keys held with <kbd>Ctrl</kbd>, <kbd>Cmd</kbd> or <kbd>Alt</kbd> do not play.</dd>
+                        <dt class="m-mouse">The arrows do not change the octave</dt><dd class="m-mouse">A knob or a field has focus and takes the arrows. Click an empty part of the panel, or use <span class="m-btn">◀ OCT</span> and <span class="m-btn">OCT ▶</span>.</dd>
+                        <dt>A note does not stop</dt><dd>HOLD is on. Press the lit key again, or turn HOLD off.</dd>
+                        <dt>My chord plays one note</dt><dd>Only Poly Synth plays chords (chapter 04).</dd>
+                        <dt>Every key sounds the same</dt><dd>Metal Synth takes its pitch from its Frequency knob, and Noise Synth has no pitch. That is how they work.</dd>
+                        <dt>Spread is greyed out</dt><dd>Pick a fat wave (chapter 05).</dd>
+                        <dt>Crusher does nothing</dt><dd>Your browser does not support the audio feature the Crusher needs. The other effects still work.</dd>
+                        <dt>The screen flickers or the device runs hot</dt><dd>Turn off Flicker and Glitch in Settings, row CRT screen.</dd>
+                    </dl>
+                </section>
+
+                <section class="m-chapter m-mouse" id="m-shortcuts" aria-labelledby="m-shortcuts-h">
+                    <h2 id="m-shortcuts-h"><span>14</span> Shortcuts</h2>
+                    <div class="m-table-wrap">
+                        <table class="m-table m-table-2">
+                            <thead><tr><th scope="col">Keys</th><th scope="col">Action</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Letter keys</th><td>Play notes (chapter 07).</td></tr>
+                                <tr><th scope="row"><kbd>←</kbd> <kbd>→</kbd></th><td>Octave down / up, when no knob or field has focus.</td></tr>
+                                <tr><th scope="row"><kbd>Tab</kbd></th><td>Move between controls.</td></tr>
+                                <tr><th scope="row"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Page Up</kbd> <kbd>Page Down</kbd> <kbd>Home</kbd> <kbd>End</kbd></th><td>Change the focused knob.</td></tr>
+                                <tr><th scope="row"><kbd>Enter</kbd> / <kbd>Space</kbd></th><td>Press the focused button or key.</td></tr>
+                                <tr><th scope="row"><kbd>Esc</kbd></th><td>Close a hint, a list, Settings or a window like this one.</td></tr>
+                                <tr><th scope="row"><kbd>Shift</kbd> + drag or scroll</th><td>Fine knob moves.</td></tr>
+                                <tr><th scope="row">Double-click a knob</th><td>Reset it.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
         </div>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -531,6 +826,10 @@
                         <button type="button" class="preset-btn view-btn chip active" data-crt="glitch" aria-pressed="true">Glitch</button>
                     </div>
                 </div>
+                <div class="sheet-row" id="manualRow">
+                    <div class="sheet-row-text"><span class="sheet-row-title">Manual</span><span class="sheet-row-hint">How every part of ToneLAB works, chapter by chapter.</span></div>
+                    <button type="button" class="preset-btn view-btn chip" data-manual-open aria-haspopup="dialog">Manual</button>
+                </div>
                 <div class="sheet-row" id="creditsRow">
                     <div class="sheet-row-text"><span class="sheet-row-title">Credits</span><span class="sheet-row-hint">Who made ToneLAB and what it runs on.</span></div>
                     <button type="button" class="preset-btn view-btn chip" data-credits-open aria-haspopup="dialog">Credits</button>
@@ -560,6 +859,7 @@
     <link rel="modulepreload" href="js/ui/learn.js">
     <link rel="modulepreload" href="js/ui/envelope.js">
     <link rel="modulepreload" href="js/ui/arp.js">
+    <link rel="modulepreload" href="js/ui/manual.js">
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

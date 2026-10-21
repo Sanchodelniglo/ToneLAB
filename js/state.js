@@ -35,8 +35,7 @@ export const state = {
     autoInput: false          // true while code (RND) writes the controls: Learn goals ignore it
 };
 
-// Keyboard layouts — 2 octaves (25 notes: C to C)
-// Bottom row = octave 1, top row = octave 2
+// Keyboard layouts — 20 keys: C to B, then C to G of the next octave (index = semitone from C)
 export const keyboardLayouts = {
     qwerty: ['a','w','s','e','d','f','t','g','y','h','u','j','k','o','l','p',';','\'','[',']'],
     azerty: ['q','z','s','e','d','f','t','g','y','h','u','j','k','o','l','p','m','ù','^','$'],

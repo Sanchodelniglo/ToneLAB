@@ -66,13 +66,6 @@ function unlatch(note) {
     keysForNote(note).forEach(k => k.classList.remove('pressed'));
     if (state.arp?.on) return; // the arp owns the voice
     stopNote(note);
-    // stopNote blanks the readout when nothing is physically pressed; if other
-    // notes are still latched, show the most recent one instead.
-    if (state.heldNotes.size > 0) {
-        const last = Array.from(state.heldNotes).pop();
-        const el = document.getElementById('currentNote');
-        if (el) el.textContent = getDisplayLabel(last.replace(/\d+/, '')) + (last.match(/\d+/)?.[0] || '');
-    }
 }
 
 // Forget latched notes without releasing the voice (mono: the new attack owns it)

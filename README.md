@@ -13,7 +13,7 @@ It runs in the browser, works offline, and installs as an app.
 - **Scope**: oscilloscope or log-frequency spectrum of what you hear, after the effects
 
 ### Playing
-- **2-octave keyboard** with QWERTY, AZERTY (with dead keys), QWERTZ and Dvorak layouts. Octave buttons shift the range
+- **20-key keyboard** (C up to the G of the next octave) with QWERTY, AZERTY (with dead keys), QWERTZ and Dvorak layouts. Octave buttons shift the range
 - **HOLD**: latches notes so they keep ringing. Tap a lit key to release it
 - **Arpeggiator (ARP)**: held notes become a running pattern. Modes up, down, up-down, random, as-played. 1 to 3 octaves, rate, gate, swing, BPM knob and tap tempo. 16 step lights (LEN 8, 12 or 16): tap one to mute it, double-tap to accent it
 - **Touch**: glide across keys, haptic tick on note start (where the browser allows it)
@@ -34,9 +34,9 @@ It runs in the browser, works offline, and installs as an app.
 ## Controls
 
 ### Keyboard
-- Play notes with your computer keyboard (2 octaves mapped)
+- Play notes with your computer keyboard (20 keys: C up to the G of the next octave)
 - Use the OCT buttons to shift octaves
-- The layout is detected automatically and can be changed in the keyboard panel
+- Choose your layout in the keyboard panel (Settings on phones and tablets); it is saved, QWERTY by default
 
 ### Knobs
 - **Drag up/down** to change a value (hold **Shift** for fine steps)

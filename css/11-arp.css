@@ -49,8 +49,7 @@
 }
 
 .arp-bpm-stepper,
-.arp-touch-stepper,
-.arp-chips {
+.arp-touch-stepper {
     display: none;
 }
 
@@ -219,10 +218,6 @@ body[data-controls="sliders"] .arp-knob input[type="range"] {
    while the arp runs). The keyboard box keeps only the ARP switch, so the
    keys never move. Lights are big, gate / swing are sliders. ---- */
 @media (max-width: 1023px) {
-    .arp-chips {
-        display: none;
-    }
-
     .arp-set {
         display: flex;
     }

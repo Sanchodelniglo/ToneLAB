@@ -1,14 +1,8 @@
 // Synth engine: instrument construction and config, parameter updates, and note
 // triggering with the monotonic trigger clock.
-import { state, getDisplayLabel } from '../state.js';
+import { state } from '../state.js';
 
 // Initialize synth
-// The "Playing:" readout is optional (the desktop bar dropped it); any
-// element with id currentNote still receives the note name.
-function setNoteReadout(text) {
-    const el = document.getElementById('currentNote');
-    if (el) el.textContent = text;
-}
 
 function initSynth(type) {
     if (state.synth) {
@@ -16,7 +10,6 @@ function initSynth(type) {
         state.activeKeys.clear();
         state.activeTouches.clear();
         document.querySelectorAll('.key.pressed').forEach(k => k.classList.remove('pressed'));
-        setNoteReadout('\u2014');
         // Let the old voice ring out instead of cutting it with a click,
         // then free it once its longest plausible release tail has passed.
         const old = state.synth;
@@ -249,11 +242,6 @@ function nextTriggerTime() {
 function playNote(note) {
     if (!state.synth) return;
 
-    // Display note in chosen notation (e.g. "C#4" → "Do#4")
-    const noteName = note.replace(/\d+/, '');
-    const octaveNum = note.match(/\d+/)?.[0] || '';
-    setNoteReadout(getDisplayLabel(noteName) + octaveNum);
-
     const trigger = (time) => {
         if (state.currentInstrumentType === 'NoiseSynth') {
             state.synth.triggerAttack(time);
@@ -309,7 +297,6 @@ function stopNote(note) {
     }
 
     if (state.activeKeys.size === 0 && state.activeTouches.size === 0) {
-        setNoteReadout('\u2014');
         document.dispatchEvent(new Event('voicerelease')); // the last key is up: the playhead enters R
     }
 }
@@ -344,7 +331,6 @@ function releaseAllVoices() {
         if (typeof state.synth.releaseAll === 'function') state.synth.releaseAll();
         else state.synth.triggerRelease();
     } catch (_) { /* nothing sounding */ }
-    setNoteReadout('\u2014');
     document.dispatchEvent(new Event('voicerelease'));
 }
 

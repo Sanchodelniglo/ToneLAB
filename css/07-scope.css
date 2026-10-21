@@ -211,8 +211,3 @@
     text-transform: uppercase;
 }
 
-#currentNote {
-    color: var(--cyan-text);
-    font-weight: var(--weight-bold);
-}
-

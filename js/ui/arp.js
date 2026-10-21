@@ -154,14 +154,6 @@ function paint(step, note) {
     if (note) document.querySelectorAll(`.key[data-note="${note}"]`).forEach(k => k.classList.add('arp-playing'));
 }
 
-function paintChips() {
-    const a = state.arp;
-    document.querySelectorAll('[data-arp-cycle]').forEach(chip => {
-        const what = chip.dataset.arpCycle;
-        chip.textContent = what === 'mode' ? MODES[a.mode] : what === 'rate' ? RATES[a.rate] : String(Math.round(a.bpm));
-    });
-}
-
 function paintSteps() {
     const a = state.arp;
     ui.steps.forEach((el, i) => {
@@ -218,36 +210,8 @@ export function initArp() {
 
     fillSelect(ui.mode, MODES, state.arp.mode);
     fillSelect(ui.rate, RATES, state.arp.rate);
-    ui.mode.addEventListener('change', () => { state.arp.mode = ui.mode.value; patternIndex = 0; save(); ui.mode.blur(); paintChips(); });
-    ui.rate.addEventListener('change', () => { setRate(ui.rate.value); ui.rate.blur(); paintChips(); });
-
-    // Quick chips next to the lights: tap cycles mode / rate, BPM +5 (long press -5)
-    const cycle = (map, current, dir = 1) => { const keys = Object.keys(map); return keys[(keys.indexOf(current) + dir + keys.length) % keys.length]; };
-    document.querySelectorAll('[data-arp-cycle]').forEach(chip => {
-        const what = chip.dataset.arpCycle;
-        let pressTimer = null; let longPressed = false;
-        chip.addEventListener('pointerdown', () => {
-            if (what !== 'bpm') return;
-            longPressed = false;
-            pressTimer = setTimeout(() => { longPressed = true; nudgeBpm(-5); }, 450);
-        });
-        const clearPress = () => { clearTimeout(pressTimer); pressTimer = null; };
-        chip.addEventListener('pointerup', clearPress);
-        chip.addEventListener('pointercancel', clearPress);
-        chip.addEventListener('pointerleave', clearPress);
-        chip.addEventListener('click', () => {
-            if (what === 'mode') { ui.mode.value = cycle(MODES, state.arp.mode); ui.mode.dispatchEvent(new Event('change')); }
-            else if (what === 'rate') { ui.rate.value = cycle(RATES, state.arp.rate); ui.rate.dispatchEvent(new Event('change')); }
-            else if (!longPressed) nudgeBpm(5);
-            chip.blur();
-        });
-    });
-    function nudgeBpm(delta) {
-        ui.bpm.value = Math.max(Number(ui.bpm.min), Math.min(Number(ui.bpm.max), Number(ui.bpm.value) + delta));
-        ui.bpm.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    ui.bpm.addEventListener('input', paintChips);
-    paintChips();
+    ui.mode.addEventListener('change', () => { state.arp.mode = ui.mode.value; patternIndex = 0; save(); ui.mode.blur(); });
+    ui.rate.addEventListener('change', () => { setRate(ui.rate.value); ui.rate.blur(); });
 
     ui.octBtns.forEach(b => b.addEventListener('click', () => {
         state.arp.octaves = Number(b.dataset.arpOct);
